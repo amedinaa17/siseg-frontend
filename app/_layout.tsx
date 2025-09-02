@@ -1,21 +1,24 @@
 import { AuthProvider, useAuth } from "@/context/AuthProvider";
-import { Slot, useRouter } from "expo-router";
+import { Slot, useRouter, useSegments } from "expo-router";
 import React, { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 function AuthGate() {
   const { session, loading } = useAuth();
   const router = useRouter();
+  const segments = useSegments();
 
   useEffect(() => {
     if (!loading) {
-      if (!session) {
+      const inAuthGroup = segments[0] === "(auth)";
+
+      if (!session && !inAuthGroup) {
         router.replace("/(auth)/login");
-      } else {
+      } else if (session && inAuthGroup) {
         router.replace("/(app)");
       }
     }
-  }, [session, loading]);
+  }, [session, loading, segments]);
 
   if (loading) {
     return (

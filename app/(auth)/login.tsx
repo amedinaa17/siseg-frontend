@@ -66,10 +66,10 @@ export default function Login() {
           <ErrorText>{errors.password?.message}</ErrorText>
         </View>
 
-        <Text style={styles.forgot}>¿Olvidaste tu contraseña?</Text>
+        <Link href="/(auth)/reset-password" style={styles.forgot}>¿Olvidaste tu contraseña?</Link>
 
         <Button
-          title={'Iniciar sesión'}
+          title={isSubmitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitting}
         />

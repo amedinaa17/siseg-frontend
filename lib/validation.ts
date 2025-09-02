@@ -20,8 +20,8 @@ export const authSchema = z.object({
 
 export type AuthForm = z.infer<typeof authSchema>;
 
-// Esquema para registro
-export const registerSchema = z.object({
+// Validación para correo
+export const emailSchema = z.object({
   correo: z
     .string()
     .nonempty("Este campo es obligatorio")
@@ -32,4 +32,4 @@ export const registerSchema = z.object({
     ),
 });
 
-export type RegisterForm = z.infer<typeof registerSchema>;
+export type EmailForm = z.infer<typeof emailSchema>;

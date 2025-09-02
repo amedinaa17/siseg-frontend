@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
@@ -10,11 +10,9 @@ import Button from "@/components/ui/Button";
 import ErrorText from "@/components/ui/ErrorText";
 import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
 
-import { useAuth } from "@/context/AuthProvider";
 import { emailSchema, type EmailForm } from "@/lib/validation";
 
-export default function Register() {
-  const { signUp } = useAuth();
+export default function ResetPassword() {
   const {
     control,
     handleSubmit,
@@ -25,7 +23,10 @@ export default function Register() {
   });
 
   const onSubmit = async ({ correo }: EmailForm) => {
-    await signUp(correo);
+    Alert.alert(
+      "Recuperación enviada",
+      `Se ha enviado un correo a ${correo} con instrucciones para restablecer tu contraseña.`
+    );
   };
 
   return (
@@ -33,9 +34,9 @@ export default function Register() {
       <Header />
 
       <View style={styles.formWrapper}>
-        <Text style={styles.title}>Registro</Text>
+        <Text style={styles.title}>Restablecer Contraseña</Text>
 
-        <View style={{ marginBottom: 25 }}>
+        <View style={{ marginBottom: 10 }}>
           <Controller
             control={control}
             name="correo"
@@ -54,7 +55,7 @@ export default function Register() {
         </View>
 
         <Button
-          title={isSubmitting ? "Registrando…" : "Registrar"}
+          title={isSubmitting ? "Enviando…" : "Recuperar contraseña"}
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitting}
         />
@@ -99,8 +100,8 @@ const styles = StyleSheet.create({
   },
   divider: {
     borderBottomWidth: 1,
-    borderColor: '#d1d5db',
-    marginVertical: 25,
+    borderColor: "#d1d5db",
+    marginVertical: 16,
   },
   registerText: {
     textAlign: "center",
