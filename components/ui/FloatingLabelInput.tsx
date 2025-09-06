@@ -1,3 +1,4 @@
+import { Colors } from '@/theme/colors';
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -5,6 +6,7 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  Text,
   TextInput,
   TextInputProps,
   View,
@@ -12,7 +14,7 @@ import {
 
 type Props = TextInputProps & {
   label: string;
-  error?: boolean;
+  error?: string;
 };
 
 export default function FloatingLabelInput({
@@ -42,22 +44,22 @@ export default function FloatingLabelInput({
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-    color: error ? "#dc2626" : focused ? "#2563eb" : "#9ca3af",
-    backgroundColor: "#fff",
+    color: error ? Colors.error : focused ? Colors.link : Colors.lightText,
+    backgroundColor: Colors.background,
     paddingHorizontal: 4,
   };
 
   return (
-    <View style={{ marginBottom: 20 }}>
+    <View>
       <View
         style={[
           styles.wrapper,
           {
             borderColor: error
-              ? "#dc2626"
+              ? Colors.error
               : focused
-              ? "#2563eb"
-              : "#d1d5db",
+              ? Colors.link
+              : Colors.lightText,
           },
         ]}
       >
@@ -83,7 +85,6 @@ export default function FloatingLabelInput({
           ]}
         />
 
-        {/* 👁 Botón toggle */}
         {secureTextEntry && (
           <Pressable
             onPress={() => setShowPassword((prev) => !prev)}
@@ -97,6 +98,10 @@ export default function FloatingLabelInput({
           </Pressable>
         )}
       </View>
+
+      {error && (
+        <Text style={styles.errorText}>{error}</Text>
+      )}
     </View>
   );
 }
@@ -105,8 +110,8 @@ const styles = StyleSheet.create({
   wrapper: {
     borderWidth: 1,
     borderRadius: 8,
-    borderColor: "#d1d5db",
-    backgroundColor: "#fff",
+    borderColor: Colors.lightText,
+    backgroundColor: Colors.background,
     position: "relative",
     flexDirection: "row",
     alignItems: "center",
@@ -118,11 +123,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 10,
     paddingBottom: 6,
-    color: "#111827",
+    color: Colors.secondary,
   },
   icon: {
     position: "absolute",
     right: 12,
     padding: 6,
+  },
+  errorText: {
+    color: Colors.error,
+    marginTop: 5,
+    fontSize: 13,
   },
 });

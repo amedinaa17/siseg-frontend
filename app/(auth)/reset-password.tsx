@@ -1,16 +1,14 @@
+import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
+import Button from "@/components/ui/Button";
+import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import { emailSchema, type EmailForm } from "@/lib/validation";
+import { Colors, Fonts } from '@/theme/colors';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, StyleSheet, Text, View } from "react-native";
-
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
-import Button from "@/components/ui/Button";
-import ErrorText from "@/components/ui/ErrorText";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
-
-import { emailSchema, type EmailForm } from "@/lib/validation";
+import { Alert, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ResetPassword() {
   const {
@@ -30,86 +28,100 @@ export default function ResetPassword() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Header />
+    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <Header />
+        <View style={styles.formWrapper}>
+          <Text style={styles.title}>Restablecer Contraseña</Text>
 
-      <View style={styles.formWrapper}>
-        <Text style={styles.title}>Restablecer Contraseña</Text>
+          <View style={{ marginBottom: 25 }}>
+            <Controller
+              control={control}
+              name="correo"
+              render={({ field: { onChange, value } }) => (
+                <FloatingLabelInput
+                  label="Correo Electrónico Institucional"
+                  value={value}
+                  onChangeText={onChange}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  error={errors.correo?.message}
+                />
+              )}
+            />
+          </View>
 
-        <View style={{ marginBottom: 10 }}>
-          <Controller
-            control={control}
-            name="correo"
-            render={({ field: { onChange, value } }) => (
-              <FloatingLabelInput
-                label="Correo Electrónico Institucional"
-                value={value}
-                onChangeText={onChange}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                error={!!errors.correo}
-              />
-            )}
+          <Button
+            title={isSubmitting ? "Enviando…" : "Recuperar contraseña"}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
           />
-          <ErrorText>{errors.correo?.message}</ErrorText>
+
+          <View style={styles.divider} />
+
+          <Text style={styles.registerText}>
+            ¿Ya tienes una cuenta?{" "}
+            <Link href="/(auth)/login" style={styles.registerLink}>
+              Inicia sesión aquí
+            </Link>
+          </Text>
         </View>
-
-        <Button
-          title={isSubmitting ? "Enviando…" : "Recuperar contraseña"}
-          onPress={handleSubmit(onSubmit)}
-          disabled={isSubmitting}
-        />
-
-        <View style={styles.divider} />
-
-        <Text style={styles.registerText}>
-          ¿Ya tienes una cuenta?{" "}
-          <Link href="/(auth)/login" style={styles.registerLink}>
-            Inicia sesión aquí
-          </Link>
-        </Text>
-      </View>
-
-      <Footer />
+        <Footer />
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   formWrapper: {
     width: "90%",
     maxWidth: 500,
     margin: "auto",
     padding: 24,
     borderWidth: 1,
-    borderColor: '#d1d5db',
     borderRadius: 12,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 6,
+    borderColor: Colors.borderColor,
+    backgroundColor: Colors.background,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: '0px 4px 6px rgba(0,0,0,0.05)',
+      },
+    }),
     elevation: 2,
   },
   title: {
-    fontSize: 24,
+    fontSize: Fonts.title,
+    color: Colors.secondary,
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 24,
-    color: "#111827",
   },
   divider: {
+    borderColor: Colors.borderColor,
     borderBottomWidth: 1,
-    borderColor: "#d1d5db",
     marginVertical: 16,
   },
   registerText: {
+    fontSize: Fonts.text,
+    color: Colors.darkText,
     textAlign: "center",
-    fontSize: 14,
-    color: "#374151",
   },
   registerLink: {
-    color: "#2563eb",
+    color: Colors.link,
     fontWeight: "500",
   },
 });
