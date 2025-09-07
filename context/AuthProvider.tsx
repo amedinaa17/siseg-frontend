@@ -1,7 +1,7 @@
 import { sessionStorage } from "@/lib/session";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-export type Session = { boleta: string; correo?: string } | null;
+export type Session = { boleta: string; correo?: string; rol?: string } | null;
 
 type AuthContextType = {
   session: Session;
@@ -18,32 +18,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const raw = await sessionStorage.getItem("AUTH_SESSION");
-        if (raw) setSession(JSON.parse(raw));
-      } catch (e) {
-        console.error("Error cargando sesión:", e);
-      } finally {
-        setLoading(false);
+  const loadSession = async () => {
+    try {
+      const raw = await sessionStorage.getItem("AUTH_SESSION");
+      if (raw) {
+        setSession(JSON.parse(raw));
       }
-    })();
-  }, []);
-
-  const signIn = async (boleta: string, password: string) => {
-    // ⚠️ Aquí va tu lógica real contra la API de login
-    const fakeSession = { boleta };
-    await sessionStorage.setItem("AUTH_SESSION", JSON.stringify(fakeSession));
-    setSession(fakeSession);
+    } catch (e) {
+      console.error("Error cargando sesión:", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const signUp = async (correo: string,) => {
-    console.log("Nuevo usuario registrado:", correo);
+  loadSession();
+}, []);
 
-    // Supongamos que al registrarse el backend devuelve la boleta asignada
-    const fakeSession = { boleta: "20250001", correo };
-    await sessionStorage.setItem("AUTH_SESSION", JSON.stringify(fakeSession));
-    setSession(fakeSession);
+
+  const signIn = async (boleta: string, password: string) => {
+    setLoading(true);
+    try {
+      const authenticatedSession = { boleta: boleta, rol: "alumno" };
+
+      await sessionStorage.setItem("AUTH_SESSION", JSON.stringify(authenticatedSession));
+      setSession(authenticatedSession);
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signUp = async (correo: string) => {
+    console.log("Nuevo usuario registrado:", correo);
   };
 
   const signOut = async () => {
