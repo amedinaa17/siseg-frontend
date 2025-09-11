@@ -1,32 +1,32 @@
-import { Colors, Fonts } from '@/theme/colors';
+import { Colores, Fuentes } from '@/temas/colores';
 import React from "react";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
-export default function HomeScreen() {
-  const isMobile = Platform.OS === "ios" || Platform.OS === "android";
+export default function InicioAlumno() {
+  const esMovil = Platform.OS === "ios" || Platform.OS === "android";
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.formWrapper}>
-          <View style={styles.header}>
-            <Text style={styles.sisegText}>SISEG</Text>
-            {!isMobile && (
-              <Text style={styles.sisegDescription}>
+        <View style={styles.contenedorFormulario}>
+          <View style={styles.encabezado}>
+            <Text style={styles.sisegTexto}>SISEG</Text>
+            {!esMovil && (
+              <Text style={styles.sisegDescripcion}>
                 Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
               </Text>
             )}
           </View>
 
-          <Text style={styles.title}>Bienvenido</Text>
-          <Text style={styles.nameText}>Medina Angeles Ana Cristina</Text>
-          <Text style={styles.idText}>2022630301</Text>
+          <Text style={styles.titulo}>Bienvenido</Text>
+          <Text style={styles.nombreAlumno}>Medina Angeles Ana Cristina</Text>
+          <Text style={styles.idAlumno}>2022630301</Text>
 
-          <View style={styles.footer}>
-            <View style={styles.avisoContainer}>
-              <Text style={styles.avisoText}>AVISO</Text>
-              <View style={styles.separator} />
-              <Text style={styles.footerText}>
+          <View style={styles.piePagina}>
+            <View style={styles.avisoContenedor}>
+              <Text style={styles.avisoTexto}>AVISO</Text>
+              <View style={styles.separador} />
+              <Text style={styles.piePaginaTexto}>
                 Tus datos personales son protegidos conforme a lo establecido por la Ley General de Protección de Datos Personales en Posesión de los Particulares.
               </Text>
             </View>
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  formWrapper: {
+  contenedorFormulario: {
     width: "90%",
     maxWidth: 1000,
     height: "80%",
@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colors.borderColor,
-    backgroundColor: Colors.background,
+    borderColor: Colores.bordes,
+    backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
         shadowColor: "#000",
@@ -68,65 +68,65 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  header: {
+  encabezado: {
     flexDirection: "row",
     justifyContent: "flex-end",
     flexWrap: "nowrap",
     alignItems: "center",
     marginBottom: 24,
   },
-  sisegText: {
-    fontSize: Fonts.big,
-    color: Colors.primary,
+  sisegTexto: {
+    fontSize: Fuentes.grande,
+    color: Colores.textoGuinda,
     fontWeight: "700",
     marginRight: 12,
   },
-  sisegDescription: {
-    fontSize: Fonts.text,
-    color: Colors.darkText,
+  sisegDescripcion: {
+    fontSize: Fuentes.texto,
+    color: Colores.textoOscuro,
     flexWrap: "nowrap",
   },
-  title: {
-    fontSize: Fonts.title,
-    color: Colors.primary,
+  titulo: {
+    fontSize: Fuentes.titulo,
+    color: Colores.textoGuinda,
     fontWeight: "700",
     marginTop: 25,
     marginBottom: 5,
   },
-  nameText: {
-    fontSize: Fonts.medium,
-    color: Colors.secondary,
+  nombreAlumno: {
+    fontSize: Fuentes.mediano,
+    color: Colores.texto,
   },
-  idText: {
-    fontSize: Fonts.medium,
-    color: Colors.darkText,
+  idAlumno: {
+    fontSize: Fuentes.mediano,
+    color: Colores.textoOscuro,
   },
-  footer: {
+  piePagina: {
     marginTop: 50,
     paddingVertical: 10,
     flex: 1,
     justifyContent: 'flex-end',
   },
-  avisoContainer: {
+  avisoContenedor: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
-  avisoText: {
-    fontSize: Fonts.title,
-    color: Colors.primary,
+  avisoTexto: {
+    fontSize: Fuentes.titulo,
+    color: Colores.textoGuinda,
     fontWeight: "700",
     marginRight: 10,
   },
-  separator: {
-    backgroundColor: Colors.primary,
+  separador: {
+    backgroundColor: Colores.textoGuinda,
     width: 1.5,
     height: 35,
     marginRight: 10,
   },
-  footerText: {
-    fontSize: Fonts.small,
-    color: Colors.darkText,
+  piePaginaTexto: {
+    fontSize: Fuentes.pequeño,
+    color: Colores.textoOscuro,
     flex: 1,
     textAlign: 'right',
   },

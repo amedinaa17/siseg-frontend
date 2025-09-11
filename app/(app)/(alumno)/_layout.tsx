@@ -1,6 +1,6 @@
-import AlumnoNavbarWeb from '@/components/layout/AlumnoNavbarWeb';
+import AlumnoMenuWeb from '@/componentes/layout/AlumnoMenuWeb';
 import { useAuth } from "@/context/AuthProvider";
-import { Colors, Fonts } from '@/theme/colors';
+import { Colores, Fuentes } from '@/temas/colores';
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { Slot, useRouter } from "expo-router";
 import { Drawer } from "expo-router/drawer";
@@ -8,16 +8,16 @@ import React, { useState } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function AlumnoLayout() {
-  const isMobile = Platform.OS === "ios" || Platform.OS === "android";
+  const esMovil = Platform.OS === "ios" || Platform.OS === "android";
 
-  if (isMobile) {
+  if (esMovil) {
     return (
       <Drawer
         screenOptions={{
-          headerStyle: { backgroundColor: Colors.backgroundIPN },
-          headerTintColor: Colors.lightSecondary,
-          drawerActiveTintColor: Colors.primary,
-          drawerStyle: { backgroundColor: Colors.background },
+          headerStyle: { backgroundColor: Colores.fondoIPN },
+          headerTintColor: Colores.textoBlanco,
+          drawerActiveTintColor: Colores.textoGuinda,
+          drawerStyle: { backgroundColor: Colores.fondo },
         }}
         drawerContent={(props) => <AlumnoDrawerContent {...props} />}
       >
@@ -25,7 +25,7 @@ export default function AlumnoLayout() {
         <Drawer.Screen name="AcuseSolicitud" options={{ title: "Acuse de Solicitud" }} />
         <Drawer.Screen name="Expediente" options={{ title: "Ver Expediente" }} />
         <Drawer.Screen name="CursoInduccion" options={{ title: "Curso de Inducción" }} />
-        <Drawer.Screen name="CatalogoPlazas" options={{ title: "Catálogo de Plazas" }} />
+        <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
         <Drawer.Screen name="PlazaAsignada" options={{ title: "Plaza Asignada" }} />
         <Drawer.Screen name="SituacionRiesgo" options={{ title: "Situación de Riesgo" }} />
         <Drawer.Screen name="Encuesta" options={{ title: "Encuesta de Satisfacción" }} />
@@ -35,24 +35,24 @@ export default function AlumnoLayout() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <AlumnoNavbarWeb />
+    <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
+      <AlumnoMenuWeb />
       <Slot />
     </View>
   );
 }
 
 function AlumnoDrawerContent(props) {
-  const { signOut } = useAuth();
+  const { cerrarSesion } = useAuth();
   const router = useRouter();
 
-  const [expedienteOpen, setExpedienteOpen] = useState(false);
-  const [plazasOpen, setPlazasOpen] = useState(false);
-  const [reportesOpen, setReportesOpen] = useState(false);
+  const [submenuExpediente, setsubmenuExpediente] = useState(false);
+  const [submenuPlazas, setSubmenuPlazas] = useState(false);
+  const [submenuReportes, setSubmenuReportes] = useState(false);
 
   const handleLogout = async () => {
-    await signOut();
-    router.replace("/(auth)/login");
+    await cerrarSesion();
+    router.replace("/(auth)/iniciar-sesion");
   };
 
   return (
@@ -63,15 +63,15 @@ function AlumnoDrawerContent(props) {
       />
 
       <TouchableOpacity
-        onPress={() => setExpedienteOpen(!expedienteOpen)}
-        style={drawerStyles.sectionHeader}
+        onPress={() => setsubmenuExpediente(!submenuExpediente)}
+        style={drawerStyles.seccionEncabezado}
       >
-        <Text style={drawerStyles.sectionHeaderText}>
-          EXPEDIENTE DIGITAL {expedienteOpen ? "▴" : "▾"}
+        <Text style={drawerStyles.seccionEncabezadoTexto}>
+          EXPEDIENTE DIGITAL {submenuExpediente ? "▴" : "▾"}
         </Text>
       </TouchableOpacity>
-      {expedienteOpen && (
-        <View style={drawerStyles.submenuContainer}>
+      {submenuExpediente && (
+        <View style={drawerStyles.submenuContenedor}>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
             onPress={() => router.push("/")}
@@ -89,22 +89,22 @@ function AlumnoDrawerContent(props) {
 
       <DrawerItem
         label="CURSO DE INDUCCIÓN"
-        onPress={() => router.push("/(app)/(alumno)/CatalogoPlazas")}
+        onPress={() => router.push("/(app)/(alumno)/catalogo-plazas")}
       />
 
       <TouchableOpacity
-        onPress={() => setPlazasOpen(!plazasOpen)}
-        style={drawerStyles.sectionHeader}
+        onPress={() => setSubmenuPlazas(!submenuPlazas)}
+        style={drawerStyles.seccionEncabezado}
       >
-        <Text style={drawerStyles.sectionHeaderText}>
-          PLAZAS {plazasOpen ? "▴" : "▾"}
+        <Text style={drawerStyles.seccionEncabezadoTexto}>
+          PLAZAS {submenuPlazas ? "▴" : "▾"}
         </Text>
       </TouchableOpacity>
-      {plazasOpen && (
-        <View style={drawerStyles.submenuContainer}>
+      {submenuPlazas && (
+        <View style={drawerStyles.submenuContenedor}>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/(app)/(alumno)/CatalogoPlazas")}
+            onPress={() => router.push("/(app)/(alumno)/catalogo-plazas")}
           >
             <Text style={drawerStyles.submenuText}>Catálogo de Plazas</Text>
           </TouchableOpacity>
@@ -118,15 +118,15 @@ function AlumnoDrawerContent(props) {
       )}
 
       <TouchableOpacity
-        onPress={() => setReportesOpen(!reportesOpen)}
-        style={drawerStyles.sectionHeader}
+        onPress={() => setSubmenuReportes(!submenuReportes)}
+        style={drawerStyles.seccionEncabezado}
       >
-        <Text style={drawerStyles.sectionHeaderText}>
-          REPORTES {reportesOpen ? "▴" : "▾"}
+        <Text style={drawerStyles.seccionEncabezadoTexto}>
+          REPORTES {submenuReportes ? "▴" : "▾"}
         </Text>
       </TouchableOpacity>
-      {reportesOpen && (
-        <View style={drawerStyles.submenuContainer}>
+      {submenuReportes && (
+        <View style={drawerStyles.submenuContenedor}>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
             onPress={() => router.push("/")}
@@ -147,32 +147,32 @@ function AlumnoDrawerContent(props) {
         onPress={() => router.push("/")}
       />
 
-      <View><Text style={{ color: Colors.borderColor }}>──────────────────</Text></View>
+      <View><Text style={{ color: Colores.borderColor }}>──────────────────</Text></View>
 
       <DrawerItem
         label="CERRAR SESIÓN"
-        labelStyle={{ color: Colors.primary, fontWeight: "600" }}
+        labelStyle={{ color: Colores.textoGuinda, fontWeight: "600" }}
         onPress={handleLogout}
       />
     </DrawerContentScrollView>
   );
 }
 const drawerStyles = StyleSheet.create({
-  sectionHeader: {
+  seccionEncabezado: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 11,
     paddingStart: 16,
     paddingEnd: 24,
-    backgroundColor: Colors.background,
+    backgroundColor: Colores.fondo,
   },
-  sectionHeaderText: {
+  seccionEncabezadoTexto: {
     flex: 1,
     color: '#5f5f5fff',
     lineHeight: 24,
     fontWeight: "500",
   },
-  submenuContainer: {
+  submenuContenedor: {
     overflow: "hidden",
     marginLeft: 32,
   },
@@ -184,7 +184,7 @@ const drawerStyles = StyleSheet.create({
     paddingEnd: 24,
   },
   submenuText: {
-    fontSize: Fonts.text,
+    fontSize: Fuentes.texto,
     color: '#5f5f5fff',
     flex: 1,
     lineHeight: 20,

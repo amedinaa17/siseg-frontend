@@ -1,64 +1,64 @@
 import { useAuth } from "@/context/AuthProvider";
-import { Colors, Fonts } from "@/theme/colors";
+import { Colores, Fuentes } from "@/temas/colores";
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export default function AlumnoNavbarWeb() {
-  const { signOut } = useAuth();
+export default function AlumnoMenuWeb() {
+  const { cerrarSesion } = useAuth();
   const router = useRouter();
-  const [showSubmenuExpediente, setShowSubmenuExpediente] = useState(false);
-  const [showSubmenuPlazas, setShowSubmenuPlazas] = useState(false);
-  const [showSubmenuReportes, setShowSubmenuReportes] = useState(false);
+  const [mostrarSubmenuExpediente, setMostrarSubmenuExpediente] = useState(false);
+  const [mostrarSubmenuPlazas, setMostrarSubmenuPlazas] = useState(false);
+  const [mostrarSubmenuReportes, setMostrarSubmenuReportes] = useState(false);
 
   const handleLogout = async () => {
-    await signOut();
-    router.replace("/(auth)/login");
+    await cerrarSesion();
+    router.replace("/(auth)/iniciar-sesion");
   };
 
   const toggleExpediente = () => {
-    setShowSubmenuExpediente(!showSubmenuExpediente);
-    setShowSubmenuPlazas(false);
-    setShowSubmenuReportes(false);
+    setMostrarSubmenuExpediente(!mostrarSubmenuExpediente);
+    setMostrarSubmenuPlazas(false);
+    setMostrarSubmenuReportes(false);
   };
 
   const togglePlazas = () => {
-    setShowSubmenuPlazas(!showSubmenuPlazas);
-    setShowSubmenuExpediente(false);
-    setShowSubmenuReportes(false);
+    setMostrarSubmenuPlazas(!mostrarSubmenuPlazas);
+    setMostrarSubmenuExpediente(false);
+    setMostrarSubmenuReportes(false);
   };
 
   const toggleReportes = () => {
-    setShowSubmenuReportes(!showSubmenuReportes);
-    setShowSubmenuExpediente(false);
-    setShowSubmenuPlazas(false);
+    setMostrarSubmenuReportes(!mostrarSubmenuReportes);
+    setMostrarSubmenuExpediente(false);
+    setMostrarSubmenuPlazas(false);
   };
 
   return (
-    <View style={styles.navbar}>
+    <View style={styles.menu}>
       <Link href="/(app)/(alumno)" asChild>
         <TouchableOpacity>
-          <Text style={styles.navItem}>INICIO</Text>
+          <Text style={styles.menuItem}>INICIO</Text>
         </TouchableOpacity>
       </Link>
 
-      <View style={styles.dropdown}>
+      <View style={styles.submenuContenedor}>
         <TouchableOpacity onPress={toggleExpediente}>
-          <Text style={styles.navItem}>
-            EXPEDIENTE DIGITAL {showSubmenuExpediente ? "▴" : "▾"}
+          <Text style={styles.menuItem}>
+            EXPEDIENTE DIGITAL {mostrarSubmenuExpediente ? "▴" : "▾"}
           </Text>
         </TouchableOpacity>
 
-        {showSubmenuExpediente && (
+        {mostrarSubmenuExpediente && (
           <View style={styles.submenu}>
             <Link href="/" asChild>
               <TouchableOpacity>
-                <Text style={styles.subItem}>Acuse de Solicitud</Text>
+                <Text style={styles.submenuitem}>Acuse de Solicitud</Text>
               </TouchableOpacity>
             </Link>
             <Link href="/" asChild>
               <TouchableOpacity>
-                <Text style={styles.subItem}>Ver Expediente</Text>
+                <Text style={styles.submenuitem}>Ver Expediente</Text>
               </TouchableOpacity>
             </Link>
           </View>
@@ -67,51 +67,51 @@ export default function AlumnoNavbarWeb() {
 
       <Link href="/" asChild>
         <TouchableOpacity>
-          <Text style={styles.navItem}>CURSO DE INDUCCIÓN</Text>
+          <Text style={styles.menuItem}>CURSO DE INDUCCIÓN</Text>
         </TouchableOpacity>
       </Link>
 
-      <View style={styles.dropdown}>
+      <View style={styles.submenuContenedor}>
         <TouchableOpacity onPress={togglePlazas}>
-          <Text style={styles.navItem}>
-            PLAZAS {showSubmenuPlazas ? "▴" : "▾"}
+          <Text style={styles.menuItem}>
+            PLAZAS {mostrarSubmenuPlazas ? "▴" : "▾"}
           </Text>
         </TouchableOpacity>
 
-        {showSubmenuPlazas && (
+        {mostrarSubmenuPlazas && (
           <View style={styles.submenu}>
-            <Link href="/(app)/(alumno)/CatalogoPlazas" asChild>
+            <Link href="/(app)/(alumno)/catalogo-plazas" asChild>
               <TouchableOpacity>
-                <Text style={styles.subItem}>Cátalogo de Plazas</Text>
+                <Text style={styles.submenuitem}>Cátalogo de Plazas</Text>
               </TouchableOpacity>
             </Link>
             <Link href="/" asChild>
               <TouchableOpacity>
-                <Text style={styles.subItem}>Plaza Asignada</Text>
+                <Text style={styles.submenuitem}>Plaza Asignada</Text>
               </TouchableOpacity>
             </Link>
           </View>
         )}
       </View>
 
-      <View style={styles.dropdown}>
+      <View style={styles.submenuContenedor}>
         <TouchableOpacity onPress={toggleReportes}>
-          <Text style={styles.navItem}>
-            REPORTES {showSubmenuReportes ? "▴" : "▾"}
+          <Text style={styles.menuItem}>
+            REPORTES {mostrarSubmenuReportes ? "▴" : "▾"}
           </Text>
         </TouchableOpacity>
 
-        {showSubmenuReportes && (
+        {mostrarSubmenuReportes && (
 
           <View style={styles.submenu}>
             <Link href="/" asChild>
               <TouchableOpacity>
-                <Text style={styles.subItem}>Situación de Riesgo</Text>
+                <Text style={styles.submenuitem}>Situación de Riesgo</Text>
               </TouchableOpacity>
             </Link>
             <Link href="/" asChild>
               <TouchableOpacity>
-                <Text style={styles.subItem}>Encuesta de Satisfacción</Text>
+                <Text style={styles.submenuitem}>Encuesta de Satisfacción</Text>
               </TouchableOpacity>
             </Link>
           </View>
@@ -120,37 +120,37 @@ export default function AlumnoNavbarWeb() {
 
       <Link href="/" asChild>
         <TouchableOpacity>
-          <Text style={styles.navItem}>MI PERFIL</Text>
+          <Text style={styles.menuItem}>MI PERFIL</Text>
         </TouchableOpacity>
       </Link>
 
       <TouchableOpacity onPress={handleLogout}>
-        <Text style={styles.navItem}>CERRAR SESIÓN</Text>
+        <Text style={styles.menuItem}>CERRAR SESIÓN</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  navbar: {
+  menu: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: Colors.backgroundIPN,
+    backgroundColor: Colores.fondoIPN,
     paddingVertical: 13,
     position: "relative",
     zIndex: 1,
   },
-  navItem: {
-    fontSize: Fonts.text,
-    color: Colors.lightSecondary,
+  menuItem: {
+    fontSize: Fuentes.texto,
+    color: Colores.textoBlanco,
     fontWeight: "600",
   },
-  dropdown: {
+  submenuContenedor: {
     position: "relative",
   },
   submenu: {
-    backgroundColor: Colors.background,
-    borderColor: Colors.borderColor,
+    backgroundColor: Colores.fondo,
+    borderColor: Colores.bordes,
     position: "absolute",
     top: 30,
     left: 0,
@@ -160,9 +160,9 @@ const styles = StyleSheet.create({
     minWidth: 180,
     elevation: 5,
   },
-  subItem: {
-    fontSize: Fonts.text,
-    color: Colors.darkText,
+  submenuitem: {
+    fontSize: Fuentes.texto,
+    color: Colores.textoOscuro,
     paddingVertical: 6,
     paddingHorizontal: 10,
   },

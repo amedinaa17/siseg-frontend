@@ -1,44 +1,44 @@
-import Footer from '@/components/layout/Footer';
-import Header from '@/components/layout/Header';
-import Button from '@/components/ui/Button';
-import FloatingLabelInput from '@/components/ui/FloatingLabelInput';
+import Encabezado from '@/componentes/layout/Encabezado';
+import PiePagina from '@/componentes/layout/PiePagina';
+import Boton from '@/componentes/ui/Boton';
+import EntradaEtiquetaFlotante from '@/componentes/ui/EntradaEtiquetaFlotante';
 import { useAuth } from '@/context/AuthProvider';
-import { authSchema, type AuthForm } from '@/lib/validation';
-import { Colors, Fonts } from '@/theme/colors';
+import { iniciarSesionEsquema, type IniciarSesionFormulario } from '@/lib/validacion';
+import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'expo-router';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-export default function Login() {
-  const { signIn } = useAuth();
+export default function IniciarSesion() {
+  const { iniciarSesion } = useAuth();
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<AuthForm>({
-    resolver: zodResolver(authSchema),
-    defaultValues: { boleta: "", password: "" },
+  } = useForm<IniciarSesionFormulario>({
+    resolver: zodResolver(iniciarSesionEsquema),
+    defaultValues: { boleta: "", contraseña: "" },
   });
 
-  const onSubmit = async ({ boleta, password }: AuthForm) => {
-    await signIn(boleta, password);
+  const onSubmit = async ({ boleta, contraseña }: IniciarSesionFormulario) => {
+    await iniciarSesion(boleta, contraseña);
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Header />
-        <View style={styles.formWrapper}>
-          <Text style={styles.title}>Inicio de Sesión</Text>
+        <Encabezado />
+        <View style={styles.contenedorFormulario}>
+          <Text style={styles.titulo}>Inicio de Sesión</Text>
 
           <View style={{ marginBottom: 15 }}>
             <Controller
               control={control}
               name="boleta"
               render={({ field: { onChange, value } }) => (
-                <FloatingLabelInput
+                <EntradaEtiquetaFlotante
                   label="Boleta"
                   value={value}
                   onChangeText={onChange}
@@ -52,40 +52,40 @@ export default function Login() {
           <View style={{ marginBottom: 15 }}>
             <Controller
               control={control}
-              name="password"
+              name="contraseña"
               render={({ field: { onChange, value } }) => (
-                <FloatingLabelInput
+                <EntradaEtiquetaFlotante
                   label="Contraseña"
                   secureTextEntry
                   value={value}
                   onChangeText={onChange}
-                  error={errors.password?.message}
+                  error={errors.contraseña?.message}
                 />
               )}
             />
           </View>
 
-          <Link href="/(auth)/reset-password" style={styles.forgot}>¿Olvidaste tu contraseña?</Link>
+          <Link href="/(auth)/restablecer-contrasena" style={styles.olvidarContraseña}>¿Olvidaste tu contraseña?</Link>
 
-          <Button
+          <Boton
             title={isSubmitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
             onPress={handleSubmit(onSubmit)}
             disabled={isSubmitting}
           />
 
-          <View style={styles.divider} />
+          <View style={styles.separador} />
 
-          <Text style={styles.registerText}>
+          <Text style={styles.iniciarSesionTexto}>
             ¿Aún no tienes una cuenta?{' '}
-            <Link href="/(auth)/register" style={styles.registerLink}>
+            <Link href="/(auth)/registro" style={styles.iniciarSesionLink}>
               Regístrate aquí
             </Link>
           </Text>
-            <Link href="/(auth)/complete-register" style={styles.registerLink}>
+            <Link href="/(auth)/completar-registro" style={styles.iniciarSesionLink}>
               prueba
             </Link>
         </View>
-        <Footer />
+        <PiePagina />
       </ScrollView>
     </View>
   );
@@ -97,15 +97,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  formWrapper: {
+  contenedorFormulario: {
     width: "90%",
     maxWidth: 500,
     margin: "auto",
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colors.borderColor,
-    backgroundColor: Colors.background,
+    borderColor: Colores.bordes,
+    backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -122,31 +122,31 @@ const styles = StyleSheet.create({
     }),
     elevation: 2,
   },
-  title: {
-    fontSize: Fonts.title,
-    color: Colors.secondary,
+  titulo: {
+    fontSize: Fuentes.titulo,
+    color: Colores.texto,
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 24,
   },
-  forgot: {
-    fontSize: Fonts.small,
-    color: Colors.lightText,
+  olvidarContraseña: {
+    fontSize: Fuentes.small,
+    color: Colores.textoClaro,
     textAlign: 'right',
     marginBottom: 25,
   },
-  divider: {
-    borderColor: Colors.borderColor,
+  separador: {
+    borderColor: Colores.bordes,
     borderBottomWidth: 1,
     marginVertical: 25,
   },
-  registerText: {
-    fontSize: Fonts.text,
-    color: Colors.darkText,
+  iniciarSesionTexto: {
+    fontSize: Fuentes.texto,
+    color: Colores.textoOscuro,
     textAlign: 'center',
   },
-  registerLink: {
-    color: Colors.link,
+  iniciarSesionLink: {
+    color: Colores.link,
     fontWeight: '500',
   },
 });

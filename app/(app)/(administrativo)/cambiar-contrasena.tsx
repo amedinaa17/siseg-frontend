@@ -1,47 +1,47 @@
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
-import Button from "@/components/ui/Button";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
-import { ChangePasswordForm, changePasswordSchema } from "@/lib/validation";
-import { Colors, Fonts } from '@/theme/colors';
+import Encabezado from "@/componentes/layout/Encabezado";
+import PiePagina from "@/componentes/layout/PiePagina";
+import Boton from "@/componentes/ui/Boton";
+import EntradaEtiquetaFlotante from "@/componentes/ui/EntradaEtiquetaFlotante";
+import { CambiarContraseñaFormulario, cambiarContraseñaEsquema } from "@/lib/validacion";
+import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 
-export default function ChangePassword() {
+export default function CambiarContraseña() {
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<ChangePasswordForm>({
-    resolver: zodResolver(changePasswordSchema),
-    defaultValues: { password: "", confirmPassword: "" },
+  } = useForm<CambiarContraseñaFormulario>({
+    resolver: zodResolver(cambiarContraseñaEsquema),
+    defaultValues: { contraseña: "", confirmarContraseña: "" },
   });
 
-  const onSubmit = async ({ password }: ChangePasswordForm) => {
+  const onSubmit = async ({ contraseña }: CambiarContraseñaFormulario) => {
     Alert.alert("Contraseña actualizada", "Tu contraseña ha sido cambiada con éxito.");
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <View style={{ flex: 1, backgroundColor: Colores.background }}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Header />
-        <View style={styles.formWrapper}>
-          <Text style={styles.title}>Cambiar Contraseña</Text>
+        <Encabezado />
+        <View style={styles.contenedorFormulario}>
+          <Text style={styles.titulo}>Cambiar Contraseña</Text>
 
           <View style={{ marginBottom: 15 }}>
             <Controller
               control={control}
-              name="password"
+              name="contraseña"
               render={({ field: { onChange, value } }) => (
-                <FloatingLabelInput
+                <EntradaEtiquetaFlotante
                   label="Nueva Contraseña"
                   secureTextEntry
                   value={value}
                   onChangeText={onChange}
-                  error={errors.password?.message}
+                  error={errors.contraseña?.message}
                 />
               )}
             />
@@ -50,26 +50,26 @@ export default function ChangePassword() {
           <View style={{ marginBottom: 25 }}>
             <Controller
               control={control}
-              name="confirmPassword"
+              name="confirmarContraseña"
               render={({ field: { onChange, value } }) => (
-                <FloatingLabelInput
+                <EntradaEtiquetaFlotante
                   label="Confirmar Contraseña"
                   secureTextEntry
                   value={value}
                   onChangeText={onChange}
-                  error={errors.confirmPassword?.message}
+                  error={errors.confirmarContraseña?.message}
                 />
               )}
             />
           </View>
 
-          <Button
+          <Boton
             title={isSubmitting ? "Guardando…" : "Guardar contraseña"}
             onPress={handleSubmit(onSubmit)}
             disabled={isSubmitting}
           />
         </View>
-        <Footer />
+        <PiePagina />
       </ScrollView>
     </View>
   );
@@ -81,15 +81,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  formWrapper: {
+  contenedorFormulario: {
     width: "90%",
     maxWidth: 500,
     margin: "auto",
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colors.borderColor,
-    backgroundColor: Colors.background,
+    borderColor: Colores.borderColor,
+    backgroundColor: Colores.background,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -106,16 +106,11 @@ const styles = StyleSheet.create({
     }),
     elevation: 2,
   },
-  title: {
-    fontSize: Fonts.title,
-    color: Colors.secondary,
+  titulo: {
+    fontSize: Fuentes.titulo,
+    color: Colores.texto,
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 24,
-  },
-  divider: {
-    borderColor: Colors.borderColor,
-    borderBottomWidth: 1,
-    marginVertical: 16,
-  },
+  }
 });

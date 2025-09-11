@@ -1,17 +1,10 @@
-import { Colors } from '@/theme/colors';
+import { Colores } from '@/temas/colores';
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Animated, Modal, Pressable, StyleSheet, Text, View, } from "react-native";
 
 type Item = { label: string; value: string };
 
-type Props = {
+type Propiedades = {
   label: string;
   selectedValue?: string;
   onValueChange: (value: string) => void;
@@ -25,7 +18,7 @@ export default function FloatingLabelSelect({
   onValueChange,
   items,
   error,
-}: Props) {
+}: Propiedades) {
   const [focused, setFocused] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -41,13 +34,13 @@ export default function FloatingLabelSelect({
 
   const isError = !!error;
 
-  const labelStyle = {
+  const estiloEtiqueta = {
     position: "absolute" as const,
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-    color: isError ? Colors.error : focused ? Colors.link : Colors.lightText,
-    backgroundColor: Colors.background,
+    color: isError ? Colores.error : focused ? Colores.link : Colores.textoClaro,
+    backgroundColor: Colores.fondo,
     paddingHorizontal: 4,
   };
 
@@ -56,28 +49,28 @@ export default function FloatingLabelSelect({
       <Pressable
         onPress={() => setModalVisible(true)}
         style={[
-          styles.wrapper,
+          styles.contenedor,
           {
             borderColor: isError
-              ? Colors.error
+              ? Colores.error
               : focused
-              ? Colors.link
-              : Colors.lightText,
+              ? Colores.link
+              : Colores.textoClaro,
           },
         ]}
       >
-        <Animated.Text style={labelStyle}>{label}</Animated.Text>
+        <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
         <Text
           style={[
-            styles.valueText,
-            { color: selectedValue ? Colors.secondary : Colors.lightText },
+            styles.valorTexto,
+            { color: selectedValue ? Colores.texto : Colores.textoClaro },
           ]}
         >
           {selectedValue || ""}
         </Text>
       </Pressable>
 
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text style={styles.errorTexto}>{error}</Text>}
 
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
@@ -90,17 +83,17 @@ export default function FloatingLabelSelect({
                   setModalVisible(false);
                   setFocused(true);
                 }}
-                style={styles.option}
+                style={styles.opcion}
               >
-                <Text style={styles.optionText}>{item.label}</Text>
+                <Text style={styles.textoOpcion}>{item.label}</Text>
               </Pressable>
             ))}
 
             <Pressable
               onPress={() => setModalVisible(false)}
-              style={[styles.option, styles.cancelOption]}
+              style={[styles.opcion, styles.cancelarOpcion]}
             >
-              <Text style={styles.cancelText}>Cancelar</Text>
+              <Text style={styles.cancelarTexto}>Cancelar</Text>
             </Pressable>
           </View>
         </View>
@@ -110,24 +103,24 @@ export default function FloatingLabelSelect({
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  contenedor: {
     borderWidth: 1,
     borderRadius: 8,
-    borderColor: Colors.lightText,
-    backgroundColor: Colors.background,
+    borderColor: Colores.textoClaro,
+    backgroundColor: Colores.fondo,
     position: "relative",
     flexDirection: "row",
     alignItems: "center",
     height: 48,
     paddingHorizontal: 12,
   },
-  valueText: {
+  valorTexto: {
     flex: 1,
     fontSize: 16,
-    color: Colors.secondary,
+    color: Colores.texto,
   },
-  errorText: {
-    color: Colors.error,
+  errorTexto: {
+    color: Colores.error,
     marginTop: 5,
     fontSize: 13,
   },
@@ -138,28 +131,28 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.4)",
   },
   modalBox: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colores.fondo,
     borderRadius: 12,
     width: "80%",
     maxWidth: 400,
     paddingVertical: 10,
     elevation: 4,
   },
-  option: {
+  opcion: {
     paddingVertical: 14,
     paddingHorizontal: 20,
   },
-  optionText: {
+  textoOpcion: {
     fontSize: 16,
-    color: Colors.secondary,
+    color: Colores.texto,
   },
-  cancelOption: {
+  cancelarOpcion: {
     borderTopWidth: 1,
     borderColor: "#ddd",
   },
-  cancelText: {
+  cancelarTexto: {
     fontSize: 16,
-    color: Colors.error,
+    color: Colores.error,
     textAlign: "center",
   },
 });

@@ -1,45 +1,46 @@
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
-import Button from "@/components/ui/Button";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
-import { emailSchema, type EmailForm } from "@/lib/validation";
-import { Colors, Fonts } from '@/theme/colors';
+import Encabezado from "@/componentes/layout/Encabezado";
+import PiePagina from "@/componentes/layout/PiePagina";
+import Boton from "@/componentes/ui/Boton";
+import EntradaEtiquetaFlotante from "@/componentes/ui/EntradaEtiquetaFlotante";
+import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
-export default function ResetPassword() {
+import { useAuth } from "@/context/AuthProvider";
+import { correoEsquema, type CorreoFormulario } from "@/lib/validacion";
+
+export default function Register() {
+  const { registro } = useAuth();
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<EmailForm>({
-    resolver: zodResolver(emailSchema),
+  } = useForm<CorreoFormulario>({
+    resolver: zodResolver(correoEsquema),
     defaultValues: { correo: "" },
   });
 
-  const onSubmit = async ({ correo }: EmailForm) => {
-    Alert.alert(
-      "Recuperación enviada",
-      `Se ha enviado un correo a ${correo} con instrucciones para restablecer tu contraseña.`
-    );
+  const onSubmit = async ({ correo }: CorreoFormulario) => {
+    await registro(correo);
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <View style={{ flex: 1, backgroundColor: Colores.background }}>
+
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Header />
-        <View style={styles.formWrapper}>
-          <Text style={styles.title}>Restablecer Contraseña</Text>
+        <Encabezado />
+        <View style={styles.contenedorFormulario}>
+          <Text style={styles.titulo}>Registro</Text>
 
           <View style={{ marginBottom: 25 }}>
             <Controller
               control={control}
               name="correo"
               render={({ field: { onChange, value } }) => (
-                <FloatingLabelInput
+                <EntradaEtiquetaFlotante
                   label="Correo Electrónico Institucional"
                   value={value}
                   onChangeText={onChange}
@@ -51,22 +52,22 @@ export default function ResetPassword() {
             />
           </View>
 
-          <Button
-            title={isSubmitting ? "Enviando…" : "Recuperar contraseña"}
+          <Boton
+            title={isSubmitting ? "Registrando…" : "Registrar"}
             onPress={handleSubmit(onSubmit)}
             disabled={isSubmitting}
           />
 
-          <View style={styles.divider} />
+          <View style={styles.separador} />
 
-          <Text style={styles.registerText}>
+          <Text style={styles.registroTexto}>
             ¿Ya tienes una cuenta?{" "}
-            <Link href="/(auth)/login" style={styles.registerLink}>
+            <Link href="/(auth)/iniciar-sesion" style={styles.registroLink}>
               Inicia sesión aquí
             </Link>
           </Text>
         </View>
-        <Footer />
+        <PiePagina />
       </ScrollView>
     </View>
   );
@@ -78,15 +79,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  formWrapper: {
+  contenedorFormulario: {
     width: "90%",
     maxWidth: 500,
     margin: "auto",
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colors.borderColor,
-    backgroundColor: Colors.background,
+    borderColor: Colores.bordes,
+    backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -103,25 +104,25 @@ const styles = StyleSheet.create({
     }),
     elevation: 2,
   },
-  title: {
-    fontSize: Fonts.title,
-    color: Colors.secondary,
+  titulo: {
+    fontSize: Fuentes.titulo,
+    color: Colores.texto,
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 24,
   },
-  divider: {
-    borderColor: Colors.borderColor,
+  separador: {
+    borderColor: Colores.bordes,
     borderBottomWidth: 1,
-    marginVertical: 16,
+    marginVertical: 25,
   },
-  registerText: {
-    fontSize: Fonts.text,
-    color: Colors.darkText,
+  registroTexto: {
+    color: Colores.textoOscuro,
+    fontSize: Fuentes.texto,
     textAlign: "center",
   },
-  registerLink: {
-    color: Colors.link,
+  registroLink: {
+    color: Colores.link,
     fontWeight: "500",
   },
 });

@@ -1,4 +1,4 @@
-import { sessionStorage } from '@/lib/session';
+import { sessionStorage } from '@/lib/sesion';
 import axios from 'axios';
 import type { AuthAdapter, Session } from '../adapter';
 

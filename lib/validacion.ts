@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Validación para correo institucional
-export const emailSchema = z.object({
+export const correoEsquema = z.object({
   correo: z
     .string()
     .nonempty("Este campo es obligatorio")
@@ -12,10 +12,10 @@ export const emailSchema = z.object({
     ),
 });
 
-export type EmailForm = z.infer<typeof emailSchema>;
+export type CorreoFormulario = z.infer<typeof correoEsquema>;
 
 // Validación para boleta
-export const boletaSchema = z
+export const boletaEsquema = z
   .string()
   .nonempty("Este campo es obligatorio")
   .refine((val) => /^\d+$/.test(val), {
@@ -26,21 +26,21 @@ export const boletaSchema = z
     });
 
 // Validación para contraseña
-export const passwordSchema = z
+export const contraseñaEsquema = z
   .string()
   .nonempty("Este campo es obligatorio")
   .min(8, "La contraseña debe tener al menos 8 caracteres");
 
 // Esquema para inicio de sesión
-export const authSchema = z.object({
-  boleta: boletaSchema,
-  password: passwordSchema,
+export const iniciarSesionEsquema = z.object({
+  boleta: boletaEsquema,
+  contraseña: contraseñaEsquema,
 });
 
-export type AuthForm = z.infer<typeof authSchema>;
+export type IniciarSesionFormulario = z.infer<typeof iniciarSesionEsquema>;
 
 // Esquema para registro 
-export const registroSchema = z.object({
+export const registroEsquema = z.object({
   rfc: z
     .string()
     .nonempty("El RFC es obligatorio")
@@ -103,18 +103,18 @@ export const registroSchema = z.object({
     }),
 });
 
-export type RegistroForm = z.infer<typeof registroSchema>;
+export type RegistroFormulario = z.infer<typeof registroEsquema>;
 
 // Esquema de validación para cambiar la contraseña
-export const changePasswordSchema = z
+export const cambiarContraseñaEsquema = z
   .object({
-    password: passwordSchema,
-    confirmPassword: z.string().nonempty("Debes confirmar la contraseña"),
+    contraseña: contraseñaEsquema,
+    confirmarContraseña: z.string().nonempty("Debes confirmar la contraseña"),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => data.contraseña === data.confirmarContraseña, {
     message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"],
+    path: ["confirmarContraseña"],
   });
 
 // Tipo inferido para el formulario de cambio de contraseña
-export type ChangePasswordForm = z.infer<typeof changePasswordSchema>;
+export type CambiarContraseñaFormulario = z.infer<typeof cambiarContraseñaEsquema>;

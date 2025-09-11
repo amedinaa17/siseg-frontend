@@ -1,65 +1,65 @@
-import { sessionStorage } from "@/lib/session";
+import { sessionStorage } from "@/lib/sesion";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-export type Session = { boleta: string; correo?: string; rol?: string } | null;
+export type Sesion = { boleta: string; correo?: string; rol?: string } | null;
 
 type AuthContextType = {
-  session: Session;
-  loading: boolean;
-  signIn: (boleta: string, password: string) => Promise<void>;
-  signUp: (correo: string) => Promise<void>;
-  signOut: () => Promise<void>;
+  sesion: Sesion;
+  cargando: boolean;
+  iniciarSesion: (boleta: string, contraseña: string) => Promise<void>;
+  registro: (correo: string) => Promise<void>;
+  cerrarSesion: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session>(null);
-  const [loading, setLoading] = useState(true);
+  const [sesion, setSesion] = useState<Sesion>(null);
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-  const loadSession = async () => {
+  const cargarSesion = async () => {
     try {
-      const raw = await sessionStorage.getItem("AUTH_SESSION");
-      if (raw) {
-        setSession(JSON.parse(raw));
+      const fila = await sessionStorage.getItem("AUTH_SESSION");
+      if (fila) {
+        setSesion(JSON.parse(fila));
       }
     } catch (e) {
       console.error("Error cargando sesión:", e);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  loadSession();
+  cargarSesion();
 }, []);
 
 
-  const signIn = async (boleta: string, password: string) => {
-    setLoading(true);
+  const iniciarSesion = async (boleta: string, contraseña: string) => {
+    setCargando(true);
     try {
-      const authenticatedSession = { boleta: boleta, rol: "alumno" };
+      const sesionAutenticada = { boleta: boleta, rol: "alumno" };
 
-      await sessionStorage.setItem("AUTH_SESSION", JSON.stringify(authenticatedSession));
-      setSession(authenticatedSession);
+      await sessionStorage.setItem("AUTH_SESSION", JSON.stringify(sesionAutenticada));
+      setSesion(sesionAutenticada);
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const signUp = async (correo: string) => {
+  const registro = async (correo: string) => {
     console.log("Nuevo usuario registrado:", correo);
   };
 
-  const signOut = async () => {
+  const cerrarSesion = async () => {
     await sessionStorage.removeItem("AUTH_SESSION");
-    setSession(null);
+    setSesion(null);
   };
 
   return (
-    <AuthContext.Provider value={{ session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ sesion, cargando, iniciarSesion, registro, cerrarSesion }}>
       {children}
     </AuthContext.Provider>
   );
@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error("useAuth must be used within <AuthProvider>");
+    throw new Error("useAuth debe usarse dentro de <AuthProvider>");
   }
   return ctx;
 }

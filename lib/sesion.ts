@@ -1,11 +1,11 @@
 import * as SecureStore from "expo-secure-store";
 
-const isWeb = typeof window !== "undefined" && window.localStorage;
+const web = typeof window !== "undefined" && window.localStorage;
 
 export const sessionStorage = {
   // Obtener item del almacenamiento
   async getItem(key: string) {
-    if (isWeb) {
+    if (web) {
       // Si es web, usar localStorage
       return window.localStorage.getItem(key);
     } else {
@@ -16,7 +16,7 @@ export const sessionStorage = {
 
   // Guardar item en el almacenamiento
   async setItem(key: string, value: string) {
-    if (isWeb) {
+    if (web) {
       // Si es web, usar localStorage
       window.localStorage.setItem(key, value);
     } else {
@@ -27,7 +27,7 @@ export const sessionStorage = {
 
   // Eliminar item del almacenamiento
   async removeItem(key: string) {
-    if (isWeb) {
+    if (web) {
       // Si es web, usar localStorage
       window.localStorage.removeItem(key);
     } else {

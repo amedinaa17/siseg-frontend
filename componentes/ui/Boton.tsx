@@ -1,13 +1,13 @@
 import React from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
-type ButtonProps = {
+type PropiedadesBoton = {
   title: string;
   onPress: () => void;
   disabled?: boolean;
 };
 
-export default function Button({ title, onPress, disabled }: ButtonProps) {
+export default function Boton({ title, onPress, disabled }: PropiedadesBoton) {
   return (
     <Pressable
       onPress={onPress}
@@ -15,11 +15,11 @@ export default function Button({ title, onPress, disabled }: ButtonProps) {
       style={({ hovered, pressed }) => [
         styles.base,
         hovered && styles.hover,
-        pressed && styles.pressed,
-        disabled && styles.disabled,
+        pressed && styles.presionado,
+        disabled && styles.deshabilitado,
       ]}
     >
-      <Text style={styles.text}>{title}</Text>
+      <Text style={styles.texto}>{title}</Text>
     </Pressable>
   );
 }
@@ -34,13 +34,13 @@ const styles = StyleSheet.create({
   hover: {
     backgroundColor: "#666666",
   },
-  pressed: {
+  presionado: {
     backgroundColor: "#666666",
   },
-  disabled: {
+  deshabilitado: {
     opacity: 0.6,
   },
-  text: {
+  texto: {
     color: "white",
     fontWeight: "700",
     textAlign: "center",

@@ -1,23 +1,14 @@
-import { Colors } from '@/theme/colors';
+import { Colores } from '@/temas/colores';
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import {
-  Animated,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  View,
-} from "react-native";
+import { Animated, Platform, Pressable, StyleSheet, Text, TextInput, TextInputProps, View, } from "react-native";
 
-type Props = TextInputProps & {
+type Propiedades = TextInputProps & {
   label: string;
   error?: string;
 };
 
-export default function FloatingLabelInput({
+export default function EntradaEtiquetaFlotante({
   label,
   error,
   value,
@@ -26,9 +17,9 @@ export default function FloatingLabelInput({
   style,
   secureTextEntry,
   ...props
-}: Props) {
+}: Propiedades) {
   const [focused, setFocused] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [mostrarContraseña, setMostrarContraseña] = React.useState(false);
   const anim = React.useRef(new Animated.Value(value ? 1 : 0)).current;
 
   React.useEffect(() => {
@@ -39,13 +30,13 @@ export default function FloatingLabelInput({
     }).start();
   }, [focused, value]);
 
-  const labelStyle = {
+  const estiloEtiqueta = {
     position: "absolute" as const,
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-    color: error ? Colors.error : focused ? Colors.link : Colors.lightText,
-    backgroundColor: Colors.background,
+    color: error ? Colores.error : focused ? Colores.link : Colores.textoClaro,
+    backgroundColor: Colores.fondo,
     paddingHorizontal: 4,
   };
 
@@ -53,21 +44,21 @@ export default function FloatingLabelInput({
     <View>
       <View
         style={[
-          styles.wrapper,
+          styles.contenedor,
           {
             borderColor: error
-              ? Colors.error
+              ? Colores.error
               : focused
-              ? Colors.link
-              : Colors.lightText,
+              ? Colores.link
+              : Colores.textoClaro,
           },
         ]}
       >
-        <Animated.Text style={labelStyle}>{label}</Animated.Text>
+        <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
         <TextInput
           {...props}
           value={value}
-          secureTextEntry={secureTextEntry && !showPassword}
+          secureTextEntry={secureTextEntry && !mostrarContraseña}
           onFocus={(e) => {
             setFocused(true);
             onFocus?.(e);
@@ -77,7 +68,7 @@ export default function FloatingLabelInput({
             onBlur?.(e);
           }}
           style={[
-            styles.input,
+            styles.entrada,
             style,
             Platform.OS === "web"
               ? ({ outlineStyle: "none" } as any)
@@ -87,11 +78,11 @@ export default function FloatingLabelInput({
 
         {secureTextEntry && (
           <Pressable
-            onPress={() => setShowPassword((prev) => !prev)}
-            style={styles.icon}
+            onPress={() => setMostrarContraseña((prev) => !prev)}
+            style={styles.icono}
           >
             <Ionicons
-              name={showPassword ? "eye-off" : "eye"}
+              name={mostrarContraseña ? "eye-off" : "eye"}
               size={20}
               color="#6b7280"
             />
@@ -100,38 +91,38 @@ export default function FloatingLabelInput({
       </View>
 
       {error && (
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.errorTexto}>{error}</Text>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  contenedor: {
     borderWidth: 1,
     borderRadius: 8,
-    borderColor: Colors.lightText,
-    backgroundColor: Colors.background,
+    borderColor: Colores.textoClaro,
+    backgroundColor: Colores.fondo,
     position: "relative",
     flexDirection: "row",
     alignItems: "center",
   },
-  input: {
+  entrada: {
     flex: 1,
     height: 48,
     fontSize: 16,
     paddingHorizontal: 12,
     paddingTop: 10,
     paddingBottom: 6,
-    color: Colors.secondary,
+    color: Colores.texto,
   },
-  icon: {
+  icono: {
     position: "absolute",
     right: 12,
     padding: 6,
   },
-  errorText: {
-    color: Colors.error,
+  errorTexto: {
+    color: Colores.error,
     marginTop: 5,
     fontSize: 13,
   },
