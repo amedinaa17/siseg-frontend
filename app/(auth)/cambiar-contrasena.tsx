@@ -78,7 +78,7 @@ export default function CambiarContraseña() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
   },
   contenedorFormulario: {
@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colores.borderColor,
-    backgroundColor: Colores.background,
+    borderColor: Colores.bordes,
+    backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
         shadowColor: '#000',

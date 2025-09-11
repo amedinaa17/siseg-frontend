@@ -7,7 +7,7 @@ import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 import {
   registroEsquema,
@@ -15,7 +15,8 @@ import {
 } from "@/lib/validacion";
 
 export default function RegistroMultipasos() {
-  const esMovil = Platform.OS === "ios" || Platform.OS === "android";
+  const { width } = useWindowDimensions();
+    const esPantallaPequeña = width < 600;
   const [step, setStep] = useState(1);
 
   const {
@@ -49,7 +50,7 @@ export default function RegistroMultipasos() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <Encabezado />
         <View
-          style={[styles.contenedorFormulario, esMovil && { maxWidth: "95%" }]}
+          style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}
         >
           <Text style={styles.titulo}>
             {step === 1 ? "Validar Datos" : "Completar Registro"}
@@ -62,7 +63,7 @@ export default function RegistroMultipasos() {
               </View>
 
               <View
-                style={[styles.row, esMovil && { flexDirection: "column" }]}
+                style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}
               >
                 <View style={{ flex: 1, marginBottom: 5 }} pointerEvents="none" >
                   <EntradaEtiquetaFlotante
@@ -89,7 +90,7 @@ export default function RegistroMultipasos() {
               </View>
 
               <View
-                style={[styles.row, esMovil && { flexDirection: "column" }]}
+                style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}
               >
                 <View style={{ flex: 1, marginBottom: 5 }} pointerEvents="none">
                   <EntradaEtiquetaFlotante
@@ -108,7 +109,7 @@ export default function RegistroMultipasos() {
               </View>
 
               <View
-                style={[styles.row, esMovil && { flexDirection: "column" }]}
+                style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}
               >
                 <View style={{ flex: 1, marginBottom: 5 }} pointerEvents="none">
                   <EntradaEtiquetaFlotante
@@ -160,7 +161,7 @@ export default function RegistroMultipasos() {
                 />
               </View>
 
-              <View style={[styles.row, esMovil && { flexDirection: "column" }]}>
+              <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                 <View style={{ flex: 1, marginBottom: 5 }}>
                   <Controller
                     control={control}
@@ -189,7 +190,7 @@ export default function RegistroMultipasos() {
                 </View>
               </View>
               <View
-                style={[styles.row, esMovil && { flexDirection: "column" }]}
+                style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}
               >
                 <View style={{ flex: 1, marginBottom: 5 }}>
                   <Controller
@@ -220,7 +221,7 @@ export default function RegistroMultipasos() {
               </View>
 
               <View
-                style={[styles.row, esMovil && { flexDirection: "column" }]}
+                style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}
               >
                 <View style={{ flex: 1, marginBottom: errors.sexo ? 0 : 5 }}>
                   <Controller
@@ -236,7 +237,7 @@ export default function RegistroMultipasos() {
                     )}
                   />
                 </View>
-                <View style={{ flex: 1, marginBottom: 15, marginTop: errors.codigoPostal && esMovil && !errors.sexo ? 15 : 0 }}>
+                <View style={{ flex: 1, marginBottom: 15, marginTop: errors.codigoPostal && esPantallaPequeña && !errors.sexo ? 15 : 0 }}>
                   <Controller
                     control={control}
                     name="sexo"
@@ -256,7 +257,7 @@ export default function RegistroMultipasos() {
                 </View>
               </View>
 
-              <View style={[styles.row, esMovil && { flexDirection: "column" }]}>
+              <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                 <View style={{ flex: 1, marginBottom: 5 }}>
                   <Controller
                     control={control}
@@ -289,7 +290,7 @@ export default function RegistroMultipasos() {
 
               <View style={{ flexDirection: "row", gap: 12 }}>
                 <View style={{ flex: 1 }}>
-                  <Button title="Atrás" onPress={handleBack} />
+                  <Button title="Regresar" onPress={handleBack} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Button
@@ -311,7 +312,7 @@ export default function RegistroMultipasos() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
   },
   contenedorFormulario: {

@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const iniciarSesion = async (boleta: string, contraseña: string) => {
     setCargando(true);
     try {
-      const sesionAutenticada = { boleta: boleta, rol: "alumno" };
+      const sesionAutenticada = { boleta: boleta, rol: "administrativo" };
 
       await sessionStorage.setItem("AUTH_SESSION", JSON.stringify(sesionAutenticada));
       setSesion(sesionAutenticada);

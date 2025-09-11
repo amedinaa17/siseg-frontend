@@ -116,5 +116,66 @@ export const cambiarContraseñaEsquema = z
     path: ["confirmarContraseña"],
   });
 
-// Tipo inferido para el formulario de cambio de contraseña
 export type CambiarContraseñaFormulario = z.infer<typeof cambiarContraseñaEsquema>;
+
+// Esquema para modificar datos del perfil
+export const modificarPerfilEsquema = z.object({
+  calle: z
+    .string()
+    .nonempty("La calle es obligatoria")
+    .min(3, "Debe tener al menos 3 caracteres"),
+
+  colonia: z
+    .string()
+    .nonempty("La colonia es obligatoria")
+    .min(3, "Debe tener al menos 3 caracteres"),
+
+  municipio: z
+    .string()
+    .nonempty("El municipio es obligatorio")
+    .min(3, "Debe tener al menos 3 caracteres"),
+
+  estado: z
+    .string()
+    .nonempty("El estado es obligatorio")
+    .min(3, "Debe tener al menos 3 caracteres"),
+
+  codigoPostal: z
+    .string()
+    .nonempty("El código postal es obligatorio")
+    .refine((val) => /^\d+$/.test(val), {
+      message: "El código postal solo debe contener dígitos",
+    })
+    .refine((val) => val.length === 5, {
+      message: "El código postal debe contener exactamente 5 dígitos",
+    }),
+
+  sexo: z
+    .string()
+    .nonempty("El sexo es obligatorio")
+    .refine((val) => ["Hombre", "Mujer"].includes(val), {
+      message: "El sexo debe ser Hombre o Mujer",
+    }),
+
+  telefonoCelular: z
+    .string()
+    .nonempty("El teléfono celular es obligatorio")
+    .refine((val) => /^\d+$/.test(val), {
+      message: "El número de celular solo debe contener dígitos",
+    })
+    .refine((val) => val.length === 10, {
+      message: "El número de celular debe contener exactamente 10 dígitos",
+    }),
+
+  telefonoLocal: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^\d+$/.test(val), {
+      message: "El número local solo debe contener dígitos",
+    })
+    .refine((val) => !val || (val.length >= 7 && val.length <= 10), {
+      message: "El número local debe tener entre 7 y 10 dígitos",
+    }),
+});
+
+export type ModificarPerfilFormulario = z.infer<typeof modificarPerfilEsquema>;

@@ -13,11 +13,12 @@ type Propiedades = {
 };
 
 export default function FloatingLabelSelect({
-  label,
+  label, 
   selectedValue,
   onValueChange,
   items,
   error,
+  ...props
 }: Propiedades) {
   const [focused, setFocused] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -55,7 +56,7 @@ export default function FloatingLabelSelect({
               ? Colores.error
               : focused
               ? Colores.link
-              : Colores.textoClaro,
+              : Colores.bordes,
           },
         ]}
       >

@@ -77,7 +77,7 @@ export default function NuevaContraseña() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
   },
   contenedorFormulario: {

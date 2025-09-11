@@ -165,6 +165,7 @@ const drawerStyles = StyleSheet.create({
     paddingStart: 16,
     paddingEnd: 24,
     backgroundColor: Colores.fondo,
+    marginVertical: 20,
   },
   seccionEncabezadoTexto: {
     flex: 1,

@@ -50,7 +50,7 @@ export default function EntradaEtiquetaFlotante({
               ? Colores.error
               : focused
               ? Colores.link
-              : Colores.textoClaro,
+              : Colores.bordes,
           },
         ]}
       >
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   contenedor: {
     borderWidth: 1,
     borderRadius: 8,
-    borderColor: Colores.textoClaro,
+    borderColor: Colores.bordes,
     backgroundColor: Colores.fondo,
     position: "relative",
     flexDirection: "row",

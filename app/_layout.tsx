@@ -40,7 +40,7 @@ function AuthGate() {
 
   if (cargando) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#5a0839" />
       </View>
     );
