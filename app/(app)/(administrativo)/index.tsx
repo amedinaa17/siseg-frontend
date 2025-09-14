@@ -7,7 +7,7 @@ export default function InicioPersonalAdministrativo() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colores.background }}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.contenedorFormulario}>
           <View style={styles.encabezado}>
             <Text style={styles.sisegTexto}>SISEG</Text>
@@ -19,7 +19,7 @@ export default function InicioPersonalAdministrativo() {
           </View>
 
           <Text style={styles.titulo}>Bienvenido</Text>
-          <Text style={styles.nombrePersonalAdministrativo}>MEDINA ANGELES ANA CRISTINA</Text>
+          <Text style={styles.nombrePersonalAdministrativo}>Medina Angeles Ana Cristina</Text>
           <Text style={styles.idPersonalAdministrativo}>2022630301</Text>
 
           <View style={styles.tarjetaContenedor}>
@@ -53,11 +53,6 @@ export default function InicioPersonalAdministrativo() {
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   contenedorFormulario: {
     width: "90%",
     maxWidth: 1000,
@@ -67,7 +62,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
@@ -92,30 +87,30 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sisegTexto: {
-    fontSize: Fuentes.grande,
-    color: Colores.textoGuinda,
+    fontSize: Fuentes.display,
+    color: Colores.primario,
     fontWeight: "700",
     marginRight: 12,
   },
   sisegDescripcion: {
-    fontSize: Fuentes.texto,
-    color: Colores.textoOscuro,
+    fontSize: Fuentes.cuerpoPrincipal,
+    color: Colores.textoSecundario,
     flexWrap: "nowrap",
   },
   titulo: {
     fontSize: Fuentes.titulo,
-    color: Colores.textoGuinda,
+    color: Colores.primario,
     fontWeight: "700",
     marginTop: 25,
     marginBottom: 5,
   },
   nombrePersonalAdministrativo: {
-    fontSize: Fuentes.mediano,
-    color: Colores.texto,
+    fontSize: Fuentes.subtitulo,
+    color: Colores.textoPrincipal,
   },
   idPersonalAdministrativo: {
-    fontSize: Fuentes.mediano,
-    color: Colores.textoOscuro,
+    fontSize: Fuentes.subtitulo,
+    color: Colores.textoSecundario,
     marginBottom: 20,
   },
   tarjetaContenedor: {
@@ -132,7 +127,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     alignItems: "center",
     ...Platform.select({
       ios: {
@@ -150,15 +145,15 @@ const styles = StyleSheet.create({
     }),
   },
   tarjetaTitulo: {
-    fontSize: Fuentes.texto,
-    color: Colores.textoOscuro,
+    fontSize: Fuentes.cuerpoPrincipal,
+    color: Colores.textoSecundario,
     textAlign: "center",
     marginBottom: 8,
   },
   tarjetaValor: {
     fontSize: Fuentes.titulo,
     fontWeight: "700",
-    color: Colores.textoGuinda,
+    color: Colores.primario,
   },
   piePagina: {
     marginTop: 50,
@@ -173,19 +168,19 @@ const styles = StyleSheet.create({
   },
   avisoTexto: {
     fontSize: Fuentes.titulo,
-    color: Colores.textoGuinda,
+    color: Colores.primario,
     fontWeight: "700",
     marginRight: 10,
   },
   separacion: {
-    backgroundColor: Colores.textoGuinda,
+    backgroundColor: Colores.primario,
     width: 1.5,
     height: 35,
     marginRight: 10,
   },
   piePaginaTexto: {
-    fontSize: Fuentes.pequeño,
-    color: Colores.textoOscuro,
+    fontSize: Fuentes.caption,
+    color: Colores.textoSecundario,
     flex: 1,
     textAlign: 'right',
   },

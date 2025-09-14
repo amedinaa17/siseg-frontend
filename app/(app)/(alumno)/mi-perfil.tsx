@@ -1,18 +1,15 @@
-import PiePagina from "@/componentes/layout/PiePagina";
 import Button from "@/componentes/ui/Boton";
-import EntradaEtiquetaFlotante from "@/componentes/ui/EntradaEtiquetaFlotante";
-import SelectorEtiquetaFlotante from "@/componentes/ui/SelectorEtiquetaFlotante";
+import Entrada from "@/componentes/ui/Entrada";
+import Selector from "@/componentes/ui/Selector";
 import {
-    cambiarContraseñaEsquema,
-    modificarPerfilEsquema,
-    type CambiarContraseñaFormulario,
-    type ModificarPerfilFormulario,
+    cambiarContraseñaEsquema, modificarPerfilEsquema,
+    type CambiarContraseñaFormulario, type ModificarPerfilFormulario
 } from "@/lib/validacion";
 import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function MiPerfil() {
     const { width } = useWindowDimensions();
@@ -60,55 +57,61 @@ export default function MiPerfil() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colores.background }}>
-            <ScrollView contentContainerStyle={styles.scroll}>
-                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }, vista === "contraseña" && { marginTop: 100 } ]}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} >
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View
+                    style={[
+                        styles.contenedorFormulario,
+                        esPantallaPequeña && { maxWidth: "95%" },
+                        vista === "contraseña" && { marginTop: 100 }
+                    ]}
+                >
                     {vista === "perfil" && (
                         <>
                             <Text style={styles.titulo}>Mi Perfil</Text>
 
-                            <View style={{ marginBottom: 15 }} pointerEvents="none">
-                                <EntradaEtiquetaFlotante label="Nombre" value="Ana" editable={false} />
+                            <View style={{ marginBottom: 15, pointerEvents: "none" }} >
+                                <Entrada label="Nombre" value="Ana" editable={false} />
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Apellido Paterno" value="Medina" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Apellido Paterno" value="Medina" editable={false} />
                                 </View>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Apellido Materno" value="Angeles" editable={false} />
-                                </View>
-                            </View>
-
-                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="CURP" value="MEAA010203AACDNNA1" editable={false} />
-                                </View>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="RFC" value="MEAA010203ABC" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Apellido Materno" value="Angeles" editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Boleta" value="2022630301" keyboardType="numeric" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="CURP" value="MEAA010203AACDNNA1" editable={false} />
                                 </View>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Carrera" value="Médico Cirujano y Homeópata" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="RFC" value="MEAA010203ABC" editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Generación" value="Febrero 2025" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Boleta" value="2022630301" keyboardType="numeric" editable={false} />
                                 </View>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Promedio" value="9.0" keyboardType="decimal-pad" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Carrera" value="Médico Cirujano y Homeópata" editable={false} />
                                 </View>
                             </View>
 
-                            <View style={{ marginBottom: 15 }} pointerEvents="none">
-                                <EntradaEtiquetaFlotante
+                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Generación" value="Febrero 2025" editable={false} />
+                                </View>
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Promedio" value="9.0" keyboardType="decimal-pad" editable={false} />
+                                </View>
+                            </View>
+
+                            <View style={{ marginBottom: 15, pointerEvents: "none" }}>
+                                <Entrada
                                     label="Correo Electrónico Institucional"
                                     value="amedina1416@alumno.ipn.mx"
                                     keyboardType="email-address"
@@ -117,29 +120,29 @@ export default function MiPerfil() {
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Calle y Número" value="Av. Politécnico 123" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Calle y Número" value="Av. Politécnico 123" editable={false} />
                                 </View>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Colonia" value="Lindavista" editable={false} />
-                                </View>
-                            </View>
-
-                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Delegación / Municipio" value="Gustavo A. Madero" editable={false} />
-                                </View>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Estado de Procedencia" value="Ciudad de México" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Colonia" value="Lindavista" editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Código Postal" value="07300" keyboardType="numeric" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Delegación / Municipio" value="Gustavo A. Madero" editable={false} />
                                 </View>
-                                <View style={styles.col} pointerEvents="none">
-                                    <SelectorEtiquetaFlotante
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Estado de Procedencia" value="Ciudad de México" editable={false} />
+                                </View>
+                            </View>
+
+                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Código Postal" value="07300" keyboardType="numeric" editable={false} />
+                                </View>
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Selector
                                         label="Sexo"
                                         selectedValue="Mujer"
                                         items={[
@@ -152,11 +155,11 @@ export default function MiPerfil() {
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Teléfono Celular" value="5512345678" keyboardType="phone-pad" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Teléfono Celular" value="5512345678" keyboardType="phone-pad" editable={false} />
                                 </View>
-                                <View style={styles.col} pointerEvents="none">
-                                    <EntradaEtiquetaFlotante label="Teléfono Local" value="5554321987" keyboardType="phone-pad" editable={false} />
+                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                    <Entrada label="Teléfono Local" value="5554321987" keyboardType="phone-pad" editable={false} />
                                 </View>
                             </View>
 
@@ -180,7 +183,7 @@ export default function MiPerfil() {
                                         control={controlPerfil}
                                         name="calle"
                                         render={({ field }) => (
-                                            <EntradaEtiquetaFlotante
+                                            <Entrada
                                                 label="Calle y Número"
                                                 {...field}
                                                 error={errorsPerfil.calle?.message}
@@ -193,7 +196,7 @@ export default function MiPerfil() {
                                         control={controlPerfil}
                                         name="colonia"
                                         render={({ field }) => (
-                                            <EntradaEtiquetaFlotante
+                                            <Entrada
                                                 label="Colonia"
                                                 {...field}
                                                 error={errorsPerfil.colonia?.message}
@@ -210,7 +213,7 @@ export default function MiPerfil() {
                                         control={controlPerfil}
                                         name="municipio"
                                         render={({ field }) => (
-                                            <EntradaEtiquetaFlotante
+                                            <Entrada
                                                 label="Delegación / Municipio"
                                                 {...field}
                                                 error={errorsPerfil.municipio?.message}
@@ -223,7 +226,7 @@ export default function MiPerfil() {
                                         control={controlPerfil}
                                         name="estado"
                                         render={({ field }) => (
-                                            <EntradaEtiquetaFlotante
+                                            <Entrada
                                                 label="Estado de Procedencia"
                                                 {...field}
                                                 error={errorsPerfil.estado?.message}
@@ -240,7 +243,7 @@ export default function MiPerfil() {
                                         control={controlPerfil}
                                         name="codigoPostal"
                                         render={({ field }) => (
-                                            <EntradaEtiquetaFlotante
+                                            <Entrada
                                                 label="Código Postal"
                                                 keyboardType="numeric"
                                                 {...field}
@@ -254,7 +257,7 @@ export default function MiPerfil() {
                                         control={controlPerfil}
                                         name="sexo"
                                         render={({ field: { onChange, value } }) => (
-                                            <SelectorEtiquetaFlotante
+                                            <Selector
                                                 label="Sexo"
                                                 selectedValue={value}
                                                 onValueChange={onChange}
@@ -274,7 +277,7 @@ export default function MiPerfil() {
                                         control={controlPerfil}
                                         name="telefonoCelular"
                                         render={({ field }) => (
-                                            <EntradaEtiquetaFlotante
+                                            <Entrada
                                                 label="Teléfono Celular"
                                                 keyboardType="phone-pad"
                                                 {...field}
@@ -288,7 +291,7 @@ export default function MiPerfil() {
                                         control={controlPerfil}
                                         name="telefonoLocal"
                                         render={({ field }) => (
-                                            <EntradaEtiquetaFlotante
+                                            <Entrada
                                                 label="Teléfono Local"
                                                 keyboardType="phone-pad"
                                                 {...field}
@@ -301,7 +304,7 @@ export default function MiPerfil() {
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Button title="Regresar"  onPress={() => {resetPerfil(); setVista("perfil")}} />
+                                    <Button title="Regresar" onPress={() => { resetPerfil(); setVista("perfil") }} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Button
@@ -322,7 +325,7 @@ export default function MiPerfil() {
                                     control={controlContraseña}
                                     name="contraseña"
                                     render={({ field: { onChange, value } }) => (
-                                        <EntradaEtiquetaFlotante
+                                        <Entrada
                                             label="Nueva Contraseña"
                                             secureTextEntry
                                             value={value}
@@ -338,7 +341,7 @@ export default function MiPerfil() {
                                     control={controlContraseña}
                                     name="confirmarContraseña"
                                     render={({ field: { onChange, value } }) => (
-                                        <EntradaEtiquetaFlotante
+                                        <Entrada
                                             label="Confirmar Contraseña"
                                             secureTextEntry
                                             value={value}
@@ -351,7 +354,7 @@ export default function MiPerfil() {
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Button title="Regresar" onPress={() => {resetContraseña(); setVista("perfil")}} />
+                                    <Button title="Regresar" onPress={() => { resetContraseña(); setVista("perfil") }} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Button
@@ -363,18 +366,12 @@ export default function MiPerfil() {
                         </>
                     )}
                 </View>
-                <PiePagina />
             </ScrollView>
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
-    scroll: {
-        flexGrow: 1,
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
     contenedorFormulario: {
         width: "90%",
         maxWidth: 800,
@@ -382,7 +379,7 @@ const styles = StyleSheet.create({
         padding: 24,
         borderWidth: 1,
         borderRadius: 12,
-        borderColor: Colores.bordes,
+        borderColor: Colores.borde,
         backgroundColor: Colores.fondo,
         ...Platform.select({
             ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
@@ -397,7 +394,7 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         textAlign: "center",
         marginBottom: 24,
-        color: Colores.texto,
+        color: Colores.textoPrincipal,
     },
     row: {
         flexDirection: "row",

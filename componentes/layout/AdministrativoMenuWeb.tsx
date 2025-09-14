@@ -128,7 +128,7 @@ export default function AdministrativoMenuWeb() {
         )}
       </View>
 
-      <Link href="/mi-perfil" asChild>
+      <Link href="/mi-perfil-administrativo" asChild>
         <TouchableOpacity>
           <Text style={styles.menuItem}>MI PERFIL</Text>
         </TouchableOpacity>
@@ -145,14 +145,14 @@ const styles = StyleSheet.create({
   menu: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: Colores.fondoIPN,
+    backgroundColor: Colores.fondoInstitucional,
     paddingVertical: 13,
     position: "relative",
     zIndex: 1,
   },
   menuItem: {
-    fontSize: Fuentes.texto,
-    color: Colores.textoBlanco,
+    fontSize: Fuentes.cuerpoPrincipal,
+    color: Colores.onPrimario,
     fontWeight: "600",
   },
   submenuContenedor: {
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   },
   submenu: {
     backgroundColor: Colores.fondo,
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     position: "absolute",
     top: 30,
     left: 0,
@@ -171,8 +171,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   submenuitem: {
-    fontSize: Fuentes.texto,
-    color: Colores.textoOscuro,
+    fontSize: Fuentes.cuerpoPrincipal,
+    color: Colores.textoSecundario,
     paddingVertical: 6,
     paddingHorizontal: 10,
   },

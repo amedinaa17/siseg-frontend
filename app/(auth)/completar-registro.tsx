@@ -1,13 +1,13 @@
 import Encabezado from "@/componentes/layout/Encabezado";
 import PiePagina from "@/componentes/layout/PiePagina";
 import Button from "@/componentes/ui/Boton";
-import EntradaEtiquetaFlotante from "@/componentes/ui/EntradaEtiquetaFlotante";
-import SelectorEtiquetaFlotante from "@/componentes/ui/SelectorEtiquetaFlotante";
+import Entrada from "@/componentes/ui/Entrada";
+import Selector from "@/componentes/ui/Selector";
 import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 import {
   registroEsquema,
@@ -16,7 +16,7 @@ import {
 
 export default function RegistroMultipasos() {
   const { width } = useWindowDimensions();
-    const esPantallaPequeña = width < 600;
+  const esPantallaPequeña = width < 600;
   const [step, setStep] = useState(1);
 
   const {
@@ -46,8 +46,8 @@ export default function RegistroMultipasos() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colores.background }}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} > >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View
           style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}
@@ -58,22 +58,22 @@ export default function RegistroMultipasos() {
 
           {step === 1 && (
             <>
-              <View style={{ marginBottom: 15 }} pointerEvents="none" >
-                <EntradaEtiquetaFlotante label="Nombre" value="Ana" editable={false} />
+              <View style={{ marginBottom: 15, pointerEvents: "none" }} >
+                <Entrada label="Nombre" value="Ana" editable={false} />
               </View>
 
               <View
                 style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}
               >
-                <View style={{ flex: 1, marginBottom: 5 }} pointerEvents="none" >
-                  <EntradaEtiquetaFlotante
+                <View style={{ flex: 1, marginBottom: 5, pointerEvents: "none" }} >
+                  <Entrada
                     label="Apellido Paterno"
                     value="Medina"
                     editable={false}
                   />
                 </View>
-                <View style={{ flex: 1, marginBottom: 15 }} pointerEvents="none">
-                  <EntradaEtiquetaFlotante
+                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                  <Entrada
                     label="Apellido Materno"
                     value="Angeles"
                     editable={false}
@@ -81,8 +81,8 @@ export default function RegistroMultipasos() {
                 </View>
               </View>
 
-              <View style={{ marginBottom: 15 }} pointerEvents="none" >
-                <EntradaEtiquetaFlotante
+              <View style={{ marginBottom: 15, pointerEvents: "none" }} >
+                <Entrada
                   label="CURP"
                   value="MEAA010203AACDNNA1"
                   editable={false}
@@ -92,15 +92,15 @@ export default function RegistroMultipasos() {
               <View
                 style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}
               >
-                <View style={{ flex: 1, marginBottom: 5 }} pointerEvents="none">
-                  <EntradaEtiquetaFlotante
+                <View style={{ flex: 1, marginBottom: 5, pointerEvents: "none" }}>
+                  <Entrada
                     label="Boleta"
                     value="2022570330"
                     editable={false}
                   />
                 </View>
-                <View style={{ flex: 1, marginBottom: 15 }} pointerEvents="none">
-                  <EntradaEtiquetaFlotante
+                <View style={{ flex: 1, marginBottom: 5, pointerEvents: "none" }}>
+                  <Entrada
                     label="Carrera"
                     value="Médico Cirujano y Homeópata"
                     editable={false}
@@ -112,14 +112,14 @@ export default function RegistroMultipasos() {
                 style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}
               >
                 <View style={{ flex: 1, marginBottom: 5 }} pointerEvents="none">
-                  <EntradaEtiquetaFlotante
+                  <Entrada
                     label="Generación"
                     value="Febrero 2025"
                     editable={false}
                   />
                 </View>
-                <View style={{ flex: 1, marginBottom: 15 }} pointerEvents="none">
-                  <EntradaEtiquetaFlotante
+                <View style={{ flex: 1, marginBottom: 5, pointerEvents: "none" }}>
+                  <Entrada
                     label="Promedio"
                     value="9.0"
                     editable={false}
@@ -128,7 +128,7 @@ export default function RegistroMultipasos() {
               </View>
 
               <View style={{ marginBottom: 25 }} pointerEvents="none">
-                <EntradaEtiquetaFlotante
+                <Entrada
                   label="Correo Electrónico Institucional"
                   value="amedina1416@alumno.ipn.mx"
                   editable={false}
@@ -151,7 +151,7 @@ export default function RegistroMultipasos() {
                   control={control}
                   name="rfc"
                   render={({ field: { onChange, value } }) => (
-                    <EntradaEtiquetaFlotante
+                    <Entrada
                       label="RFC"
                       value={value}
                       onChangeText={onChange}
@@ -167,7 +167,7 @@ export default function RegistroMultipasos() {
                     control={control}
                     name="calle"
                     render={({ field }) => (
-                      <EntradaEtiquetaFlotante
+                      <Entrada
                         label="Calle y Número"
                         {...field}
                         error={errors.calle?.message}
@@ -180,7 +180,7 @@ export default function RegistroMultipasos() {
                     control={control}
                     name="colonia"
                     render={({ field }) => (
-                      <EntradaEtiquetaFlotante
+                      <Entrada
                         label="Colonia"
                         {...field}
                         error={errors.colonia?.message}
@@ -197,7 +197,7 @@ export default function RegistroMultipasos() {
                     control={control}
                     name="municipio"
                     render={({ field }) => (
-                      <EntradaEtiquetaFlotante
+                      <Entrada
                         label="Delegación / Municipio"
                         {...field}
                         error={errors.municipio?.message}
@@ -210,7 +210,7 @@ export default function RegistroMultipasos() {
                     control={control}
                     name="estado"
                     render={({ field }) => (
-                      <EntradaEtiquetaFlotante
+                      <Entrada
                         label="Estado de Procedencia"
                         {...field}
                         error={errors.estado?.message}
@@ -228,7 +228,7 @@ export default function RegistroMultipasos() {
                     control={control}
                     name="codigoPostal"
                     render={({ field }) => (
-                      <EntradaEtiquetaFlotante
+                      <Entrada
                         label="Código Postal"
                         keyboardType="numeric"
                         {...field}
@@ -242,7 +242,7 @@ export default function RegistroMultipasos() {
                     control={control}
                     name="sexo"
                     render={({ field: { onChange, value } }) => (
-                      <SelectorEtiquetaFlotante
+                      <Selector
                         label="Sexo"
                         selectedValue={value}
                         onValueChange={onChange}
@@ -263,7 +263,7 @@ export default function RegistroMultipasos() {
                     control={control}
                     name="telefonoCelular"
                     render={({ field }) => (
-                      <EntradaEtiquetaFlotante
+                      <Entrada
                         label="Teléfono Celular"
                         keyboardType="phone-pad"
                         {...field}
@@ -277,7 +277,7 @@ export default function RegistroMultipasos() {
                     control={control}
                     name="telefonoLocal"
                     render={({ field }) => (
-                      <EntradaEtiquetaFlotante
+                      <Entrada
                         label="Teléfono Local"
                         keyboardType="phone-pad"
                         {...field}
@@ -305,16 +305,11 @@ export default function RegistroMultipasos() {
         </View>
         <PiePagina />
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   contenedorFormulario: {
     width: "90%",
     maxWidth: 800,
@@ -322,7 +317,7 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
@@ -346,7 +341,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 24,
-    color: Colores.texto,
+    color: Colores.textoPrincipal,
   },
   row: {
     flexDirection: "row",

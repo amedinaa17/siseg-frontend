@@ -7,7 +7,7 @@ export default function InicioAlumno() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.contenedorFormulario}>
           <View style={styles.encabezado}>
             <Text style={styles.sisegTexto}>SISEG</Text>
@@ -38,11 +38,6 @@ export default function InicioAlumno() {
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   contenedorFormulario: {
     width: "90%",
     maxWidth: 1000,
@@ -51,7 +46,7 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
@@ -76,30 +71,30 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sisegTexto: {
-    fontSize: Fuentes.grande,
-    color: Colores.textoGuinda,
+    fontSize: Fuentes.display,
+    color: Colores.primario,
     fontWeight: "700",
     marginRight: 12,
   },
   sisegDescripcion: {
-    fontSize: Fuentes.texto,
-    color: Colores.textoOscuro,
+    fontSize: Fuentes.cuerpoPrincipal,
+    color: Colores.textoSecundario,
     flexWrap: "nowrap",
   },
   titulo: {
     fontSize: Fuentes.titulo,
-    color: Colores.textoGuinda,
+    color: Colores.primario,
     fontWeight: "700",
     marginTop: 25,
     marginBottom: 5,
   },
   nombreAlumno: {
-    fontSize: Fuentes.mediano,
-    color: Colores.texto,
+    fontSize: Fuentes.subtitulo,
+    color: Colores.textoPrincipal,
   },
   idAlumno: {
-    fontSize: Fuentes.mediano,
-    color: Colores.textoOscuro,
+    fontSize: Fuentes.subtitulo,
+    color: Colores.textoSecundario,
   },
   piePagina: {
     marginTop: 50,
@@ -114,19 +109,19 @@ const styles = StyleSheet.create({
   },
   avisoTexto: {
     fontSize: Fuentes.titulo,
-    color: Colores.textoGuinda,
+    color: Colores.primario,
     fontWeight: "700",
     marginRight: 10,
   },
   separador: {
-    backgroundColor: Colores.textoGuinda,
+    backgroundColor: Colores.primario,
     width: 1.5,
     height: 35,
     marginRight: 10,
   },
   piePaginaTexto: {
-    fontSize: Fuentes.pequeño,
-    color: Colores.textoOscuro,
+    fontSize: Fuentes.caption,
+    color: Colores.textoSecundario,
     flex: 1,
     textAlign: 'right',
   },

@@ -1,7 +1,7 @@
 import Encabezado from '@/componentes/layout/Encabezado';
 import PiePagina from '@/componentes/layout/PiePagina';
 import Boton from '@/componentes/ui/Boton';
-import EntradaEtiquetaFlotante from '@/componentes/ui/EntradaEtiquetaFlotante';
+import Entrada from '@/componentes/ui/Entrada';
 import { useAuth } from '@/context/AuthProvider';
 import { iniciarSesionEsquema, type IniciarSesionFormulario } from '@/lib/validacion';
 import { Colores, Fuentes } from '@/temas/colores';
@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'expo-router';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function IniciarSesion() {
   const { iniciarSesion } = useAuth();
@@ -27,8 +27,8 @@ export default function IniciarSesion() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} > >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>
           <Text style={styles.titulo}>Inicio de Sesión</Text>
@@ -38,7 +38,7 @@ export default function IniciarSesion() {
               control={control}
               name="boleta"
               render={({ field: { onChange, value } }) => (
-                <EntradaEtiquetaFlotante
+                <Entrada
                   label="Boleta"
                   value={value}
                   onChangeText={onChange}
@@ -54,7 +54,7 @@ export default function IniciarSesion() {
               control={control}
               name="contraseña"
               render={({ field: { onChange, value } }) => (
-                <EntradaEtiquetaFlotante
+                <Entrada
                   label="Contraseña"
                   secureTextEntry
                   value={value}
@@ -66,7 +66,7 @@ export default function IniciarSesion() {
           </View>
 
           <Link href="/(auth)/restablecer-contrasena" style={styles.olvidarContraseña}>¿Olvidaste tu contraseña?</Link>
-
+          
           <Boton
             title={isSubmitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
             onPress={handleSubmit(onSubmit)}
@@ -77,26 +77,18 @@ export default function IniciarSesion() {
 
           <Text style={styles.iniciarSesionTexto}>
             ¿Aún no tienes una cuenta?{' '}
-            <Link href="/(auth)/registro" style={styles.iniciarSesionLink}>
+            <Link href="/(auth)/registrar-cuenta" style={styles.iniciarSesionLink}>
               Regístrate aquí
             </Link>
           </Text>
-            <Link href="/(auth)/completar-registro" style={styles.iniciarSesionLink}>
-              prueba
-            </Link>
         </View>
         <PiePagina />
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   contenedorFormulario: {
     width: "90%",
     maxWidth: 500,
@@ -104,7 +96,7 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
@@ -124,7 +116,7 @@ const styles = StyleSheet.create({
   },
   titulo: {
     fontSize: Fuentes.titulo,
-    color: Colores.texto,
+    color: Colores.textoPrincipal,
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 24,
@@ -136,17 +128,17 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   separador: {
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     borderBottomWidth: 1,
     marginVertical: 25,
   },
   iniciarSesionTexto: {
-    fontSize: Fuentes.texto,
-    color: Colores.textoOscuro,
+    fontSize: Fuentes.cuerpoPrincipal,
+    color: Colores.textoSecundario,
     textAlign: 'center',
   },
   iniciarSesionLink: {
-    color: Colores.link,
+    color: Colores.textoInfo,
     fontWeight: '500',
   },
 });

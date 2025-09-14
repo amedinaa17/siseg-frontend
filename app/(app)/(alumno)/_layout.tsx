@@ -14,22 +14,22 @@ export default function AlumnoLayout() {
     return (
       <Drawer
         screenOptions={{
-          headerStyle: { backgroundColor: Colores.fondoIPN },
-          headerTintColor: Colores.textoBlanco,
-          drawerActiveTintColor: Colores.textoGuinda,
+          headerStyle: { backgroundColor: Colores.fondoInstitucional },
+          headerTintColor: Colores.onPrimario,
+          drawerActiveTintColor: Colores.primario,
           drawerStyle: { backgroundColor: Colores.fondo },
         }}
         drawerContent={(props) => <AlumnoDrawerContent {...props} />}
       >
         <Drawer.Screen name="index" options={{ title: "Inicio" }} />
         <Drawer.Screen name="AcuseSolicitud" options={{ title: "Acuse de Solicitud" }} />
-        <Drawer.Screen name="Expediente" options={{ title: "Ver Expediente" }} />
+        <Drawer.Screen name="expediente-digital" options={{ title: "Ver Expediente" }} />
         <Drawer.Screen name="CursoInduccion" options={{ title: "Curso de Inducción" }} />
         <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
         <Drawer.Screen name="PlazaAsignada" options={{ title: "Plaza Asignada" }} />
         <Drawer.Screen name="SituacionRiesgo" options={{ title: "Situación de Riesgo" }} />
         <Drawer.Screen name="Encuesta" options={{ title: "Encuesta de Satisfacción" }} />
-        <Drawer.Screen name="Perfil" options={{ title: "Mi Perfil" }} />
+        <Drawer.Screen name="mi-perfil" options={{ title: "Mi Perfil" }} />
       </Drawer>
     );
   }
@@ -80,7 +80,7 @@ function AlumnoDrawerContent(props) {
           </TouchableOpacity>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/expediente-digital")}
           >
             <Text style={drawerStyles.submenuText}>Ver Expediente</Text>
           </TouchableOpacity>
@@ -89,7 +89,7 @@ function AlumnoDrawerContent(props) {
 
       <DrawerItem
         label="CURSO DE INDUCCIÓN"
-        onPress={() => router.push("/(app)/(alumno)/catalogo-plazas")}
+        onPress={() => router.push("/")}
       />
 
       <TouchableOpacity
@@ -144,14 +144,14 @@ function AlumnoDrawerContent(props) {
 
       <DrawerItem
         label="MI PERFIL"
-        onPress={() => router.push("/")}
+        onPress={() => router.push("/mi-perfil")}
       />
 
       <View><Text style={{ color: Colores.borderColor }}>──────────────────</Text></View>
 
       <DrawerItem
         label="CERRAR SESIÓN"
-        labelStyle={{ color: Colores.textoGuinda, fontWeight: "600" }}
+        labelStyle={{ color: Colores.primario, fontWeight: "600" }}
         onPress={handleLogout}
       />
     </DrawerContentScrollView>
@@ -165,7 +165,6 @@ const drawerStyles = StyleSheet.create({
     paddingStart: 16,
     paddingEnd: 24,
     backgroundColor: Colores.fondo,
-    marginVertical: 20,
   },
   seccionEncabezadoTexto: {
     flex: 1,
@@ -185,7 +184,7 @@ const drawerStyles = StyleSheet.create({
     paddingEnd: 24,
   },
   submenuText: {
-    fontSize: Fuentes.texto,
+    fontSize: Fuentes.cuerpoPrincipal,
     color: '#5f5f5fff',
     flex: 1,
     lineHeight: 20,

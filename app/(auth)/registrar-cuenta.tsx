@@ -1,13 +1,13 @@
 import Encabezado from "@/componentes/layout/Encabezado";
 import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
-import EntradaEtiquetaFlotante from "@/componentes/ui/EntradaEtiquetaFlotante";
+import Entrada from "@/componentes/ui/Entrada";
 import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useAuth } from "@/context/AuthProvider";
 import { correoEsquema, type CorreoFormulario } from "@/lib/validacion";
@@ -28,9 +28,8 @@ export default function Register() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colores.background }}>
-
-      <ScrollView contentContainerStyle={styles.scroll}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} > >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>
           <Text style={styles.titulo}>Registro</Text>
@@ -40,7 +39,7 @@ export default function Register() {
               control={control}
               name="correo"
               render={({ field: { onChange, value } }) => (
-                <EntradaEtiquetaFlotante
+                <Entrada
                   label="Correo Electrónico Institucional"
                   value={value}
                   onChangeText={onChange}
@@ -69,16 +68,11 @@ export default function Register() {
         </View>
         <PiePagina />
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   contenedorFormulario: {
     width: "90%",
     maxWidth: 500,
@@ -86,7 +80,7 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
@@ -106,23 +100,23 @@ const styles = StyleSheet.create({
   },
   titulo: {
     fontSize: Fuentes.titulo,
-    color: Colores.texto,
+    color: Colores.textoPrincipal,
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 24,
   },
   separador: {
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     borderBottomWidth: 1,
     marginVertical: 25,
   },
   registroTexto: {
-    color: Colores.textoOscuro,
-    fontSize: Fuentes.texto,
+    color: Colores.textoSecundario,
+    fontSize: Fuentes.cuerpoPrincipal,
     textAlign: "center",
   },
   registroLink: {
-    color: Colores.link,
+    color: Colores.textoInfo,
     fontWeight: "500",
   },
 });

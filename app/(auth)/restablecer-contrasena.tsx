@@ -1,14 +1,14 @@
 import Encabezado from "@/componentes/layout/Encabezado";
 import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
-import EntradaEtiquetaFlotante from "@/componentes/ui/EntradaEtiquetaFlotante";
+import Entrada from "@/componentes/ui/Entrada";
 import { correoEsquema, type CorreoFormulario } from "@/lib/validacion";
 import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ResetPassword() {
   const {
@@ -28,8 +28,8 @@ export default function ResetPassword() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} > >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>
           <Text style={styles.titulo}>Restablecer Contraseña</Text>
@@ -39,7 +39,7 @@ export default function ResetPassword() {
               control={control}
               name="correo"
               render={({ field: { onChange, value } }) => (
-                <EntradaEtiquetaFlotante
+                <Entrada
                   label="Correo Electrónico Institucional"
                   value={value}
                   onChangeText={onChange}
@@ -68,16 +68,11 @@ export default function ResetPassword() {
         </View>
         <PiePagina />
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   contenedorFormulario: {
     width: "90%",
     maxWidth: 500,
@@ -85,7 +80,7 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
@@ -105,23 +100,23 @@ const styles = StyleSheet.create({
   },
   titulo: {
     fontSize: Fuentes.titulo,
-    color: Colores.texto,
+    color: Colores.textoPrincipal,
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 24,
   },
   separador: {
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     borderBottomWidth: 1,
     marginVertical: 16,
   },
   restrablecerTexto: {
-    fontSize: Fuentes.texto,
-    color: Colores.textoOscuro,
+    fontSize: Fuentes.cuerpoPrincipal,
+    color: Colores.textoSecundario,
     textAlign: "center",
   },
   restablecerLink: {
-    color: Colores.link,
+    color: Colores.textoInfo,
     fontWeight: "500",
   },
 });

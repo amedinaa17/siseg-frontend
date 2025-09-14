@@ -1,3 +1,4 @@
+import { Colores, Fuentes } from "@/temas/colores";
 import React from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
@@ -15,7 +16,7 @@ export default function Boton({ title, onPress, disabled }: PropiedadesBoton) {
       style={({ hovered, pressed }) => [
         styles.base,
         hovered && styles.hover,
-        pressed && styles.presionado,
+        pressed && styles.hover,
         disabled && styles.deshabilitado,
       ]}
     >
@@ -26,23 +27,22 @@ export default function Boton({ title, onPress, disabled }: PropiedadesBoton) {
 
 const styles = StyleSheet.create({
   base: {
-    backgroundColor: "#333333",
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
+    backgroundColor: Colores.textoSecundario,
+    fontSize: Fuentes.cuerpo,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    alignItems: "center"
   },
   hover: {
-    backgroundColor: "#666666",
-  },
-  presionado: {
-    backgroundColor: "#666666",
+    backgroundColor: Colores.hover,
   },
   deshabilitado: {
     opacity: 0.6,
   },
   texto: {
-    color: "white",
-    fontWeight: "700",
+    color: Colores.onPrimario,
     textAlign: "center",
+    fontWeight: "500"
   },
 });

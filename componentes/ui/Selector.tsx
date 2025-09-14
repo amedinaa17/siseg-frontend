@@ -1,4 +1,4 @@
-import { Colores } from '@/temas/colores';
+import { Colores, Fuentes } from '@/temas/colores';
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Modal, Pressable, StyleSheet, Text, View, } from "react-native";
 
@@ -12,7 +12,7 @@ type Propiedades = {
   error?: string;
 };
 
-export default function FloatingLabelSelect({
+export default function Selector({
   label, 
   selectedValue,
   onValueChange,
@@ -40,7 +40,7 @@ export default function FloatingLabelSelect({
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-    color: isError ? Colores.error : focused ? Colores.link : Colores.textoClaro,
+    color: isError ? Colores.textoError : focused ? Colores.textoInfo : Colores.textoClaro,
     backgroundColor: Colores.fondo,
     paddingHorizontal: 4,
   };
@@ -53,10 +53,10 @@ export default function FloatingLabelSelect({
           styles.contenedor,
           {
             borderColor: isError
-              ? Colores.error
+              ? Colores.textoError
               : focused
-              ? Colores.link
-              : Colores.bordes,
+              ? Colores.textoInfo
+              : Colores.borde,
           },
         ]}
       >
@@ -117,13 +117,13 @@ const styles = StyleSheet.create({
   },
   valorTexto: {
     flex: 1,
-    fontSize: 16,
-    color: Colores.texto,
+    fontSize: 15,
+    color: Colores.textoPrincipal,
   },
   errorTexto: {
-    color: Colores.error,
+    color: Colores.textoError,
     marginTop: 5,
-    fontSize: 13,
+    fontSize: Fuentes.caption,
   },
   modalOverlay: {
     flex: 1,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   },
   textoOpcion: {
     fontSize: 16,
-    color: Colores.texto,
+    color: Colores.textoPrincipal,
   },
   cancelarOpcion: {
     borderTopWidth: 1,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   },
   cancelarTexto: {
     fontSize: 16,
-    color: Colores.error,
+    color: Colores.textoError,
     textAlign: "center",
   },
 });

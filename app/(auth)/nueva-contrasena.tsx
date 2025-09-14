@@ -1,13 +1,13 @@
 import Encabezado from "@/componentes/layout/Encabezado";
 import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
-import EntradaEtiquetaFlotante from "@/componentes/ui/EntradaEtiquetaFlotante";
+import Entrada from "@/componentes/ui/Entrada";
 import { cambiarContraseñaEsquema, CambiarContraseñaFormulario } from "@/lib/validacion";
 import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function NuevaContraseña() {
   const {
@@ -24,8 +24,8 @@ export default function NuevaContraseña() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} > >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>
           <Text style={styles.titulo}>Restablecer Contraseña</Text>
@@ -35,7 +35,7 @@ export default function NuevaContraseña() {
               control={control}
               name="contraseña"
               render={({ field: { onChange, value } }) => (
-                <EntradaEtiquetaFlotante
+                <Entrada
                   label="Nueva Contraseña"
                   secureTextEntry
                   value={value}
@@ -51,7 +51,7 @@ export default function NuevaContraseña() {
               control={control}
               name="confirmarContraseña"
               render={({ field: { onChange, value } }) => (
-                <EntradaEtiquetaFlotante
+                <Entrada
                   label="Confirmar Contraseña"
                   secureTextEntry
                   value={value}
@@ -70,16 +70,11 @@ export default function NuevaContraseña() {
         </View>
         <PiePagina />
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   contenedorFormulario: {
     width: "90%",
     maxWidth: 500,
@@ -87,7 +82,7 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: {
@@ -107,7 +102,7 @@ const styles = StyleSheet.create({
   },
   titulo: {
     fontSize: Fuentes.titulo,
-    color: Colores.texto,
+    color: Colores.textoPrincipal,
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 24,

@@ -31,11 +31,11 @@ export default function Encabezado() {
 
 const styles = StyleSheet.create({
   seguro: {
-    backgroundColor: Colores.fondoIPN,
+    backgroundColor: Colores.fondoInstitucional,
     width: "100%",
   },
   encabezado: {
-    backgroundColor: Colores.fondoIPN,
+    backgroundColor: Colores.fondoInstitucional,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
@@ -48,16 +48,16 @@ const styles = StyleSheet.create({
   textoEnLinea: {
     flex: 1,
     flexWrap: "wrap",
-    color: Colores.textoBlanco,
+    color: Colores.onPrimario,
   },
   titulo: {
-    fontSize: Fuentes.mediano,
+    fontSize: Fuentes.subtitulo,
     fontWeight: "700",
-    color: Colores.textoBlanco,
+    color: Colores.onPrimario,
     marginLeft: 12,
     marginRight: 12,
   },
   subtitulo: {
-    fontSize: Fuentes.texto
+    fontSize: Fuentes.cuerpo
   },
 });

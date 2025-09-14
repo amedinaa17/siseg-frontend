@@ -1,4 +1,4 @@
-import { Colores } from '@/temas/colores';
+import { Colores, Fuentes } from '@/temas/colores';
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Animated, Platform, Pressable, StyleSheet, Text, TextInput, TextInputProps, View, } from "react-native";
@@ -8,7 +8,7 @@ type Propiedades = TextInputProps & {
   error?: string;
 };
 
-export default function EntradaEtiquetaFlotante({
+export default function Entrada({
   label,
   error,
   value,
@@ -35,7 +35,7 @@ export default function EntradaEtiquetaFlotante({
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-    color: error ? Colores.error : focused ? Colores.link : Colores.textoClaro,
+    color: error ? Colores.textoError : focused ? Colores.textoInfo : Colores.textoClaro,
     backgroundColor: Colores.fondo,
     paddingHorizontal: 4,
   };
@@ -47,10 +47,10 @@ export default function EntradaEtiquetaFlotante({
           styles.contenedor,
           {
             borderColor: error
-              ? Colores.error
+              ? Colores.textoError
               : focused
-              ? Colores.link
-              : Colores.bordes,
+              ? Colores.textoInfo
+              : Colores.borde,
           },
         ]}
       >
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   contenedor: {
     borderWidth: 1,
     borderRadius: 8,
-    borderColor: Colores.bordes,
+    borderColor: Colores.borde,
     backgroundColor: Colores.fondo,
     position: "relative",
     flexDirection: "row",
@@ -110,11 +110,11 @@ const styles = StyleSheet.create({
   entrada: {
     flex: 1,
     height: 48,
-    fontSize: 16,
+    fontSize: 15,
     paddingHorizontal: 12,
     paddingTop: 10,
     paddingBottom: 6,
-    color: Colores.texto,
+    color: Colores.textoPrincipal,
   },
   icono: {
     position: "absolute",
@@ -122,8 +122,8 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   errorTexto: {
-    color: Colores.error,
+    color: Colores.textoError,
     marginTop: 5,
-    fontSize: 13,
+    fontSize: Fuentes.caption,
   },
 });

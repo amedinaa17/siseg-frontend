@@ -15,13 +15,13 @@ export default function PiePagina() {
 
 const styles = StyleSheet.create({
   seguro: {
-    backgroundColor: Colores.fondoIPN,
+    backgroundColor: Colores.fondoInstitucional,
     width: "100%",
   },
   piePagina: {
-    backgroundColor: Colores.fondoESCOM,
+    backgroundColor: Colores.fondoSecundario,
     padding: 10,
     alignItems: 'center',
   },
-  piePaginaTexto: { color: Colores.textoBlanco, fontWeight: '600', textAlign: 'center', },
+  piePaginaTexto: { color: Colores.onPrimario, fontWeight: '600', textAlign: 'center', },
 });

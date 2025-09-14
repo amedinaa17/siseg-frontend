@@ -1,7 +1,7 @@
 import { AuthProvider, useAuth } from "@/context/AuthProvider";
 import { Slot, useRouter, useSegments } from "expo-router";
 import React, { useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 function AuthGate() {
   const { sesion, cargando } = useAuth();
@@ -40,7 +40,7 @@ function AuthGate() {
 
   if (cargando) {
     return (
-      <View style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#5a0839" />
       </View>
     );
@@ -51,8 +51,10 @@ function AuthGate() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <AuthGate />
-    </AuthProvider>
+    <View style={StyleSheet.absoluteFill}>
+      <AuthProvider>
+        <AuthGate />
+      </AuthProvider>
+    </View>
   );
 }

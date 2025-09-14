@@ -14,9 +14,9 @@ export default function AdministrativoLayout() {
     return (
       <Drawer
         screenOptions={{
-          headerStyle: { backgroundColor: Colores.fondoIPN },
-          headerTintColor: Colores.textoBlanco,
-          drawerActiveTintColor: Colores.textoGuinda,
+          headerStyle: { backgroundColor: Colores.fondoInstitucional },
+          headerTintColor: Colores.onPrimario,
+          drawerActiveTintColor: Colores.primario,
           drawerStyle: { backgroundColor: Colores.fondo },
         }}
         drawerContent={(props) => <AdministrativoDrawerContent {...props} />}
@@ -31,7 +31,7 @@ export default function AdministrativoLayout() {
         <Drawer.Screen name="mapa-plazas" options={{ title: "Mapa de Plazas" }} />
         <Drawer.Screen name="reportes-riesgo" options={{ title: "Reportes de Situación de Riesgo" }} />
         <Drawer.Screen name="reportes-encuestas" options={{ title: "Encuestas de Satisfacción" }} />
-        <Drawer.Screen name="mi-perfil" options={{ title: "Mi Perfil" }} />
+        <Drawer.Screen name="mi-perfil-administrativo" options={{ title: "Mi Perfil" }} />
       </Drawer>
     );
   }
@@ -158,14 +158,14 @@ function AdministrativoDrawerContent(props) {
 
       <DrawerItem
         label="MI PERFIL"
-        onPress={() => router.push("/mi-perfil")}
+        onPress={() => router.push("/mi-perfil-administrativo")}
       />
 
       <View><Text style={{ color: Colores.borderColor }}>──────────────────</Text></View>
 
       <DrawerItem
         label="CERRAR SESIÓN"
-        labelStyle={{ color: Colores.textoGuinda, fontWeight: "600" }}
+        labelStyle={{ color: Colores.primario, fontWeight: "600" }}
         onPress={handleLogout}
       />
     </DrawerContentScrollView>
@@ -198,7 +198,7 @@ const drawerStyles = StyleSheet.create({
     paddingEnd: 24,
   },
   submenuText: {
-    fontSize: Fuentes.texto,
+    fontSize: Fuentes.cuerpoPrincipal,
     color: '#5f5f5fff',
     flex: 1,
     lineHeight: 20,
