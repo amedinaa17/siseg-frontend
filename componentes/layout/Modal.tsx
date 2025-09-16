@@ -1,13 +1,14 @@
 import { Colores, Fuentes } from "@/temas/colores";
 import React, { useState } from "react";
-import { Modal, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 type Props = {
   visible: boolean;
   titulo?: string;
   children: React.ReactNode;
   onClose: () => void;
-  mostrarCerrar?: boolean;
+  cerrar?: boolean;
+  maxWidth?: number;
 
   // Footer
   aceptar?: boolean;
@@ -23,7 +24,8 @@ export default function ModalPersonalizado({
   titulo,
   children,
   onClose,
-  mostrarCerrar = true,
+  cerrar = true,
+  maxWidth = 500,
 
   aceptar = true,
   cancelar = false,
@@ -34,16 +36,16 @@ export default function ModalPersonalizado({
 }: Props) {
   const [hoverAceptar, setHoverAceptar] = useState(false);
   const [hoverCancelar, setHoverCancelar] = useState(false);
+  const { height } = useWindowDimensions();
 
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <View style={styles.contenedor}>
-
+        <View style={[styles.contenedor, { maxHeight: height * 0.9, maxWidth }]}>
           {/* Encabezado */}
           <View style={styles.encabezado}>
             <Text style={styles.titulo}>{titulo}</Text>
-            {mostrarCerrar && (
+            {cerrar && (
               <Pressable onPress={onClose}>
                 <Text style={{ fontSize: 20, color: Colores.textoPrincipal }}>✕</Text>
               </Pressable>
@@ -51,39 +53,44 @@ export default function ModalPersonalizado({
           </View>
 
           {/* Contenido */}
-          <View style={{ padding: 20 }}>{children}</View>
+          <ScrollView
+            contentContainerStyle={{ padding: 20 }}
+            showsVerticalScrollIndicator={false}
+          >
+            {children}
 
-          {/* Footer */}
-          {(aceptar || cancelar) && (
-            <View style={styles.footer}>
-              {cancelar && (
-                <Pressable
-                  onPress={onCancelar || onClose}
-                  onHoverIn={() => setHoverCancelar(true)}
-                  onHoverOut={() => setHoverCancelar(false)}
-                  style={[
-                    styles.boton,
-                    { backgroundColor: hoverCancelar ? Colores.borde : Colores.textoClaro },
-                  ]}
-                >
-                  <Text style={{ color: Colores.textoPrincipal }}>{textoCancelar}</Text>
-                </Pressable>
-              )}
-              {aceptar && (
-                <Pressable
-                  onPress={onAceptar || onClose}
-                  onHoverIn={() => setHoverAceptar(true)}
-                  onHoverOut={() => setHoverAceptar(false)}
-                  style={[
-                    styles.boton,
-                    { backgroundColor: hoverAceptar ? Colores.hover : Colores.textoSecundario },
-                  ]}
-                >
-                  <Text style={{ color: Colores.onPrimario }}>{textoAceptar}</Text>
-                </Pressable>
-              )}
-            </View>
-          )}
+            {/* Footer */}
+            {(aceptar || cancelar) && (
+              <View style={styles.footer}>
+                {cancelar && (
+                  <Pressable
+                    onPress={onCancelar || onClose}
+                    onHoverIn={() => setHoverCancelar(true)}
+                    onHoverOut={() => setHoverCancelar(false)}
+                    style={[
+                      styles.boton,
+                      { backgroundColor: hoverCancelar ? Colores.borde : Colores.textoClaro },
+                    ]}
+                  >
+                    <Text style={{ color: Colores.textoPrincipal }}>{textoCancelar}</Text>
+                  </Pressable>
+                )}
+                {aceptar && (
+                  <Pressable
+                    onPress={onAceptar || onClose}
+                    onHoverIn={() => setHoverAceptar(true)}
+                    onHoverOut={() => setHoverAceptar(false)}
+                    style={[
+                      styles.boton,
+                      { backgroundColor: hoverAceptar ? Colores.hover : Colores.textoSecundario },
+                    ]}
+                  >
+                    <Text style={{ color: Colores.onPrimario }}>{textoAceptar}</Text>
+                  </Pressable>
+                )}
+              </View>
+            )}
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -100,7 +107,6 @@ const styles = StyleSheet.create({
   },
   contenedor: {
     width: "100%",
-    maxWidth: 500,
     backgroundColor: Colores.fondo,
     borderRadius: 12,
     overflow: "hidden",
@@ -123,14 +129,13 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: 25,
-    paddingHorizontal: 15,
-    paddingBottom: 15,
+    gap: 20,
+    paddingTop: 20,
   },
   boton: {
     fontSize: Fuentes.cuerpo,
     paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     borderRadius: 6,
     fontWeight: "700",
   },

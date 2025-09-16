@@ -198,7 +198,7 @@ const drawerStyles = StyleSheet.create({
     paddingEnd: 24,
   },
   submenuText: {
-    fontSize: Fuentes.cuerpoPrincipal,
+    fontSize: Fuentes.cuerpo,
     color: '#5f5f5fff',
     flex: 1,
     lineHeight: 20,

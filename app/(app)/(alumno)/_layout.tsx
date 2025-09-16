@@ -27,7 +27,7 @@ export default function AlumnoLayout() {
         <Drawer.Screen name="CursoInduccion" options={{ title: "Curso de Inducción" }} />
         <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
         <Drawer.Screen name="PlazaAsignada" options={{ title: "Plaza Asignada" }} />
-        <Drawer.Screen name="SituacionRiesgo" options={{ title: "Situación de Riesgo" }} />
+        <Drawer.Screen name="reportes-riesgo" options={{ title: "Situación de Riesgo" }} />
         <Drawer.Screen name="Encuesta" options={{ title: "Encuesta de Satisfacción" }} />
         <Drawer.Screen name="mi-perfil" options={{ title: "Mi Perfil" }} />
       </Drawer>
@@ -129,7 +129,7 @@ function AlumnoDrawerContent(props) {
         <View style={drawerStyles.submenuContenedor}>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/reportes-riesgo")}
           >
             <Text style={drawerStyles.submenuText}>Situación de Riesgo</Text>
           </TouchableOpacity>
@@ -184,7 +184,7 @@ const drawerStyles = StyleSheet.create({
     paddingEnd: 24,
   },
   submenuText: {
-    fontSize: Fuentes.cuerpoPrincipal,
+    fontSize: Fuentes.cuerpo,
     color: '#5f5f5fff',
     flex: 1,
     lineHeight: 20,

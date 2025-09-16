@@ -1,4 +1,4 @@
-import Button from "@/componentes/ui/Boton";
+import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Selector from "@/componentes/ui/Selector";
 import {
@@ -74,38 +74,38 @@ export default function MiPerfil() {
                                 <Entrada label="Nombre" value="Ana" editable={false} />
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Apellido Paterno" value="Medina" editable={false} />
                                 </View>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Apellido Materno" value="Angeles" editable={false} />
                                 </View>
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="CURP" value="MEAA010203AACDNNA1" editable={false} />
                                 </View>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="RFC" value="MEAA010203ABC" editable={false} />
                                 </View>
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Boleta" value="2022630301" keyboardType="numeric" editable={false} />
                                 </View>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Carrera" value="Médico Cirujano y Homeópata" editable={false} />
                                 </View>
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Generación" value="Febrero 2025" editable={false} />
                                 </View>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Promedio" value="9.0" keyboardType="decimal-pad" editable={false} />
                                 </View>
                             </View>
@@ -119,29 +119,29 @@ export default function MiPerfil() {
                                 />
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Calle y Número" value="Av. Politécnico 123" editable={false} />
                                 </View>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Colonia" value="Lindavista" editable={false} />
                                 </View>
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Delegación / Municipio" value="Gustavo A. Madero" editable={false} />
                                 </View>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Estado de Procedencia" value="Ciudad de México" editable={false} />
                                 </View>
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Código Postal" value="07300" keyboardType="numeric" editable={false} />
                                 </View>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Selector
                                         label="Sexo"
                                         selectedValue="Mujer"
@@ -154,21 +154,21 @@ export default function MiPerfil() {
                                 </View>
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && styles.column]}>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Teléfono Celular" value="5512345678" keyboardType="phone-pad" editable={false} />
                                 </View>
-                                <View style={[styles.col, { pointerEvents: "none" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Entrada label="Teléfono Local" value="5554321987" keyboardType="phone-pad" editable={false} />
                                 </View>
                             </View>
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Button title="Modificar Datos" onPress={() => setVista("modificar")} />
+                                    <Boton title="Modificar Datos" onPress={() => setVista("modificar")} />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Button title="Cambiar Contraseña" onPress={() => setVista("contraseña")} />
+                                    <Boton title="Cambiar Contraseña" onPress={() => setVista("contraseña")} />
                                 </View>
                             </View>
                         </>
@@ -304,10 +304,10 @@ export default function MiPerfil() {
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Button title="Regresar" onPress={() => { resetPerfil(); setVista("perfil") }} />
+                                    <Boton title="Regresar" onPress={() => { resetPerfil(); setVista("perfil") }} />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Button
+                                    <Boton
                                         title={enviandoPerfil ? "Guardando…" : "Guardar Cambios"}
                                         onPress={handlePerfil(onSubmitPerfil)}
                                     />
@@ -354,10 +354,10 @@ export default function MiPerfil() {
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Button title="Regresar" onPress={() => { resetContraseña(); setVista("perfil") }} />
+                                    <Boton title="Regresar" onPress={() => { resetContraseña(); setVista("perfil") }} />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Button
+                                    <Boton
                                         title={enviandoContraseña ? "Guardando…" : "Guardar Contraseña"}
                                         onPress={handleContraseña(onSubmitContraseña)}
                                     />
@@ -400,12 +400,5 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         gap: 12,
         marginBottom: 15,
-    },
-    column: {
-        flexDirection: "column",
-    },
-    col: {
-        flex: 1,
-        marginBottom: 0,
     },
 });

@@ -25,7 +25,7 @@ export default function CambiarContraseña() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} > >
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>

@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   sisegDescripcion: {
-    fontSize: Fuentes.cuerpoPrincipal,
+    fontSize: Fuentes.cuerpo,
     color: Colores.textoSecundario,
     flexWrap: "nowrap",
   },

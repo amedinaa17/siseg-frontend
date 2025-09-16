@@ -1,6 +1,7 @@
 import Modal from "@/componentes/layout/Modal";
 import Button from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
+import EntradaMultilinea from "@/componentes/ui/EntradaMultilinea";
 import SelectorArchivo from "@/componentes/ui/SelectorArchivo";
 import Tabla from "@/componentes/ui/Tabla";
 import { Colores, Fuentes } from "@/temas/colores";
@@ -37,8 +38,8 @@ export default function ExpedienteDigital() {
         const { documento, estatus, observaciones, archivo } = docSeleccionado;
 
         return (
-            <Modal visible={!!docSeleccionado} onClose={cerrarModal} titulo={documento} 
-                aceptar={estatus === "Rechazado" ? false : true} textoAceptar={ estatus === "Sin cargar" ? "Cargar" : undefined }
+            <Modal visible={!!docSeleccionado} onClose={cerrarModal} titulo={documento}
+                aceptar={estatus === "Rechazado" ? false : true} textoAceptar={estatus === "Sin cargar" ? "Cargar" : undefined}
                 cancelar={estatus === "Sin cargar" ? true : false} >
                 <Text
                     style={[
@@ -100,7 +101,10 @@ export default function ExpedienteDigital() {
                             <Entrada label="Archivo" value="documento.pdf" editable={false} />
                         </View>
                         <View style={{ pointerEvents: "none" }}>
-                            <Entrada style={{ height: 150, marginTop: -50 }} label="Observaciones" value={observaciones} editable={false} />
+                            <EntradaMultilinea
+                                label="Descripción"
+                                value={observaciones}
+                            />
                         </View>
                     </>
                 )}
@@ -200,30 +204,16 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     subtitulo: {
-        fontSize: Fuentes.cuerpoPrincipal,
+        fontSize: Fuentes.cuerpo,
         fontWeight: "500",
         color: Colores.textoClaro,
         marginTop: 20,
         marginBottom: 10,
     },
     texto: {
-        fontSize: Fuentes.cuerpoPrincipal,
+        fontSize: Fuentes.cuerpo,
         paddingHorizontal: 15,
         paddingVertical: 8,
         fontWeight: "500"
-    },
-
-    boton: {
-        fontSize: Fuentes.cuerpo,
-        paddingVertical: 10,
-        paddingHorizontal: 16,
-        borderRadius: 6,
-        fontWeight: "700",
-    },
-    inputFake: {
-        borderWidth: 1,
-        borderColor: Colores.bordes,
-        padding: 10,
-        borderRadius: 6,
     },
 });

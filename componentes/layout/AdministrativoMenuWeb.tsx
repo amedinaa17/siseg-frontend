@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   menuItem: {
-    fontSize: Fuentes.cuerpoPrincipal,
+    fontSize: Fuentes.cuerpo,
     color: Colores.onPrimario,
     fontWeight: "600",
   },
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   submenuitem: {
-    fontSize: Fuentes.cuerpoPrincipal,
+    fontSize: Fuentes.cuerpo,
     color: Colores.textoSecundario,
     paddingVertical: 6,
     paddingHorizontal: 10,

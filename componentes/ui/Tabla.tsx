@@ -5,8 +5,9 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 type Columna = {
     key: string;
     titulo: string;
-    ancho?: string | number;
+    ancho?: number;
     render?: (valor: any, fila?: any) => React.ReactNode;
+    multilinea?: boolean;
 };
 
 type Props = {
@@ -25,7 +26,10 @@ export default function Tabla({ columnas, datos }: Props) {
                 {columnas.map((col) => (
                     <Text
                         key={col.key}
-                        style={styles.encabezado}
+                        style={[
+                            styles.encabezado,
+                            col.ancho ? { flex: 0, width: col.ancho } : { flex: 1 },
+                        ]}
                         numberOfLines={1}
                         ellipsizeMode="tail"
                     >
@@ -48,14 +52,17 @@ export default function Tabla({ columnas, datos }: Props) {
                         ]}
                     >
                         {columnas.map((col) => (
-                            <View key={col.key} style={[styles.celda]}>
+                            <View key={col.key} style={[
+                                styles.celda,
+                                col.ancho ? { flex: 0, width: col.ancho } : { flex: 1 },
+                            ]}>
                                 {col.render ? (
                                     col.render(fila[col.key], fila)
                                 ) : (
                                     <Text
                                         style={styles.texto}
-                                        numberOfLines={1}
-                                        ellipsizeMode="tail"
+                                        numberOfLines={col.multilinea ? undefined : 1}
+                                        ellipsizeMode={col.multilinea ? undefined : "tail"}
                                     >
                                         {fila[col.key]}
                                     </Text>
@@ -71,7 +78,6 @@ export default function Tabla({ columnas, datos }: Props) {
 
 const styles = StyleSheet.create({
     encabezado: {
-        flex: 1,
         fontSize: Fuentes.cuerpo,
         color: Colores.textoPrincipal,
         fontWeight: "700",
@@ -84,7 +90,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
     celda: {
-        flex: 1,
         borderBottomWidth: 1,
         borderStartWidth: 1,
         borderEndWidth: 1,
