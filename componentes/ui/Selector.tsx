@@ -40,7 +40,7 @@ export default function Selector({
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-    color: isError ? Colores.textoError : focused ? Colores.textoInfo : Colores.textoClaro,
+    color: isError ? Colores.textoError : Colores.textoClaro,
     backgroundColor: Colores.fondo,
     paddingHorizontal: 4,
   };
@@ -54,8 +54,6 @@ export default function Selector({
           {
             borderColor: isError
               ? Colores.textoError
-              : focused
-              ? Colores.textoInfo
               : Colores.borde,
           },
         ]}

@@ -61,7 +61,7 @@ export default function AdministrativoMenuWeb() {
                 <Text style={styles.submenuitem}>Lista de Asistencia al Curso de Inducción</Text>
               </TouchableOpacity>
             </Link>
-            <Link href="/" asChild>
+            <Link href="/gestionar-alumnos" asChild>
               <TouchableOpacity>
                 <Text style={styles.submenuitem}>Gestionar Alumnos</Text>
               </TouchableOpacity>

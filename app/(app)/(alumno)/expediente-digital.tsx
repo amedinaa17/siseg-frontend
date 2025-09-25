@@ -88,6 +88,7 @@ export default function ExpedienteDigital() {
                         <Text style={{ color: Colores.textoSecundario, marginBottom: 25 }}>Selecciona un archivo PDF no mayor a 2 MB</Text>
                         <SelectorArchivo
                             label="Archivo"
+                            allowedTypes={["application/pdf"]}
                             onArchivoSeleccionado={(file) => {
                                 console.log("Archivo seleccionado:", file);
                             }}

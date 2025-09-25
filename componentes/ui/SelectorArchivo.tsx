@@ -18,12 +18,14 @@ type Props = {
     uri: string;
     mimeType?: string;
   }) => void;
+  allowedTypes: string[];
 };
 
 export default function SelectorArchivo({
   label,
   error,
   onArchivoSeleccionado,
+  allowedTypes,
 }: Props) {
   const [archivo, setArchivo] = useState<string>("");
   const [focused, setFocused] = useState(false);
@@ -40,9 +42,15 @@ export default function SelectorArchivo({
 
   const seleccionarArchivo = async () => {
     setFocused(true);
+
     if (Platform.OS === "web") {
       const input = document.createElement("input");
       input.type = "file";
+      
+      if (allowedTypes.length > 0) {
+        input.accept = allowedTypes.join(", ");
+      }
+
       input.onchange = (e: any) => {
         const file = e.target.files[0];
         if (file) {
@@ -56,15 +64,24 @@ export default function SelectorArchivo({
       };
       input.click();
     } else {
-      const result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
+      const result = await DocumentPicker.getDocumentAsync({
+        type: allowedTypes.length > 0 ? allowedTypes.join(", ") : "*/*",
+        copyToCacheDirectory: true,
+      });
+
       if (!result.canceled) {
         const file = result.assets[0];
-        setArchivo(file.name);
-        onArchivoSeleccionado?.({
-          name: file.name,
-          uri: file.uri,
-          mimeType: file.mimeType,
-        });
+        
+        if (file.mimeType && allowedTypes.includes(file.mimeType)) {
+          setArchivo(file.name);
+          onArchivoSeleccionado?.({
+            name: file.name,
+            uri: file.uri,
+            mimeType: file.mimeType,
+          });
+        } else {
+          alert("El archivo seleccionado no es válido. Por favor, elige un archivo de tipo permitido.");
+        }
       }
     }
   };

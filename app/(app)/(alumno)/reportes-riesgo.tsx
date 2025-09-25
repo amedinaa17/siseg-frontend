@@ -8,13 +8,14 @@ import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import React, { useState } from "react";
 import {
+    KeyboardAvoidingView,
     Platform,
     Pressable,
     ScrollView,
     StyleSheet,
     Text,
     useWindowDimensions,
-    View,
+    View
 } from "react-native";
 
 const datosReportes = [
@@ -117,13 +118,15 @@ export default function ReportesRiesgo() {
                 }}
             >
                 <ScrollView>
-                    <View style={{ marginTop: 3, marginBottom: 20 }}>
-                        <EntradaMultilinea
-                            label="Descripción"
-                            value={descripcionNueva}
-                            onChangeText={setDescripcionNueva}
-                        />
-                    </View>
+                    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} >
+                        <View style={{ marginTop: 5, marginBottom: 20 }}>
+                            <EntradaMultilinea
+                                label="Descripción"
+                                value={descripcionNueva}
+                                onChangeText={setDescripcionNueva}
+                            />
+                        </View>
+                    </KeyboardAvoidingView>
 
                     <View style={{ marginBottom: 15, flexDirection: "row", justifyContent: "flex-end" }}>
                         <Button title="+ Agregar evidencia" onPress={handleAgregarEvidencia} />
