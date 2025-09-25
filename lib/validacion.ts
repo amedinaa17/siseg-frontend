@@ -19,11 +19,11 @@ export const boletaEsquema = z
   .string()
   .nonempty("Este campo es obligatorio")
   .refine((val) => /^\d+$/.test(val), {
-      message: "La boleta solo debe contener dígitos",
-    })
-    .refine((val) => val.length === 10, {
-      message: "La boleta debe contener exactamente 10 dígitos",
-    });
+    message: "La boleta solo debe contener dígitos",
+  })
+  .refine((val) => val.length === 10, {
+    message: "La boleta debe contener exactamente 10 dígitos",
+  });
 
 // Validación para contraseña
 export const contraseñaEsquema = z
@@ -187,17 +187,26 @@ export const alumnoEsquema = z.object({
   nombre: z
     .string()
     .nonempty("El nombre es obligatorio")
-    .min(2, "El nombre debe tener al menos 2 caracteres"),
+    .min(3, "El nombre debe tener al menos 3 caracteres")
+    .refine((val) => /^\D*$/.test(val), {
+      message: "El nombre no puede contener dígitos",
+    }),
 
   apellidoPaterno: z
     .string()
     .nonempty("El apellido paterno es obligatorio")
-    .min(2, "Debe tener al menos 2 caracteres"),
+    .min(3, "Debe tener al menos 3 caracteres")
+    .refine((val) => /^\D*$/.test(val), {
+      message: "El apellido paterno no puede contener dígitos",
+    }),
 
   apellidoMaterno: z
     .string()
     .nonempty("El apellido materno es obligatorio")
-    .min(2, "Debe tener al menos 2 caracteres"),
+    .min(3, "Debe tener al menos 3 caracteres")
+    .refine((val) => /^\D*$/.test(val), {
+      message: "El apellido materno no puede contener dígitos",
+    }),
 
   boleta: boletaEsquema,
 
@@ -300,3 +309,72 @@ export const alumnoEsquema = z.object({
 });
 
 export type AlumnoFormulario = z.infer<typeof alumnoEsquema>;
+
+// Esquema para alumnos
+export const personalEsquema = z.object({
+  nombre: z
+    .string()
+    .nonempty("El nombre es obligatorio")
+    .min(3, "El nombre debe tener al menos 3 caracteres")
+    .refine((val) => /^\D*$/.test(val), {
+      message: "El nombre no puede contener dígitos",
+    }),
+
+  apellidoPaterno: z
+    .string()
+    .nonempty("El apellido paterno es obligatorio")
+    .min(3, "Debe tener al menos 3 caracteres")
+    .refine((val) => /^\D*$/.test(val), {
+      message: "El apellido paterno no puede contener dígitos",
+    }),
+
+  apellidoMaterno: z
+    .string()
+    .nonempty("El apellido materno es obligatorio")
+    .min(3, "Debe tener al menos 3 caracteres")
+    .refine((val) => /^\D*$/.test(val), {
+      message: "El apellido materno no puede contener dígitos",
+    }),
+
+  curp: z
+    .string()
+    .nonempty("La CURP es obligatoria")
+    .regex(
+      /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/,
+      "Formato de CURP inválido"
+    ),
+
+  noEmpleado: boletaEsquema,
+
+  perfil: z
+    .string()
+    .nonempty("El perfil es obligatorio"),
+
+  correo: z
+    .string()
+    .nonempty("El correo es obligatorio")
+    .email("Formato de correo inválido")
+    .endsWith("@alumno.ipn.mx", "Debe ser un correo institucional"),
+
+  telefonoCelular: z
+    .string()
+    .nonempty("El teléfono celular es obligatorio")
+    .refine((val) => /^\d+$/.test(val), {
+      message: "El número de celular solo debe contener dígitos",
+    })
+    .refine((val) => val.length === 10, {
+      message: "El número de celular debe contener exactamente 10 dígitos",
+    }),
+
+  telefonoLocal: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^\d+$/.test(val), {
+      message: "El número local solo debe contener dígitos",
+    })
+    .refine((val) => !val || (val.length >= 7 && val.length <= 10), {
+      message: "El número local debe tener entre 7 y 10 dígitos",
+    }),
+});
+
+export type PersonalFormulario = z.infer<typeof personalEsquema>;

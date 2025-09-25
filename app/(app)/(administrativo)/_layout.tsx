@@ -25,7 +25,7 @@ export default function AdministrativoLayout() {
         <Drawer.Screen name="validar-documentos" options={{ title: "Validar Documentos" }} />
         <Drawer.Screen name="lista-asistencia" options={{ title: "Lista de Asistencia al Curso de Inducción" }} />
         <Drawer.Screen name="gestionar-alumnos" options={{ title: "Gestionar Alumnos" }} />
-        <Drawer.Screen name="personal-administrativo" options={{ title: "Personal Administrativo" }} />
+        <Drawer.Screen name="gestionar-personal" options={{ title: "Personal Administrativo" }} />
         <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
         <Drawer.Screen name="asignar-plaza" options={{ title: "Asignar Plaza" }} />
         <Drawer.Screen name="mapa-plazas" options={{ title: "Mapa de Plazas" }} />
@@ -97,7 +97,7 @@ function AdministrativoDrawerContent(props) {
 
       <DrawerItem
         label="PERSONAL ADMINISTRATIVO"
-        onPress={() => router.push("/")}
+        onPress={() => router.push("/gestionar-personal")}
       />
 
       <TouchableOpacity
@@ -112,7 +112,7 @@ function AdministrativoDrawerContent(props) {
         <View style={drawerStyles.submenuContenedor}>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/(app)/(alumno)/catalogo-plazas")}
+            onPress={() => router.push("/")}
           >
             <Text style={drawerStyles.submenuText}>Catálogo de Plazas</Text>
           </TouchableOpacity>

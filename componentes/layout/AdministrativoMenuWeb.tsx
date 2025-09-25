@@ -70,7 +70,7 @@ export default function AdministrativoMenuWeb() {
         )}
       </View>
 
-      <Link href="/" asChild>
+      <Link href="/gestionar-personal" asChild>
         <TouchableOpacity>
           <Text style={styles.menuItem}>PERSONAL ADMINISTRATIVO</Text>
         </TouchableOpacity>

@@ -52,10 +52,32 @@ const datosAlumnos = [
     },
 ];
 
+const defaultValues: AlumnoFormulario = {
+    nombre: "",
+    apellidoPaterno: "",
+    apellidoMaterno: "",
+    boleta: "",
+    carrera: "",
+    generacion: "",
+    estatus: "En proceso",
+    correo: "",
+    promedio: "",
+    curp: "",
+    rfc: "",
+    telefonoCelular: "",
+    telefonoLocal: "",
+    sexo: "",
+    calleNumero: "",
+    colonia: "",
+    delegacionMunicipio: "",
+    estadoProcedencia: "",
+    codigoPostal: "",
+};
+
 export default function GestionAlumnos() {
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<AlumnoFormulario>({
         resolver: zodResolver(alumnoEsquema),
-        defaultValues: {},
+        defaultValues: defaultValues,
     });
 
     // Estados modales
@@ -78,12 +100,11 @@ export default function GestionAlumnos() {
     const esPantallaPequeña = width < 600;
 
     const abrirModalAgregar = () => {
-        reset({});
         setModalAgregar(true);
     };
 
     const onSubmit = (data: AlumnoFormulario) => {
-        console.log("Alumno agregado:", data);
+        reset(defaultValues);
         setModalAgregar(false);
     };
 
@@ -257,7 +278,7 @@ export default function GestionAlumnos() {
 
     const renderModalAgregar = () => {
         return (
-            <Modal visible={modalAgregar} onClose={() => setModalAgregar(false)} titulo="Agregar Alumno" maxWidth={700} cancelar textoAceptar="Agregar alumno" onAceptar={handleSubmit(onSubmit)}>
+            <Modal visible={modalAgregar} onClose={() => { setModalAgregar(false); reset(defaultValues); }} titulo="Agregar Alumno" maxWidth={700} cancelar textoAceptar="Agregar alumno" onAceptar={handleSubmit(onSubmit)}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80}>
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                         <View style={{ marginTop: 5, marginBottom: 15 }}>
@@ -475,14 +496,9 @@ export default function GestionAlumnos() {
 
     const renderModalEditar = () => {
         return (
-            <Modal
-                visible={!!modalEditar}
-                onClose={() => { setAlumnoSeleccionado(null); setModalEditar(false); }}
-                titulo="Editar Alumno"
-                maxWidth={750}
-                cancelar
-                textoAceptar="Guardar Cambios"
-                onAceptar={handleSubmit(onSubmit)}
+            <Modal visible={!!modalEditar}
+                onClose={() => { setAlumnoSeleccionado(null); setModalEditar(false); reset(defaultValues); }}
+                titulo="Editar Alumno" maxWidth={750} cancelar textoAceptar="Guardar Cambios" onAceptar={handleSubmit(onSubmit)}
             >
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80}>
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -729,7 +745,7 @@ export default function GestionAlumnos() {
                                         />
                                     )}
                                 />
-                                /</View>
+                            </View>
                             <View style={{ flex: 1, marginBottom: 0 }}>
                                 <Controller
                                     control={control}
@@ -832,7 +848,7 @@ export default function GestionAlumnos() {
                     <Text>
                         Para cargar alumnos al sistema, el archivo debe estar en formato Excel (.xls, .xlsx) y no puede exceder un tamaño de 2MB.
                     </Text>
-                    <View style={{ marginTop: 15, marginBottom: 15 }}>
+                    <View style={{ marginTop: 20, marginBottom: 5 }}>
                         <SelectorArchivo label="Selecciona el archivo" onArchivoSeleccionado={handleArchivoSeleccionado}
                             allowedTypes={["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]} />
                     </View>
