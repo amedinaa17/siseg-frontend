@@ -48,7 +48,7 @@ const Paginacion: React.FC<PaginacionProps> = ({ paginaActual, totalPaginas, set
         onPress={() => setPaginaActual(1)}
         disabled={paginaActual === 1}
       >
-        <Text style={styles.btnTexto}>{"«"}</Text>
+        <Text style={[styles.btnTexto, paginaActual === 1 && { color: Colores.textoClaro }]}>{"«"}</Text>
       </Pressable>
 
       {totalPaginasMostradas.map((page, index) => {
@@ -88,7 +88,7 @@ const Paginacion: React.FC<PaginacionProps> = ({ paginaActual, totalPaginas, set
         onPress={() => setPaginaActual(totalPaginas)}
         disabled={paginaActual === totalPaginas}
       >
-        <Text style={styles.btnTexto}>{"»"}</Text>
+        <Text style={[styles.btnTexto, paginaActual === totalPaginas && { color: Colores.textoClaro }]}>{"»"}</Text>
       </Pressable>
     </View>
   );

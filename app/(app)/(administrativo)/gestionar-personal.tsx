@@ -317,7 +317,7 @@ export default function GestionPersonalAdministrativo() {
 
     const renderModalEditar = () => {
         return (
-            <Modal visible={!!modalEditar}
+            <Modal visible={modalEditar}
                 onClose={() => { setAdminisrativoSeleccionado(null); setModalEditar(false); reset(defaultValues); }}
                 titulo="Editar Personal Administrativo" maxWidth={750} cancelar textoAceptar="Guardar Cambios" onAceptar={handleSubmit(onSubmit)}
             >
@@ -470,7 +470,7 @@ export default function GestionPersonalAdministrativo() {
     const renderModalEliminar = () => {
         if (!modalEliminar) return null;
         return (
-            <Modal visible={!!modalEliminar} onClose={() => setModalEliminar(null)} titulo="Eliminar Personal Administrativo" maxWidth={500}
+            <Modal visible={modalEliminar} onClose={() => setModalEliminar(null)} titulo="Eliminar Personal Administrativo" maxWidth={500}
                 cancelar textoAceptar="Eliminar Personal" onAceptar={eliminarAdministrativo}>
                 <Text style={{ marginBottom: 20 }}>
                     ¿Estás seguro de que deseas eliminar al personal administrativo con número de número de empleado{" "}

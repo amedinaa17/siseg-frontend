@@ -496,7 +496,7 @@ export default function GestionAlumnos() {
 
     const renderModalEditar = () => {
         return (
-            <Modal visible={!!modalEditar}
+            <Modal visible={modalEditar}
                 onClose={() => { setAlumnoSeleccionado(null); setModalEditar(false); reset(defaultValues); }}
                 titulo="Editar Alumno" maxWidth={750} cancelar textoAceptar="Guardar Cambios" onAceptar={handleSubmit(onSubmit)}
             >
@@ -807,7 +807,7 @@ export default function GestionAlumnos() {
     const renderModalEliminar = () => {
         if (!modalEliminar) return null;
         return (
-            <Modal visible={!!modalEliminar} onClose={() => setModalEliminar(null)} titulo="Eliminar Alumno" maxWidth={500}
+            <Modal visible={modalEliminar} onClose={() => setModalEliminar(null)} titulo="Eliminar Alumno" maxWidth={500}
                 cancelar textoAceptar="Eliminar alumno" onAceptar={eliminarAlumno}>
                 <Text style={{ marginBottom: 20 }}>
                     ¿Estás seguro de que deseas eliminar al alumno con número de boleta{" "}

@@ -114,7 +114,7 @@ export default function AdministrativoMenuWeb() {
         {mostrarSubmenuReportes && (
 
           <View style={styles.submenu}>
-            <Link href="/" asChild>
+            <Link href="/reportes-riesgo" asChild>
               <TouchableOpacity>
                 <Text style={styles.submenuitem}>Reportes de Situación de Riesgo</Text>
               </TouchableOpacity>
