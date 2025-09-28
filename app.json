@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "SISEG",
+    "slug": "SISEG",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./activos/imagenes/icon.png",
-    "scheme": "frontend",
+    "icon": "./activos/imagenes/siseg.png",
+    "scheme": "SISEG",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./activos/imagenes/adaptive-icon.png",
+        "foregroundImage": "./activos/imagenes/siseg.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
@@ -21,14 +21,15 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./activos/imagenes/favicon.png"
+      "favicon": "./activos/imagenes/favicon.png",
+      "name": "SISEG"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./activos/imagenes/splash-icon.png",
+          "image": "./activos/imagenes/siseg.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"

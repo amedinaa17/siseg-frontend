@@ -8,6 +8,10 @@ function AuthGate() {
   const router = useRouter();
   const segmentos = useSegments();
   useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.title = "SISEG";
+    }
+
     if (cargando) {
       return;
     }
@@ -15,9 +19,8 @@ function AuthGate() {
     const enGrupoApp = segmentos[0] === "(app)";
     const enSubgrupo = segmentos[1];
     // console.log("segmentos:", segmentos);
-
     if (!sesion && !enGrupoAuth) {
-      router.replace("/(auth)/iniciar-sesion");
+      router.replace("/(auth)/inicio");
     }
     else if (sesion?.rol === "alumno") {
       if (!enGrupoApp || enSubgrupo !== "(alumno)") {
@@ -30,13 +33,10 @@ function AuthGate() {
       }
     }
     else if (!enGrupoAuth) {
-      router.replace("/(auth)/iniciar-sesion");
+      router.replace("/(auth)/inicio");
       console.log("Redirección no válida o rol no asignado:", sesion?.rol);
     }
-
-
   }, [sesion, cargando, segmentos]);
-
 
   if (cargando) {
     return (
