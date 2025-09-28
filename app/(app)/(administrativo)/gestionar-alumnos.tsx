@@ -17,37 +17,37 @@ const datosAlumnos = [
     {
         boleta: "2022630301", nombre: "Andrea", apellidoPaterno: "Salgado", apellidoMaterno: "Ramírez", carrera: "Médico Cirujano y Partero",
         generacion: "2025", estatus: "En proceso", correo: "asalga@alumno.ipn.mx", promedio: "9.1", curp: "SARA010312MDFLND09",
-        rfc: "SARA010312T55", telefonoCelular: "5512345678", telefonoLocal: "5553123456", sexo: "M", calleNumero: "Cedros 134",
+        rfc: "SARA010312T55", telefonoCelular: "5512345678", telefonoLocal: "5553123456", sexo: "F", calleNumero: "Cedros 134",
         colonia: "San Miguel", delegacionMunicipio: "2022630301", estadoProcedencia: "Iztapalapa", codigoPostal: "09830"
     },
     {
         boleta: "2022630320", nombre: "Mariana", apellidoPaterno: "Torres", apellidoMaterno: "López", carrera: "Médico Cirujano y Partero",
         generacion: "2025", estatus: "En proceso", correo: "mariana.tl@alumno.ipn.mx", promedio: "9.3", curp: "TOLM010215MDFLNS09",
-        rfc: "TOLM010215RT5", telefonoCelular: "5511223344", telefonoLocal: "5556789123", sexo: "M", calleNumero: "Insurgentes Sur 900",
+        rfc: "TOLM010215RT5", telefonoCelular: "5511223344", telefonoLocal: "5556789123", sexo: "F", calleNumero: "Insurgentes Sur 900",
         colonia: "Del Valle", delegacionMunicipio: "Benito Juárez", estadoProcedencia: "CDMX", codigoPostal: "03100"
     },
     {
         boleta: "2022630312", nombre: "Alejandro", apellidoPaterno: "Vega", apellidoMaterno: "Domínguez", carrera: "Médico Cirujano y Homeópata",
         generacion: "2024", estatus: "Concluido", correo: "alejandro@alumno.ipn.mx", promedio: "8.5", curp: "ALEA010112MDFLND09",
-        rfc: "ALEA010112T55", telefonoCelular: "5544332211", telefonoLocal: "5553445566", sexo: "H", calleNumero: "Av. Hidalgo 45",
+        rfc: "ALEA010112T55", telefonoCelular: "5544332211", telefonoLocal: "5553445566", sexo: "M", calleNumero: "Av. Hidalgo 45",
         colonia: "Centro", delegacionMunicipio: "Cuauhtémoc", estadoProcedencia: "CDMX", codigoPostal: "06000"
     },
     {
         boleta: "2022630333", nombre: "Jorge", apellidoPaterno: "Hernández", apellidoMaterno: "Castillo", carrera: "Médico Cirujano y Homeópata",
         generacion: "-", estatus: "Aspirante", correo: "jorgehc@alumno.ipn.mx", promedio: "8.1", curp: "HECJ991120MDFRNL08",
-        rfc: "HECJ991120KL9", telefonoCelular: "5522334455", telefonoLocal: "5559876543", sexo: "H", calleNumero: "Reforma 100",
+        rfc: "HECJ991120KL9", telefonoCelular: "5522334455", telefonoLocal: "5559876543", sexo: "M", calleNumero: "Reforma 100",
         colonia: "Juárez", delegacionMunicipio: "Cuauhtémoc", estadoProcedencia: "CDMX", codigoPostal: "06600"
     },
     {
         boleta: "2022630345", nombre: "Paola", apellidoPaterno: "Méndez", apellidoMaterno: "García", carrera: "Médico Cirujano y Partero",
         generacion: "-", estatus: "Candidato", correo: "paolamg@alumno.ipn.mx", promedio: "9.7", curp: "MEGP000305MDFLNR07",
-        rfc: "MEGP000305PR2", telefonoCelular: "5533445566", telefonoLocal: "5552233445", sexo: "M", calleNumero: "Av. Universidad 320",
+        rfc: "MEGP000305PR2", telefonoCelular: "5533445566", telefonoLocal: "5552233445", sexo: "F", calleNumero: "Av. Universidad 320",
         colonia: "Copilco", delegacionMunicipio: "Coyoacán", estadoProcedencia: "CDMX", codigoPostal: "04360"
     },
     {
         boleta: "2022630363", nombre: "Joel", apellidoPaterno: "Mora", apellidoMaterno: "Castañeda", carrera: "Médico Cirujano y Partero",
         generacion: "-", estatus: "Candidato", correo: "joelmc@alumno.ipn.mx", promedio: "8.7", curp: "MOCJ000305MDFLNR07",
-        rfc: "MOCJ000305PR2", telefonoCelular: "5533445566", telefonoLocal: "5552233445", sexo: "M", calleNumero: "Av. Universidad 350",
+        rfc: "MOCJ000305PR2", telefonoCelular: "5533445566", telefonoLocal: "5552233445", sexo: "F", calleNumero: "Av. Universidad 350",
         colonia: "Copilco", delegacionMunicipio: "Coyoacán", estadoProcedencia: "CDMX", codigoPostal: "04360"
     },
 ];
@@ -59,7 +59,7 @@ const defaultValues: AlumnoFormulario = {
     boleta: "",
     carrera: "",
     generacion: "",
-    estatus: "En proceso",
+    estatus: "",
     correo: "",
     promedio: "",
     curp: "",
@@ -252,10 +252,10 @@ export default function GestionAlumnos() {
                             <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                 <Selector
                                     label="Sexo"
-                                    selectedValue={sexo}
+                                    selectedValue={sexo === "F" ? "Femenino" : sexo === "M" ? "Masculino" : ""}
                                     items={[
-                                        { label: "Hombre", value: "Hombre" },
-                                        { label: "Mujer", value: "Mujer" },
+                                        { label: "Masculino", value: "M" },
+                                        { label: "Femenino", value: "F" },
                                     ]}
                                     onValueChange={() => { }}
                                 />
@@ -389,8 +389,19 @@ export default function GestionAlumnos() {
                                 <Controller
                                     control={control}
                                     name="estatus"
-                                    render={({ field }) => (
-                                        <Entrada label="Estatus" {...field} error={errors.estatus?.message} style={{ flex: 1 }} />
+                                    render={({ field: { onChange, value } }) => (
+                                        <Selector
+                                            label="Estatus"
+                                            selectedValue={value}
+                                            onValueChange={onChange}
+                                            items={[
+                                                { label: "Candidato", value: "Candidato" },
+                                                { label: "Aspirante", value: "Aspirante" },
+                                                { label: "En proceso", value: "En proceso" },
+                                                { label: "Concluido", value: "Concluido" },
+                                            ]}
+                                            error={errors.estatus?.message}
+                                        />
                                     )}
                                 />
                             </View>
@@ -452,14 +463,15 @@ export default function GestionAlumnos() {
                                 <Controller
                                     control={control}
                                     name="sexo"
+                                    defaultValue={""}
                                     render={({ field: { onChange, value } }) => (
                                         <Selector
                                             label="Sexo"
-                                            selectedValue={value}
+                                            selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
                                             onValueChange={onChange}
                                             items={[
-                                                { label: "Hombre", value: "H" },
-                                                { label: "Mujer", value: "M" },
+                                                { label: "Masculino", value: "M" },
+                                                { label: "Femenino", value: "F" },
                                             ]}
                                             error={errors.sexo?.message}
                                         />
@@ -656,12 +668,18 @@ export default function GestionAlumnos() {
                                 <Controller
                                     control={control}
                                     name="estatus"
-                                    render={({ field }) => (
-                                        <Entrada
+                                    render={({ field: { onChange, value } }) => (
+                                        <Selector
                                             label="Estatus"
-                                            {...field}
+                                            selectedValue={value}
+                                            onValueChange={onChange}
+                                            items={[
+                                                { label: "Candidato", value: "Candidato" },
+                                                { label: "Aspirante", value: "Aspirante" },
+                                                { label: "En proceso", value: "En proceso" },
+                                                { label: "Concluido", value: "Concluido" },
+                                            ]}
                                             error={errors.estatus?.message}
-                                            style={{ flex: 1 }}
                                         />
                                     )}
                                 />
@@ -753,11 +771,11 @@ export default function GestionAlumnos() {
                                     render={({ field: { onChange, value } }) => (
                                         <Selector
                                             label="Sexo"
-                                            selectedValue={value}
+                                            selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
                                             onValueChange={onChange}
                                             items={[
-                                                { label: "Hombre", value: "H" },
-                                                { label: "Mujer", value: "M" },
+                                                { label: "Masculino", value: "M" },
+                                                { label: "Femenino", value: "F" },
                                             ]}
                                             error={errors.sexo?.message}
                                         />

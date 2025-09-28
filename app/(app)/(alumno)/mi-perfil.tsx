@@ -29,7 +29,7 @@ export default function MiPerfil() {
             municipio: "Gustavo A. Madero",
             estado: "Ciudad de México",
             codigoPostal: "07300",
-            sexo: "Mujer",
+            sexo: "F",
             telefonoCelular: "5512345678",
             telefonoLocal: "5554321987",
         },
@@ -144,10 +144,10 @@ export default function MiPerfil() {
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Selector
                                         label="Sexo"
-                                        selectedValue="Mujer"
+                                        selectedValue="Femenino"
                                         items={[
-                                            { label: "Hombre", value: "Hombre" },
-                                            { label: "Mujer", value: "Mujer" },
+                                            { label: "Masculino", value: "M" },
+                                            { label: "Femenino", value: "F" },
                                         ]}
                                         onValueChange={() => { }}
                                     />
@@ -256,14 +256,15 @@ export default function MiPerfil() {
                                     <Controller
                                         control={controlPerfil}
                                         name="sexo"
+                                        defaultValue={""}
                                         render={({ field: { onChange, value } }) => (
                                             <Selector
                                                 label="Sexo"
-                                                selectedValue={value}
-                                                onValueChange={onChange}
+                                                selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
+                                                onValueChange={(val) => onChange(val)}
                                                 items={[
-                                                    { label: "Hombre", value: "Hombre" },
-                                                    { label: "Mujer", value: "Mujer" },
+                                                    { label: "Masculino", value: "M" },
+                                                    { label: "Femenino", value: "F" },
                                                 ]}
                                                 error={errorsPerfil.sexo?.message}
                                             />

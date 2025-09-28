@@ -241,14 +241,15 @@ export default function RegistroMultipasos() {
                   <Controller
                     control={control}
                     name="sexo"
+                    defaultValue={""}
                     render={({ field: { onChange, value } }) => (
                       <Selector
                         label="Sexo"
-                        selectedValue={value}
-                        onValueChange={onChange}
+                        selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
+                        onValueChange={(val) => onChange(val)}
                         items={[
-                          { label: "Hombre", value: "Hombre" },
-                          { label: "Mujer", value: "Mujer" },
+                          { label: "Masculino", value: "M" },
+                          { label: "Femenino", value: "F" },
                         ]}
                         error={errors.sexo?.message}
                       />

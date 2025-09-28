@@ -152,10 +152,7 @@ export const modificarPerfilEsquema = z.object({
 
   sexo: z
     .string()
-    .nonempty("El sexo es obligatorio")
-    .refine((val) => ["Hombre", "Mujer"].includes(val), {
-      message: "El sexo debe ser Hombre o Mujer",
-    }),
+    .nonempty("El sexo es obligatorio"),
 
   telefonoCelular: z
     .string()
@@ -282,10 +279,7 @@ export const alumnoEsquema = z.object({
 
   sexo: z
     .string()
-    .nonempty("El sexo es obligatorio")
-    .refine((val) => ["H", "M"].includes(val), {
-      message: "El sexo debe ser H (Hombre) o M (Mujer)",
-    }),
+    .nonempty("El sexo es obligatorio"),
 
   telefonoCelular: z
     .string()
