@@ -9,7 +9,7 @@ export default function AdministrativoMenuWeb() {
   const router = useRouter();
 
   const { width } = useWindowDimensions();
-  const menuHamburguesa = width < 768;
+  const menuHamburguesa = width < 780;
   const [menuHamburguesaVisible, setMenuHamburguesaVisible] = useState(false);
 
   const [mostrarSubmenuAlumnos, setMostrarSubmenuAlumnos] = useState(false);
@@ -35,7 +35,6 @@ export default function AdministrativoMenuWeb() {
 
   const handleLogout = async () => {
     await cerrarSesion();
-    router.replace("/(auth)/iniciar-sesion");
   };
 
   const toggleAlumnos = () => {

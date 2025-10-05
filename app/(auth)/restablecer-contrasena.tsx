@@ -2,6 +2,7 @@ import Encabezado from "@/componentes/layout/Encabezado";
 import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
+import { useAuth } from "@/context/AuthProvider";
 import { correoEsquema, type CorreoFormulario } from "@/lib/validacion";
 import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +12,8 @@ import { Controller, useForm } from "react-hook-form";
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ResetPassword() {
+  const { errorMessage } = useAuth();
+
   const {
     control,
     handleSubmit,
@@ -51,6 +54,10 @@ export default function ResetPassword() {
             />
           </View>
 
+          {errorMessage ? (
+            <Text style={styles.errorRestablecerContrasena}>{errorMessage}</Text>
+          ) : null}
+
           <Boton
             title={isSubmitting ? "Enviando…" : "Recuperar contraseña"}
             onPress={handleSubmit(onSubmit)}
@@ -59,12 +66,12 @@ export default function ResetPassword() {
 
           <View style={styles.separador} />
 
-          <Text style={styles.restrablecerTexto}>
-            ¿Ya tienes una cuenta?{" "}
+          <View style={styles.restrablecerTexto}>
+            <Text>¿Ya recordaste tu contraseña?</Text>
             <Link href="/(auth)/iniciar-sesion" style={styles.restablecerLink}>
               Inicia sesión aquí
             </Link>
-          </Text>
+          </View>
         </View>
         <PiePagina />
       </ScrollView>
@@ -90,7 +97,10 @@ const styles = StyleSheet.create({
         shadowRadius: 6,
       },
       android: {
-        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
       },
       web: {
         boxShadow: '0px 4px 6px rgba(0,0,0,0.05)',
@@ -111,12 +121,19 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   restrablecerTexto: {
+    flexDirection: 'row',
+    justifyContent: "center",
+    gap: 10,
     fontSize: Fuentes.cuerpo,
     color: Colores.textoSecundario,
-    textAlign: "center",
   },
   restablecerLink: {
     color: Colores.textoInfo,
     fontWeight: "500",
+  },
+  errorRestablecerContrasena: {
+    fontSize: Fuentes.caption,
+    color: Colores.textoError,
+    marginBottom: 10,
   },
 });

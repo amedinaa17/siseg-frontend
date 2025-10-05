@@ -1,74 +1,75 @@
-import { sessionStorage } from "@/lib/sesion";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "expo-router";
+import React, { createContext, ReactNode, useContext, useState } from "react";
+import { login, logout, verificarJWT } from "../lib/auth/authServicio";
 
-export type Sesion = { boleta: string; correo?: string; rol?: string } | null;
-
-type AuthContextType = {
-  sesion: Sesion;
+interface AuthContextType {
+  sesion: any;
   cargando: boolean;
+  errorMessage: string;
   iniciarSesion: (boleta: string, contraseña: string) => Promise<void>;
-  registro: (correo: string) => Promise<void>;
   cerrarSesion: () => Promise<void>;
-};
+  verificarToken: () => void;
+}
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [sesion, setSesion] = useState<Sesion>(null);
-  const [cargando, setCargando] = useState(true);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [sesion, setSesion] = useState<any>(null);
+  const [cargando, setCargando] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const router = useRouter();
 
-  useEffect(() => {
-  const cargarSesion = async () => {
+  // Verificar token al cargar la página y cada vez que se haga una petición
+  const verificarToken = async () => {
     try {
-      const fila = await sessionStorage.getItem("AUTH_SESSION");
-      if (fila) {
-        setSesion(JSON.parse(fila));
-      }
-    } catch (e) {
-      console.error("Error cargando sesión:", e);
-    } finally {
-      setCargando(false);
+      const usuario = await verificarJWT();
+      
+      setSesion(usuario);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Error al verificar el token.");
+      setSesion(null);
+      router.replace("/(auth)/iniciar-sesion");
     }
   };
-
-  cargarSesion();
-}, []);
-
 
   const iniciarSesion = async (boleta: string, contraseña: string) => {
-    setCargando(true);
-    try {
-      const sesionAutenticada = { boleta: boleta, rol: "alumno" };
+    setErrorMessage("");
+    try { 
+      const usuario = await login(boleta, contraseña);
+      setSesion({
+        token: usuario.token,
+        boleta: usuario.boleta,
+        rol: usuario.rol,
+        nombre: usuario.nombre,
+      });
 
-      await sessionStorage.setItem("AUTH_SESSION", JSON.stringify(sesionAutenticada));
-      setSesion(sesionAutenticada);
+      router.replace("/(app)");
     } catch (error) {
-      console.error("Error al iniciar sesión:", error);
-    } finally {
-      setCargando(false);
+      setErrorMessage(error instanceof Error ? error.message : "Error desconocido");
     }
-  };
-
-  const registro = async (correo: string) => {
-    console.log("Nuevo usuario registrado:", correo);
   };
 
   const cerrarSesion = async () => {
-    await sessionStorage.removeItem("AUTH_SESSION");
-    setSesion(null);
+    try {
+      await logout();
+      setSesion(null);
+      router.replace("/(auth)/iniciar-sesion");
+    } catch (error) {
+      console.error("Error al cerrar sesión", error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ sesion, cargando, iniciarSesion, registro, cerrarSesion }}>
+    <AuthContext.Provider value={{ sesion, cargando, errorMessage, iniciarSesion, cerrarSesion, verificarToken }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth debe usarse dentro de <AuthProvider>");
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth debe ser usado dentro de un AuthProvider");
   }
-  return ctx;
-}
+  return context;
+};

@@ -1,8 +1,10 @@
+import { useAuth } from "@/context/AuthProvider";
 import { Colores, Fuentes } from '@/temas/colores';
 import React from "react";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function InicioAlumno() {
+  const { sesion } = useAuth();
   const esMovil = Platform.OS === "ios" || Platform.OS === "android";
 
   return (
@@ -19,8 +21,8 @@ export default function InicioAlumno() {
           </View>
 
           <Text style={styles.titulo}>Bienvenido</Text>
-          <Text style={styles.nombreAlumno}>Medina Angeles Ana Cristina</Text>
-          <Text style={styles.idAlumno}>2022630301</Text>
+          <Text style={styles.nombreAlumno}>{sesion?.nombre || "Alumno"}</Text>
+          <Text style={styles.idAlumno}>{sesion?.boleta || ""}</Text>
 
           <View style={styles.piePagina}>
             <View style={styles.avisoContenedor}>
@@ -86,11 +88,12 @@ const styles = StyleSheet.create({
     color: Colores.primario,
     fontWeight: "700",
     marginTop: 25,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   nombreAlumno: {
     fontSize: Fuentes.subtitulo,
     color: Colores.textoPrincipal,
+    marginBottom: 3,
   },
   idAlumno: {
     fontSize: Fuentes.subtitulo,

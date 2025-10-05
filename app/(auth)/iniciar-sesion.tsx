@@ -12,7 +12,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function IniciarSesion() {
-  const { iniciarSesion } = useAuth();
+  const { iniciarSesion, errorMessage } = useAuth();
   const {
     control,
     handleSubmit,
@@ -65,8 +65,12 @@ export default function IniciarSesion() {
             />
           </View>
 
+          {errorMessage ? (
+            <Text style={styles.errorIniciarSesion}>{errorMessage}</Text>
+          ) : null}
+
           <Link href="/(auth)/restablecer-contrasena" style={styles.olvidarContraseña}>¿Olvidaste tu contraseña?</Link>
-          
+
           <Boton
             title={isSubmitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
             onPress={handleSubmit(onSubmit)}
@@ -75,12 +79,12 @@ export default function IniciarSesion() {
 
           <View style={styles.separador} />
 
-          <Text style={styles.iniciarSesionTexto}>
-            ¿Aún no tienes una cuenta?{' '}
+          <View style={styles.iniciarSesionTexto}>
+            <Text>¿Aún no tienes una cuenta?</Text>
             <Link href="/(auth)/registrar-cuenta" style={styles.iniciarSesionLink}>
               Regístrate aquí
             </Link>
-          </Text>
+          </View>
         </View>
         <PiePagina />
       </ScrollView>
@@ -106,7 +110,10 @@ const styles = StyleSheet.create({
         shadowRadius: 6,
       },
       android: {
-        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
       },
       web: {
         boxShadow: '0px 4px 6px rgba(0,0,0,0.05)',
@@ -133,12 +140,19 @@ const styles = StyleSheet.create({
     marginVertical: 25,
   },
   iniciarSesionTexto: {
+    flexDirection: 'row',
+    justifyContent: "center",
+    gap: 10,
     fontSize: Fuentes.cuerpo,
     color: Colores.textoSecundario,
-    textAlign: 'center',
   },
   iniciarSesionLink: {
     color: Colores.textoInfo,
     fontWeight: '500',
+  },
+  errorIniciarSesion: {
+    fontSize: Fuentes.caption,
+    color: Colores.textoError,
+    marginBottom: 10,
   },
 });

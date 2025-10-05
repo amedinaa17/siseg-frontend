@@ -1,20 +1,52 @@
+import Modal from "@/componentes/layout/Modal";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Selector from "@/componentes/ui/Selector";
+import { useAuth } from "@/context/AuthProvider";
 import {
     cambiarContraseñaEsquema, modificarPerfilEsquema,
     type CambiarContraseñaFormulario, type ModificarPerfilFormulario
 } from "@/lib/validacion";
+import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
+import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function MiPerfil() {
+    const { sesion, verificarToken } = useAuth();
+    const [datosAlumno, setDatosAlumno] = useState<any>(null);
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMensaje, setModalMensaje] = useState('');
+    const [modalTipo, setModalTipo] = useState(false);
+    const [vista, setVista] = useState<"perfil" | "modificar" | "contraseña">("perfil");
+
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 600;
-    const [vista, setVista] = useState<"perfil" | "modificar" | "contraseña">("perfil");
+
+    useEffect(() => {
+        const obtenerDatos = async () => {
+            if (sesion?.token) {
+                try {
+                    const response = await fetchData(`users/obtenerTodosDatosAlumno?tk=${sesion.token}`);
+                    if (response.error === 0) {
+                        setDatosAlumno(response.data);
+                    } else {
+                        console.error(response.message);
+                    }
+                } catch (error) {
+                    setModalTipo(false);
+                    setModalMensaje("Error al obtener los datos del alumno.")
+                    setModalVisible(true)
+                }
+            }
+        };
+
+        obtenerDatos();
+    }, [sesion, vista]);
 
     const {
         control: controlPerfil,
@@ -23,22 +55,42 @@ export default function MiPerfil() {
         formState: { errors: errorsPerfil, isSubmitting: enviandoPerfil },
     } = useForm<ModificarPerfilFormulario>({
         resolver: zodResolver(modificarPerfilEsquema),
-        defaultValues: {
-            calle: "Av. Politécnico 123",
-            colonia: "Lindavista",
-            municipio: "Gustavo A. Madero",
-            estado: "Ciudad de México",
-            codigoPostal: "07300",
-            sexo: "F",
-            telefonoCelular: "5512345678",
-            telefonoLocal: "5554321987",
-        },
     });
 
-    const onSubmitPerfil = (data: ModificarPerfilFormulario) => {
-        console.log(data);
-        setVista("perfil");
+    const onSubmitPerfil = async (data: ModificarPerfilFormulario) => {
+        verificarToken();
+
+        try {
+            const payload = {
+                tk: sesion?.token,
+                calle: data.calle,
+                colonia: data.colonia,
+                delegacion: data.municipio,
+                estado: data.estado,
+                cp: data.codigoPostal,
+                sexo: data.sexo,
+                telcelular: data.telefonoCelular,
+                tellocal: data.telefonoLocal
+            };
+            const response = await postData('users/modificarDatos', payload);
+
+            if (response.error === 0) {
+                setVista("perfil");
+                setModalTipo(true)
+                setModalMensaje('Tus datos se han actualizado correctamente.');
+                setModalVisible(true);
+            } else {
+                setModalTipo(false)
+                setModalMensaje('Hubo un problema al intentar actualizar tus datos.');
+                setModalVisible(true);
+            }
+        } catch (error) {
+            setModalTipo(false)
+            setModalMensaje('Error al conectar con el servidor. Intenta de nuevo.');
+            setModalVisible(true);
+        }
     };
+
 
     // Formulario Cambiar Contraseña
     const {
@@ -71,49 +123,49 @@ export default function MiPerfil() {
                             <Text style={styles.titulo}>Mi Perfil</Text>
 
                             <View style={{ marginBottom: 15, pointerEvents: "none" }} >
-                                <Entrada label="Nombre" value="Ana" editable={false} />
+                                <Entrada label="Nombre" value={datosAlumno?.nombre || "Cargando..."} editable={false} />
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Apellido Paterno" value="Medina" editable={false} />
+                                    <Entrada label="Apellido Paterno" value={datosAlumno?.apellido_paterno || "Cargando..."} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Apellido Materno" value="Angeles" editable={false} />
-                                </View>
-                            </View>
-
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="CURP" value="MEAA010203AACDNNA1" editable={false} />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="RFC" value="MEAA010203ABC" editable={false} />
+                                    <Entrada label="Apellido Materno" value={datosAlumno?.apellido_materno || "Cargando..."} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Boleta" value="2022630301" keyboardType="numeric" editable={false} />
+                                    <Entrada label="CURP" value={datosAlumno?.curp || "Cargando..."} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Carrera" value="Médico Cirujano y Homeópata" editable={false} />
+                                    <Entrada label="RFC" value={datosAlumno?.rfc || "Cargando..."} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Generación" value="Febrero 2025" editable={false} />
+                                    <Entrada label="Boleta" value={datosAlumno?.boleta || "Cargando..."} keyboardType="numeric" editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Promedio" value="9.0" keyboardType="decimal-pad" editable={false} />
+                                    <Entrada label="Carrera" value={"Médico Cirujano y " + (datosAlumno?.carrera === "Homeopatia" ? "Homeópata" : "Partero")} editable={false} />
+                                </View>
+                            </View>
+
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                    <Entrada label="Generación" value={datosAlumno?.generacion || "Cargando..."} editable={false} />
+                                </View>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                    <Entrada label="Promedio" value={datosAlumno?.promedio || "Cargando..."} keyboardType="decimal-pad" editable={false} />
                                 </View>
                             </View>
 
                             <View style={{ marginBottom: 15, pointerEvents: "none" }}>
                                 <Entrada
                                     label="Correo Electrónico Institucional"
-                                    value="amedina1416@alumno.ipn.mx"
+                                    value={datosAlumno?.correo || "Cargando..."}
                                     keyboardType="email-address"
                                     editable={false}
                                 />
@@ -121,30 +173,30 @@ export default function MiPerfil() {
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Calle y Número" value="Av. Politécnico 123" editable={false} />
+                                    <Entrada label="Calle y Número" value={datosAlumno?.calle_y_numero || "Cargando..."} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Colonia" value="Lindavista" editable={false} />
-                                </View>
-                            </View>
-
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Delegación / Municipio" value="Gustavo A. Madero" editable={false} />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Estado de Procedencia" value="Ciudad de México" editable={false} />
+                                    <Entrada label="Colonia" value={datosAlumno?.colonia || "Cargando..."} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Código Postal" value="07300" keyboardType="numeric" editable={false} />
+                                    <Entrada label="Delegación / Municipio" value={datosAlumno?.delegacion || "Cargando..."} editable={false} />
+                                </View>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                    <Entrada label="Estado de Procedencia" value={datosAlumno?.estado || "Cargando..."} editable={false} />
+                                </View>
+                            </View>
+
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                    <Entrada label="Código Postal" value={datosAlumno?.cp || "Cargando..."} keyboardType="numeric" editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Selector
                                         label="Sexo"
-                                        selectedValue="Femenino"
+                                        selectedValue={datosAlumno?.sexo === "F" ? "Femenino" : "Masculino"}
                                         items={[
                                             { label: "Masculino", value: "M" },
                                             { label: "Femenino", value: "F" },
@@ -156,10 +208,10 @@ export default function MiPerfil() {
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Teléfono Celular" value="5512345678" keyboardType="phone-pad" editable={false} />
+                                    <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular || "Cargando..."} keyboardType="phone-pad" editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Teléfono Local" value="5554321987" keyboardType="phone-pad" editable={false} />
+                                    <Entrada label="Teléfono Local" value={datosAlumno?.tellocal || "Cargando..."} keyboardType="phone-pad" editable={false} />
                                 </View>
                             </View>
 
@@ -182,6 +234,7 @@ export default function MiPerfil() {
                                     <Controller
                                         control={controlPerfil}
                                         name="calle"
+                                        defaultValue={datosAlumno?.calle_y_numero}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Calle y Número"
@@ -195,6 +248,7 @@ export default function MiPerfil() {
                                     <Controller
                                         control={controlPerfil}
                                         name="colonia"
+                                        defaultValue={datosAlumno?.colonia}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Colonia"
@@ -212,6 +266,7 @@ export default function MiPerfil() {
                                     <Controller
                                         control={controlPerfil}
                                         name="municipio"
+                                        defaultValue={datosAlumno?.delegacion}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Delegación / Municipio"
@@ -225,6 +280,7 @@ export default function MiPerfil() {
                                     <Controller
                                         control={controlPerfil}
                                         name="estado"
+                                        defaultValue={datosAlumno?.estado}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Estado de Procedencia"
@@ -242,6 +298,7 @@ export default function MiPerfil() {
                                     <Controller
                                         control={controlPerfil}
                                         name="codigoPostal"
+                                        defaultValue={datosAlumno?.cp}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Código Postal"
@@ -256,7 +313,7 @@ export default function MiPerfil() {
                                     <Controller
                                         control={controlPerfil}
                                         name="sexo"
-                                        defaultValue={""}
+                                        defaultValue={datosAlumno?.sexo}
                                         render={({ field: { onChange, value } }) => (
                                             <Selector
                                                 label="Sexo"
@@ -277,6 +334,7 @@ export default function MiPerfil() {
                                     <Controller
                                         control={controlPerfil}
                                         name="telefonoCelular"
+                                        defaultValue={datosAlumno?.telcelular}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Teléfono Celular"
@@ -290,6 +348,7 @@ export default function MiPerfil() {
                                 <View style={{ flex: 1, marginBottom: 25 }}>
                                     <Controller
                                         control={controlPerfil}
+                                        defaultValue={datosAlumno?.tellocal}
                                         name="telefonoLocal"
                                         render={({ field }) => (
                                             <Entrada
@@ -305,7 +364,7 @@ export default function MiPerfil() {
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Boton title="Regresar" onPress={() => { resetPerfil(); setVista("perfil") }} />
+                                    <Boton title="Regresar" onPress={() => { resetPerfil(); setVista("perfil") }} disabled={enviandoPerfil} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Boton
@@ -355,7 +414,7 @@ export default function MiPerfil() {
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Boton title="Regresar" onPress={() => { resetContraseña(); setVista("perfil") }} />
+                                    <Boton title="Regresar" onPress={() => { resetContraseña(); setVista("perfil") }} disabled={enviandoContraseña} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Boton
@@ -366,6 +425,24 @@ export default function MiPerfil() {
                             </View>
                         </>
                     )}
+                    <Modal
+                        visible={modalVisible}
+                        titulo={modalTipo ? "" : ""}
+                        cerrar={false}
+                        onClose={() => setModalVisible(false)}
+                    >
+                        <View style={{ alignItems: "center" }}>
+                            <Ionicons
+                                name={modalTipo ? "checkmark-circle-outline" : "close-circle-outline"}
+                                size={80}
+                                color={modalTipo ? Colores.textoExito : Colores.textoError}
+                            />
+                            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoClaro, marginBottom: 8 }}>
+                                {modalTipo ? "¡Todo Listo!" : "¡Algo Salió Mal!"}
+                            </Text>
+                            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center" }}>{modalMensaje}</Text>
+                        </View>
+                    </Modal>
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>

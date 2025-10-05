@@ -13,7 +13,7 @@ import { useAuth } from "@/context/AuthProvider";
 import { correoEsquema, type CorreoFormulario } from "@/lib/validacion";
 
 export default function Register() {
-  const { registro } = useAuth();
+  const { errorMessage } = useAuth();
   const {
     control,
     handleSubmit,
@@ -24,7 +24,7 @@ export default function Register() {
   });
 
   const onSubmit = async ({ correo }: CorreoFormulario) => {
-    await registro(correo);
+
   };
 
   return (
@@ -51,6 +51,10 @@ export default function Register() {
             />
           </View>
 
+          {errorMessage ? (
+            <Text style={styles.errorRegistrarCuenta}>{errorMessage}</Text>
+          ) : null}
+
           <Boton
             title={isSubmitting ? "Registrando…" : "Registrar"}
             onPress={handleSubmit(onSubmit)}
@@ -59,12 +63,12 @@ export default function Register() {
 
           <View style={styles.separador} />
 
-          <Text style={styles.registroTexto}>
-            ¿Ya tienes una cuenta?{" "}
+          <View style={styles.registroTexto}>
+            <Text>¿Ya tienes una cuenta?</Text>
             <Link href="/(auth)/iniciar-sesion" style={styles.registroLink}>
               Inicia sesión aquí
             </Link>
-          </Text>
+          </View>
         </View>
         <PiePagina />
       </ScrollView>
@@ -90,7 +94,10 @@ const styles = StyleSheet.create({
         shadowRadius: 6,
       },
       android: {
-        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
       },
       web: {
         boxShadow: '0px 4px 6px rgba(0,0,0,0.05)',
@@ -111,12 +118,29 @@ const styles = StyleSheet.create({
     marginVertical: 25,
   },
   registroTexto: {
-    color: Colores.textoSecundario,
+    ...Platform.select({
+      ios: {
+        gap: 10,
+      },
+      android: {
+        gap: 10,
+      },
+      web: {
+        gap: 50,
+      },
+    }),
+    flexDirection: 'row',
+    justifyContent: "center",
     fontSize: Fuentes.cuerpo,
-    textAlign: "center",
+    color: Colores.textoSecundario,
   },
   registroLink: {
     color: Colores.textoInfo,
     fontWeight: "500",
+  },
+  errorRegistrarCuenta: {
+    fontSize: Fuentes.caption,
+    color: Colores.textoError,
+    marginBottom: 10,
   },
 });

@@ -1,8 +1,10 @@
+import { useAuth } from "@/context/AuthProvider";
 import { Colores, Fuentes } from '@/temas/colores';
 import React from "react";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function InicioPersonalAdministrativo() {
+  const { sesion } = useAuth();
   const esMovil = Platform.OS === "ios" || Platform.OS === "android";
 
   return (
@@ -19,8 +21,8 @@ export default function InicioPersonalAdministrativo() {
           </View>
 
           <Text style={styles.titulo}>Bienvenido</Text>
-          <Text style={styles.nombrePersonalAdministrativo}>Medina Angeles Ana Cristina</Text>
-          <Text style={styles.idPersonalAdministrativo}>2022630301</Text>
+          <Text style={styles.nombrePersonalAdministrativo}>{sesion?.nombre || "Personal Administrativo"}</Text>
+          <Text style={styles.idPersonalAdministrativo}>{sesion?.boleta || ""}</Text>
 
           <View style={styles.tarjetaContenedor}>
             <View style={styles.tarjeta}>
@@ -102,11 +104,12 @@ const styles = StyleSheet.create({
     color: Colores.primario,
     fontWeight: "700",
     marginTop: 25,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   nombrePersonalAdministrativo: {
     fontSize: Fuentes.subtitulo,
     color: Colores.textoPrincipal,
+    marginBottom: 3,
   },
   idPersonalAdministrativo: {
     fontSize: Fuentes.subtitulo,

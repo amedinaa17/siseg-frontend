@@ -10,7 +10,7 @@ export default function AlumnoMenuWeb() {
   const pathname = usePathname();
 
   const { width } = useWindowDimensions();
-  const menuHamburguesa = width < 780;
+  const menuHamburguesa = width < 790;
   const [menuHamburguesaVisible, setMenuHamburguesaVisible] = useState(false);
 
   const [mostrarSubmenuExpediente, setMostrarSubmenuExpediente] = useState(false);
@@ -34,7 +34,6 @@ export default function AlumnoMenuWeb() {
 
   const handleLogout = async () => {
     await cerrarSesion();
-    router.replace("/(auth)/iniciar-sesion");
   };
 
   const toggleExpediente = () => {

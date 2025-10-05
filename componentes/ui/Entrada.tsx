@@ -82,8 +82,8 @@ export default function Entrada({
             style={styles.icono}
           >
             <Ionicons
-              name={mostrarContraseña ? "eye-off" : "eye"}
-              size={20}
+              name={mostrarContraseña ? "eye-off-outline" : "eye-outline"}
+              size={21}
               color="#6b7280"
             />
           </Pressable>
