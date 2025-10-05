@@ -43,7 +43,7 @@ export const login = async (boleta: string, password: string) => {
             throw new Error("Boleta o contraseña incorrecto.");
         }
     } catch (error) {
-        throw new Error(error instanceof Error ? error.message : "Error en la autenticación");
+        throw new Error("Error al conectar con el servidor. Intentalo de nuevo más tarde.");
     }
 };
 

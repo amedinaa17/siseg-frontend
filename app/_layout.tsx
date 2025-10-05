@@ -37,9 +37,8 @@ function AuthGate() {
       }
     } else if(!enGrupoAuth) {
       router.replace("/(auth)/iniciar-sesion");
-      console.log("Redirección no válida o rol no asignado:", sesion?.rol);
     }
-  }, [ segmentos]);
+  }, [segmentos, sesion]);
 
   useEffect(() => {
       verificarToken();

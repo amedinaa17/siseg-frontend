@@ -1,22 +1,28 @@
 import Encabezado from "@/componentes/layout/Encabezado";
+import Modal from "@/componentes/layout/Modal";
 import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
+import { postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
+import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { useAuth } from "@/context/AuthProvider";
 import { correoEsquema, type CorreoFormulario } from "@/lib/validacion";
 
 export default function Register() {
-  const { errorMessage } = useAuth();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMensaje, setModalMensaje] = useState('');
+  const [modalTipo, setModalTipo] = useState(false);
+
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<CorreoFormulario>({
     resolver: zodResolver(correoEsquema),
@@ -24,7 +30,22 @@ export default function Register() {
   });
 
   const onSubmit = async ({ correo }: CorreoFormulario) => {
+    try {
+      const response = await postData('users/verificarCandidato', { email: correo });
 
+      if (response.error === 0) {
+        setModalTipo(true);
+        setModalMensaje(correo);
+        setModalVisible(true);
+        reset();
+      } else {
+        setModalTipo(false);
+        setModalMensaje(correo);
+        setModalVisible(true);
+      }
+    } catch (error) {
+      setModalMensaje("Error al conectar con el servidor. Intentalo de nuevo más tarde.");
+    }
   };
 
   return (
@@ -34,7 +55,7 @@ export default function Register() {
         <View style={styles.contenedorFormulario}>
           <Text style={styles.titulo}>Registro</Text>
 
-          <View style={{ marginBottom: 25 }}>
+          <View style={{marginBottom: modalMensaje == '' || !modalMensaje.includes("Error") ?  25 : 15 }}>
             <Controller
               control={control}
               name="correo"
@@ -51,9 +72,9 @@ export default function Register() {
             />
           </View>
 
-          {errorMessage ? (
-            <Text style={styles.errorRegistrarCuenta}>{errorMessage}</Text>
-          ) : null}
+          {modalMensaje.includes("Error") && (
+            <Text style={styles.errorRegistrarCuenta}>{modalMensaje}</Text>
+          )}
 
           <Boton
             title={isSubmitting ? "Registrando…" : "Registrar"}
@@ -71,6 +92,37 @@ export default function Register() {
           </View>
         </View>
         <PiePagina />
+        <Modal visible={modalVisible} titulo={modalTipo ? "" : ""} cerrar={false} onClose={() => setModalVisible(false)} >
+          <View style={{ alignItems: "center" }}>
+            <Ionicons
+              name={modalTipo ? "checkmark-circle-outline" : "close-circle-outline"}
+              size={80}
+              color={modalTipo ? Colores.textoExito : Colores.textoError}
+            />
+            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoClaro, marginBottom: 8 }}>
+              {modalTipo ? "¡Todo Listo!" : "¡Algo Salió Mal!"}
+            </Text>
+            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center" }}>
+              {modalTipo ? (
+                <>
+                  Para completar tu registro, hemos enviado un correo electrónico a{" "}
+                  <Text style={{ color: Colores.textoInfo }}>
+                    {modalMensaje}
+                  </Text>
+                  . Revisa tu bandeja de entrada y sigue las instrucciones.
+                </>
+              ) : (
+                <>
+                  El correo{" "}
+                  <Text style={{ color: Colores.textoError }}>
+                    {modalMensaje}
+                  </Text>{" "}
+                  no está registrado para realizar servicio social. Comunícate con el Departamento de Extensión y Apoyos Educativos para obtener más información.
+                </>
+              )}
+            </Text>
+          </View>
+        </Modal>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -141,6 +193,6 @@ const styles = StyleSheet.create({
   errorRegistrarCuenta: {
     fontSize: Fuentes.caption,
     color: Colores.textoError,
-    marginBottom: 10,
+    marginBottom: 25,
   },
 });

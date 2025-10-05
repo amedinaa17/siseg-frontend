@@ -123,7 +123,17 @@ const styles = StyleSheet.create({
   restrablecerTexto: {
     flexDirection: 'row',
     justifyContent: "center",
-    gap: 10,
+    ...Platform.select({
+      ios: {
+        gap: 10,
+      },
+      android: {
+        gap: 10,
+      },
+      web: {
+        gap: 50,
+      },
+    }),
     fontSize: Fuentes.cuerpo,
     color: Colores.textoSecundario,
   },

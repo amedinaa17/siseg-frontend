@@ -39,7 +39,7 @@ export default function MiPerfil() {
                     }
                 } catch (error) {
                     setModalTipo(false);
-                    setModalMensaje("Error al obtener los datos del alumno.")
+                    setModalMensaje("Error al conectar con el servidor. Intentalo de nuevo más tarde.")
                     setModalVisible(true)
                 }
             }
@@ -86,7 +86,7 @@ export default function MiPerfil() {
             }
         } catch (error) {
             setModalTipo(false)
-            setModalMensaje('Error al conectar con el servidor. Intenta de nuevo.');
+            setModalMensaje('Error al conectar con el servidor. Intentalo de nuevo más tarde.');
             setModalVisible(true);
         }
     };
@@ -123,49 +123,49 @@ export default function MiPerfil() {
                             <Text style={styles.titulo}>Mi Perfil</Text>
 
                             <View style={{ marginBottom: 15, pointerEvents: "none" }} >
-                                <Entrada label="Nombre" value={datosAlumno?.nombre || "Cargando..."} editable={false} />
+                                <Entrada label="Nombre" value={datosAlumno?.nombre} editable={false} />
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Apellido Paterno" value={datosAlumno?.apellido_paterno || "Cargando..."} editable={false} />
+                                    <Entrada label="Apellido Paterno" value={datosAlumno?.apellido_paterno} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Apellido Materno" value={datosAlumno?.apellido_materno || "Cargando..."} editable={false} />
-                                </View>
-                            </View>
-
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="CURP" value={datosAlumno?.curp || "Cargando..."} editable={false} />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="RFC" value={datosAlumno?.rfc || "Cargando..."} editable={false} />
+                                    <Entrada label="Apellido Materno" value={datosAlumno?.apellido_materno} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Boleta" value={datosAlumno?.boleta || "Cargando..."} keyboardType="numeric" editable={false} />
+                                    <Entrada label="CURP" value={datosAlumno?.curp} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Carrera" value={"Médico Cirujano y " + (datosAlumno?.carrera === "Homeopatia" ? "Homeópata" : "Partero")} editable={false} />
+                                    <Entrada label="RFC" value={datosAlumno?.rfc} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Generación" value={datosAlumno?.generacion || "Cargando..."} editable={false} />
+                                    <Entrada label="Boleta" value={datosAlumno?.boleta} keyboardType="numeric" editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Promedio" value={datosAlumno?.promedio || "Cargando..."} keyboardType="decimal-pad" editable={false} />
+                                    <Entrada label="Carrera" value={datosAlumno ? ("Médico Cirujano y " + datosAlumno.carrera) : ""} editable={false} />
+                                </View>
+                            </View>
+
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                    <Entrada label="Generación" value={datosAlumno?.generacion} editable={false} />
+                                </View>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                    <Entrada label="Promedio" value={datosAlumno?.promedio} keyboardType="decimal-pad" editable={false} />
                                 </View>
                             </View>
 
                             <View style={{ marginBottom: 15, pointerEvents: "none" }}>
                                 <Entrada
                                     label="Correo Electrónico Institucional"
-                                    value={datosAlumno?.correo || "Cargando..."}
+                                    value={datosAlumno?.correo}
                                     keyboardType="email-address"
                                     editable={false}
                                 />
@@ -173,30 +173,30 @@ export default function MiPerfil() {
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Calle y Número" value={datosAlumno?.calle_y_numero || "Cargando..."} editable={false} />
+                                    <Entrada label="Calle y Número" value={datosAlumno?.calle_y_numero} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Colonia" value={datosAlumno?.colonia || "Cargando..."} editable={false} />
-                                </View>
-                            </View>
-
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Delegación / Municipio" value={datosAlumno?.delegacion || "Cargando..."} editable={false} />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Estado de Procedencia" value={datosAlumno?.estado || "Cargando..."} editable={false} />
+                                    <Entrada label="Colonia" value={datosAlumno?.colonia} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Código Postal" value={datosAlumno?.cp || "Cargando..."} keyboardType="numeric" editable={false} />
+                                    <Entrada label="Delegación / Municipio" value={datosAlumno?.delegacion} editable={false} />
+                                </View>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                    <Entrada label="Estado de Procedencia" value={datosAlumno?.estado} editable={false} />
+                                </View>
+                            </View>
+
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                    <Entrada label="Código Postal" value={datosAlumno?.cp} keyboardType="numeric" editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
                                     <Selector
                                         label="Sexo"
-                                        selectedValue={datosAlumno?.sexo === "F" ? "Femenino" : "Masculino"}
+                                        selectedValue={datosAlumno ? (datosAlumno.sexo === "F" ? "Femenino" : "Masculino") : ""}
                                         items={[
                                             { label: "Masculino", value: "M" },
                                             { label: "Femenino", value: "F" },
@@ -208,21 +208,22 @@ export default function MiPerfil() {
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular || "Cargando..."} keyboardType="phone-pad" editable={false} />
+                                    <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular} keyboardType="phone-pad" editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Teléfono Local" value={datosAlumno?.tellocal || "Cargando..."} keyboardType="phone-pad" editable={false} />
+                                    <Entrada label="Teléfono Local" value={datosAlumno?.tellocal} keyboardType="phone-pad" editable={false} />
                                 </View>
                             </View>
-
-                            <View style={{ flexDirection: "row", gap: 12 }}>
-                                <View style={{ flex: 1 }}>
-                                    <Boton title="Modificar Datos" onPress={() => setVista("modificar")} />
+                            {datosAlumno &&
+                                <View style={{ flexDirection: "row", gap: 12 }}>
+                                    <View style={{ flex: 1 }}>
+                                        <Boton title="Modificar Datos" onPress={() => setVista("modificar")} />
+                                    </View>
+                                    <View style={{ flex: 1 }}>
+                                        <Boton title="Cambiar Contraseña" onPress={() => setVista("contraseña")} />
+                                    </View>
                                 </View>
-                                <View style={{ flex: 1 }}>
-                                    <Boton title="Cambiar Contraseña" onPress={() => setVista("contraseña")} />
-                                </View>
-                            </View>
+                            }
                         </>
                     )}
                     {vista === "modificar" && (
