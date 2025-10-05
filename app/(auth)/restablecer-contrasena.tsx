@@ -1,22 +1,27 @@
 import Encabezado from "@/componentes/layout/Encabezado";
+import Modal from "@/componentes/layout/Modal";
 import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
-import { useAuth } from "@/context/AuthProvider";
 import { correoEsquema, type CorreoFormulario } from "@/lib/validacion";
+import { postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
+import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ResetPassword() {
-  const { errorMessage } = useAuth();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMensaje, setModalMensaje] = useState('');
+  const [modalTipo, setModalTipo] = useState(true);
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<CorreoFormulario>({
     resolver: zodResolver(correoEsquema),
@@ -24,10 +29,20 @@ export default function ResetPassword() {
   });
 
   const onSubmit = async ({ correo }: CorreoFormulario) => {
-    Alert.alert(
-      "Recuperación enviada",
-      `Se ha enviado un correo a ${correo} con instrucciones para restablecer tu contraseña.`
-    );
+    try {
+      const response = await postData('users/restablecerPasswordEmail', { email: correo });
+
+      if (response.error === 0) {
+        setModalTipo(true);
+        setModalMensaje(correo);
+        setModalVisible(true);
+        reset();
+      } else {
+        setModalMensaje("No existe una cuenta registrada con ese correo.");
+      }
+    } catch (error) {
+      setModalMensaje("Error al conectar con el servidor. Intentalo de nuevo más tarde.");
+    }
   };
 
   return (
@@ -37,7 +52,7 @@ export default function ResetPassword() {
         <View style={styles.contenedorFormulario}>
           <Text style={styles.titulo}>Restablecer Contraseña</Text>
 
-          <View style={{ marginBottom: 25 }}>
+          <View style={{marginBottom: modalMensaje.includes("@") || modalMensaje === "" ?  25 : 15 }}>
             <Controller
               control={control}
               name="correo"
@@ -54,9 +69,9 @@ export default function ResetPassword() {
             />
           </View>
 
-          {errorMessage ? (
-            <Text style={styles.errorRestablecerContrasena}>{errorMessage}</Text>
-          ) : null}
+          {!modalMensaje.includes("@") && modalMensaje != '' && (
+            <Text style={styles.errorRestablecerContrasena}>{modalMensaje}</Text>
+          )}
 
           <Boton
             title={isSubmitting ? "Enviando…" : "Recuperar contraseña"}
@@ -74,6 +89,29 @@ export default function ResetPassword() {
           </View>
         </View>
         <PiePagina />
+        <Modal visible={modalVisible} titulo={modalTipo ? "" : ""} cerrar={false} onClose={() => setModalVisible(false)} >
+          <View style={{ alignItems: "center" }}>
+            <Ionicons
+              name={modalTipo ? "checkmark-circle-outline" : "close-circle-outline"}
+              size={80}
+              color={modalTipo ? Colores.textoExito : Colores.textoError}
+            />
+            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoClaro, marginBottom: 8 }}>
+              {modalTipo ? "¡Todo Listo!" : "¡Algo Salió Mal!"}
+            </Text>
+            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center" }}>
+              {modalTipo ? (
+                <>
+                  Para continuar, hemos enviado un correo electrónico a{" "}
+                  <Text style={{ color: Colores.textoInfo }}>
+                    {modalMensaje}
+                  </Text>
+                  . Revisa tu bandeja de entrada y sigue las instrucciones.
+                </>
+              ) : modalMensaje}
+            </Text>
+          </View>
+        </Modal>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -144,6 +182,6 @@ const styles = StyleSheet.create({
   errorRestablecerContrasena: {
     fontSize: Fuentes.caption,
     color: Colores.textoError,
-    marginBottom: 10,
+    marginBottom: 25,
   },
 });
