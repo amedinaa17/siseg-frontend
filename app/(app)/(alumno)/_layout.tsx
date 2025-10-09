@@ -22,11 +22,11 @@ export default function AlumnoLayout() {
         drawerContent={(props) => <AlumnoDrawerContent {...props} />}
       >
         <Drawer.Screen name="index" options={{ title: "Inicio" }} />
-        <Drawer.Screen name="AcuseSolicitud" options={{ title: "Acuse de Solicitud" }} />
+        <Drawer.Screen name="acuse-solicitud" options={{ title: "Acuse de Solicitud" }} />
         <Drawer.Screen name="expediente-digital" options={{ title: "Ver Expediente" }} />
-        <Drawer.Screen name="CursoInduccion" options={{ title: "Curso de Inducción" }} />
+        <Drawer.Screen name="curso-induccion" options={{ title: "Curso de Inducción" }} />
         <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
-        <Drawer.Screen name="PlazaAsignada" options={{ title: "Plaza Asignada" }} />
+        <Drawer.Screen name="plaza-asignada" options={{ title: "Plaza Asignada" }} />
         <Drawer.Screen name="reportes-riesgo" options={{ title: "Situación de Riesgo" }} />
         <Drawer.Screen name="Encuesta" options={{ title: "Encuesta de Satisfacción" }} />
         <Drawer.Screen name="mi-perfil" options={{ title: "Mi Perfil" }} />
@@ -74,7 +74,7 @@ function AlumnoDrawerContent(props) {
         <View style={drawerStyles.submenuContenedor}>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/acuse-solicitud")}
           >
             <Text style={drawerStyles.submenuText}>Acuse de Solicitud</Text>
           </TouchableOpacity>
@@ -89,7 +89,7 @@ function AlumnoDrawerContent(props) {
 
       <DrawerItem
         label="CURSO DE INDUCCIÓN"
-        onPress={() => router.push("/")}
+        onPress={() => router.push("/(app)/(alumno)/curso-induccion")}
       />
 
       <TouchableOpacity
@@ -110,7 +110,7 @@ function AlumnoDrawerContent(props) {
           </TouchableOpacity>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/(app)/(alumno)/plaza-asignada")}
           >
             <Text style={drawerStyles.submenuText}>Plaza Asignada</Text>
           </TouchableOpacity>

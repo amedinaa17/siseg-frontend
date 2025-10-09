@@ -117,9 +117,9 @@ export default function AlumnoMenuWeb() {
 
               {mostrarSubmenuExpediente && (
                 <View style={menuHamburguesa ? styles.submenuHamburguesa : styles.submenu}>
-                  <Link href="/" asChild>
+                  <Link href="/(app)/(alumno)/acuse-solicitud" asChild>
                     <Pressable
-                      onHoverIn={() => setmenuItemHoverSubItem("acuse")}
+                      onHoverIn={() => setmenuItemHoverSubItem("acuse-solicitud")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
                       onPress={() => {
                         setMostrarSubmenuExpediente(false);
@@ -129,7 +129,7 @@ export default function AlumnoMenuWeb() {
                       <Text
                         style={[
                           styles.submenuitem,
-                          menuItemHoverSubItem === "acuse" && styles.submenuItemHover,
+                          menuItemHoverSubItem === "acuse-solicitud" && styles.submenuItemHover,
                         ]}
                       >
                         Acuse de Solicitud
@@ -161,9 +161,9 @@ export default function AlumnoMenuWeb() {
               )}
             </View>
 
-            <Link href="/" asChild>
+            <Link href="/(app)/(alumno)/curso-induccion" asChild>
               <Pressable
-                onHoverIn={() => setmenuItemHoverItem("curso")}
+                onHoverIn={() => setmenuItemHoverItem("curso-induccion")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
                 onPress={() => setMenuHamburguesaVisible(false)}
                 style={menuHamburguesa && { width: "100%" }}
@@ -226,7 +226,7 @@ export default function AlumnoMenuWeb() {
                     </Pressable>
                   </Link>
 
-                  <Link href="/" asChild>
+                  <Link href="/(app)/(alumno)/plaza-asignada" asChild>
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("plaza-asignada")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
