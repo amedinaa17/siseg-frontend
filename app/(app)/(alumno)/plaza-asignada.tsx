@@ -56,16 +56,11 @@ const styles = StyleSheet.create({
         borderColor: Colores.borde,
         backgroundColor: Colores.fondo,
         ...Platform.select({
-            ios: {
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.05,
-                shadowRadius: 6,
-            },
-            android: { elevation: 2 },
-            web: { 
-                boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
+            ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
+            android: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
+            web: { boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
         }),
+        elevation: 2,
         marginVertical: 30,
     },
     titulo: {

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 function AuthGate() {
-  const { sesion, cargando, verificarToken } = useAuth();
+  const { sesion, errorMessage, cargando, verificarToken } = useAuth();
   const router = useRouter();
   const segmentos = useSegments();
   const [montado, setMontado] = useState(false);
@@ -17,7 +17,7 @@ function AuthGate() {
     if (cargando || !montado) return;
 
     if (typeof document !== "undefined") document.title = "SISEG";
-    
+
     const enGrupoAuth = segmentos[0] === "(auth)";
     const enGrupoApp = segmentos[0] === "(app)";
     const enSubgrupo = segmentos[1];
@@ -26,7 +26,7 @@ function AuthGate() {
     if (segmentos[0] == "[...404]") {
       router.replace("/[...404]");
     } else if (!sesion && !enGrupoAuth) {
-      router.replace("/(auth)/");
+      router.replace("/(auth)/iniciar-sesion");
     } else if (sesion?.rol === "ALUMNO") {
       if (!enGrupoApp || enSubgrupo !== "(alumno)") {
         router.replace("/(app)/(alumno)");
@@ -35,13 +35,11 @@ function AuthGate() {
       if (!enGrupoApp || enSubgrupo !== "(administrativo)") {
         router.replace("/(app)/(administrativo)");
       }
-    } else if(!enGrupoAuth) {
-      router.replace("/(auth)/iniciar-sesion");
     }
-  }, [segmentos, sesion]);
+  }, [segmentos, montado]);
 
   useEffect(() => {
-      verificarToken();
+    verificarToken();
   }, [segmentos])
 
   if (cargando || !montado) {

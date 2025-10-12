@@ -1,14 +1,15 @@
 import { Colores, Fuentes } from "@/temas/colores";
 import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type PropiedadesBoton = {
   title: string;
   onPress: () => void;
   disabled?: boolean;
+  icon?: React.ReactNode;
 };
 
-export default function Boton({ title, onPress, disabled }: PropiedadesBoton) {
+export default function Boton({ title, onPress, disabled, icon }: PropiedadesBoton) {
   return (
     <Pressable
       onPress={onPress}
@@ -20,7 +21,10 @@ export default function Boton({ title, onPress, disabled }: PropiedadesBoton) {
         disabled && styles.deshabilitado,
       ]}
     >
-      <Text style={styles.texto}>{title}</Text>
+      <View style={styles.contenedorBoton}>
+        {icon && <View>{icon}</View>}
+        <Text style={styles.texto}>{title}</Text>
+      </View>
     </Pressable>
   );
 }
@@ -30,9 +34,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colores.textoSecundario,
     fontSize: Fuentes.cuerpo,
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     borderRadius: 6,
-    alignItems: "center"
+    alignItems: "center",
   },
   hover: {
     backgroundColor: Colores.hover,
@@ -43,6 +47,10 @@ const styles = StyleSheet.create({
   texto: {
     color: Colores.onPrimario,
     textAlign: "center",
-    fontWeight: "500"
+    fontWeight: "500",
+  },
+  contenedorBoton: {
+    flexDirection: "row",
+    margin: "auto",
   },
 });

@@ -35,11 +35,13 @@ export default function MiPerfil() {
                     if (response.error === 0) {
                         setDatosAlumno(response.data);
                     } else {
-                        console.error(response.message);
+                        setModalTipo(false);
+                        setModalMensaje("Hubo un error al obtener tus datos del servidor. Intentalo de nuevo más tarde.")
+                        setModalVisible(true)
                     }
                 } catch (error) {
                     setModalTipo(false);
-                    setModalMensaje("Error al conectar con el servidor. Intentalo de nuevo más tarde.")
+                    setModalMensaje("Hubo un error al conectar con el servidor. Intentalo de nuevo más tarde.")
                     setModalVisible(true)
                 }
             }
@@ -57,22 +59,22 @@ export default function MiPerfil() {
         resolver: zodResolver(modificarPerfilEsquema),
     });
 
-    const onSubmitPerfil = async (data: ModificarPerfilFormulario) => {
+    const onSubmitPerfil = async (datos: ModificarPerfilFormulario) => {
         verificarToken();
 
         try {
-            const payload = {
-                tk: sesion?.token,
-                calle: data.calle,
-                colonia: data.colonia,
-                delegacion: data.municipio,
-                estado: data.estado,
-                cp: data.codigoPostal,
-                sexo: data.sexo,
-                telcelular: data.telefonoCelular,
-                tellocal: data.telefonoLocal
+            const datosActualizar = {
+                calle: datos.calle,
+                colonia: datos.colonia,
+                delegacion: datos.municipio,
+                estado: datos.estado,
+                cp: datos.codigoPostal,
+                sexo: datos.sexo,
+                telcelular: datos.telefonoCelular,
+                tellocal: datos.telefonoLocal,
+                tk: sesion?.token
             };
-            const response = await postData('users/modificarDatos', payload);
+            const response = await postData('users/modificarDatos', datosActualizar);
 
             if (response.error === 0) {
                 setVista("perfil");
@@ -103,13 +105,13 @@ export default function MiPerfil() {
         defaultValues: { contraseña: "", confirmarContraseña: "" },
     });
 
-    const onSubmitContraseña = (data: CambiarContraseñaFormulario) => {
-        console.log(data);
+    const onSubmitContraseña = (datos: CambiarContraseñaFormulario) => {
+        console.log(datos);
         setVista("perfil");
     };
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} >
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined: "padding"} keyboardVerticalOffset={80} >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                 <View
                     style={[
@@ -462,7 +464,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colores.fondo,
         ...Platform.select({
             ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
-            android: { elevation: 2 },
+            android: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
             web: { boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
         }),
         elevation: 2,

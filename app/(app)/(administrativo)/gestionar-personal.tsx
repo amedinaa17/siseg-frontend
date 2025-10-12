@@ -144,7 +144,7 @@ export default function GestionPersonalAdministrativo() {
 
         return (
             <Modal visible={!!adminisrativoSeleccionado} onClose={() => setAdminisrativoSeleccionado(null)} titulo="Datos del Personal Administrativo" maxWidth={750}>
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80} >
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                         <View style={{ marginTop: 5, marginBottom: 15, pointerEvents: "none" }} >
                             <Entrada label="Nombre" value={nombre} editable={false} />
@@ -206,7 +206,7 @@ export default function GestionPersonalAdministrativo() {
     const renderModalAgregar = () => {
         return (
             <Modal visible={modalAgregar} onClose={() => { setModalAgregar(false); reset(defaultValues); }} titulo="Agregar Personal Administrativo" maxWidth={700} cancelar textoAceptar="Agregar personal" onAceptar={handleSubmit(onSubmit)}>
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80}>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                         <View style={{ marginBottom: 15 }}>
                             <Controller
@@ -321,7 +321,7 @@ export default function GestionPersonalAdministrativo() {
                 onClose={() => { setAdminisrativoSeleccionado(null); setModalEditar(false); reset(defaultValues); }}
                 titulo="Editar Personal Administrativo" maxWidth={750} cancelar textoAceptar="Guardar Cambios" onAceptar={handleSubmit(onSubmit)}
             >
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={80}>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                         <View style={{ marginTop: 10, marginBottom: 15 }} >
                             <Controller
@@ -512,8 +512,10 @@ export default function GestionPersonalAdministrativo() {
                         Para cargar personal administrativo al sistema, el archivo debe estar en formato Excel (.xls, .xlsx) y no puede exceder un tamaño de 2MB.
                     </Text>
                     <View style={{ marginTop: 20, marginBottom: 5 }}>
-                        <SelectorArchivo label="Selecciona el archivo" onArchivoSeleccionado={handleArchivoSeleccionado}
-                            allowedTypes={["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]} />
+                        <SelectorArchivo
+                            label="Selecciona el archivo"
+                            onArchivoSeleccionado={(file) => { setArchivoSeleccionado(file); }}
+                            allowedTypes={[".csv", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]} />
                     </View>
                 </ScrollView>
             </Modal>
@@ -652,7 +654,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colores.fondo,
         ...Platform.select({
             ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
-            android: { elevation: 2 },
+            android: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
             web: { boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
         }),
         elevation: 2,

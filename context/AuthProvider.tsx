@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Error al verificar el token.");
       setSesion(null);
-      router.replace("/(auth)/iniciar-sesion");
     }
   };
 

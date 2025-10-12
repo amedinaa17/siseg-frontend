@@ -7,36 +7,36 @@ import { WebView } from "react-native-webview";
 
 
 export default function AcuseSolicitud() {
-    const { width } = useWindowDimensions();
-    const esPantallaPequeña = width < 600;
-    const webViewRef = useRef<any>(null);
-    const { sesion, verificarToken } = useAuth();
-    const [datosAlumno, setDatosAlumno] = useState<any>(null);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [modalMensaje, setModalMensaje] = useState('');
-    const [modalTipo, setModalTipo] = useState(false);
+  const { width } = useWindowDimensions();
+  const esPantallaPequeña = width < 600;
+  const webViewRef = useRef<any>(null);
+  const { sesion, verificarToken } = useAuth();
+  const [datosAlumno, setDatosAlumno] = useState<any>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMensaje, setModalMensaje] = useState('');
+  const [modalTipo, setModalTipo] = useState(false);
 
-    useEffect(() => {
-        const obtenerDatos = async () => {
-            if (sesion?.token) {
-                try {
-                    const response = await fetchData(`users/obtenerTodosDatosAlumno?tk=${sesion.token}`);
-                    if (response.error === 0) {
-                        setDatosAlumno(response.data);
-                    } else {
-                        console.error(response.message);
-                    }
-                } catch (error) {
-                    setModalTipo(false);
-                    setModalMensaje("Error al conectar con el servidor. Intentalo de nuevo más tarde.")
-                    setModalVisible(true)
-                }
-            }
-        };
-        obtenerDatos();
-    }, [sesion]);
+  useEffect(() => {
+    const obtenerDatos = async () => {
+      if (sesion?.token) {
+        try {
+          const response = await fetchData(`users/obtenerTodosDatosAlumno?tk=${sesion.token}`);
+          if (response.error === 0) {
+            setDatosAlumno(response.data);
+          } else {
+            console.error(response.message);
+          }
+        } catch (error) {
+          setModalTipo(false);
+          setModalMensaje("Error al conectar con el servidor. Intentalo de nuevo más tarde.")
+          setModalVisible(true)
+        }
+      }
+    };
+    obtenerDatos();
+  }, [sesion]);
 
-    const generarHTML = () => `<html xmlns="http://www.w3.org/1999/xhtml">
+  const generarHTML = () => `<html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -209,80 +209,76 @@ export default function AcuseSolicitud() {
 
 </html>`;
 
-    return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View
-                style={[
-                    styles.contenedorFormulario,
-                    esPantallaPequeña && { maxWidth: "95%" },
-                ]}
-            >
-                <Text style={styles.titulo}>
-                    Acuse de solicitud de registro al servicio social
-                </Text>
+  return (
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View
+        style={[
+          styles.contenedorFormulario,
+          esPantallaPequeña && { maxWidth: "95%" },
+        ]}
+      >
+        <Text style={styles.titulo}>
+          Acuse de solicitud de registro al servicio social
+        </Text>
 
-                <Text style={styles.texto}>
-                    Confirma la información del documento antes de imprimir.
-                </Text>
+        <Text style={styles.texto}>
+          Confirma la información del documento antes de imprimir.
+        </Text>
 
-                <View style={{ marginTop: 30, height: 800 }}>
-                    {Platform.OS === "web" ? (
-                        <iframe
-                            srcDoc={generarHTML()}
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: 8,
-                            }}
-                        />
-                    ) : (
-                        <WebView
-                            ref={webViewRef}
-                            originWhitelist={["*"]}
-                            source={{ html: generarHTML() }}
-                            style={{ flex: 1, borderRadius: 8 }}
-                        />
-                    )}
-                </View>
-            </View>
-        </ScrollView>
-    );
+        <View style={{ marginTop: 30, height: 800 }}>
+          {Platform.OS === "web" ? (
+            <iframe
+              srcDoc={generarHTML()}
+              style={{
+                width: "100%",
+                height: "100%",
+                border: "1px solid #ccc",
+                borderRadius: 8,
+              }}
+            />
+          ) : (
+            <WebView
+              ref={webViewRef}
+              originWhitelist={["*"]}
+              source={{ html: generarHTML() }}
+              style={{ flex: 1, borderRadius: 8 }}
+            />
+          )}
+        </View>
+      </View>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
-    contenedorFormulario: {
-        width: "90%",
-        maxWidth: 1050,
-        margin: "auto",
-        padding: 24,
-        borderWidth: 1,
-        borderRadius: 12,
-        borderColor: Colores.borde,
-        backgroundColor: Colores.fondo,
-        ...Platform.select({
-            ios: {
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.05,
-                shadowRadius: 6,
-            },
-            android: { elevation: 2 },
-            web: { boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
-        }),
-        marginVertical: 30,
-    },
-    titulo: {
-        fontSize: Fuentes.titulo,
-        fontWeight: "700",
-        color: Colores.textoPrincipal,
-        textAlign: "center",
-        marginBottom: 20,
-    },
-    texto: {
-        fontSize: Fuentes.cuerpo,
-        textAlign: "justify",
-        paddingHorizontal: 15,
-        paddingVertical: 8,
-    },
+  contenedorFormulario: {
+    width: "90%",
+    maxWidth: 1050,
+    margin: "auto",
+    padding: 24,
+    borderWidth: 1,
+    borderRadius: 12,
+    borderColor: Colores.borde,
+    backgroundColor: Colores.fondo,
+    ...Platform.select({
+      ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
+      android: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
+      web: { boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
+    }),
+    elevation: 2,
+    marginVertical: 30,
+  },
+  titulo: {
+    fontSize: Fuentes.titulo,
+    fontWeight: "700",
+    color: Colores.textoPrincipal,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  texto: {
+    fontSize: Fuentes.cuerpo,
+    textAlign: "justify",
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+  },
 });

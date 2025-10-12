@@ -133,19 +133,11 @@ const styles = StyleSheet.create({
     borderColor: Colores.borde,
     alignItems: "center",
     ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-      web: {
-        boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
-      },
+      ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
+      android: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
+      web: { boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
     }),
+    elevation: 2,
   },
   tarjetaTitulo: {
     fontSize: Fuentes.cuerpo,
