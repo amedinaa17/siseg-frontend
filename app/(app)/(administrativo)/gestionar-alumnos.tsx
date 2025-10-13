@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions, } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 const datosAlumnos = [
     {
@@ -97,7 +97,7 @@ export default function GestionAlumnos() {
     const [filasPorPagina, setFilasPorPagina] = useState(5);
 
     const { width } = useWindowDimensions();
-    const esPantallaPequeña = width < 600;
+    const esPantallaPequeña = width < 790;
 
     const abrirModalAgregar = () => {
         setModalAgregar(true);
@@ -946,67 +946,60 @@ export default function GestionAlumnos() {
                     </View>
                 </View>
 
-
-                <Tabla
-                    columnas={[
-                        { key: "boleta", titulo: "Boleta" },
-                        { key: "nombre_completo", titulo: "Nombre" },
-                        { key: "carrera", titulo: "Carrera" },
-                        { key: "generacion", titulo: "Generación" },
-                        {
-                            key: "estatus",
-                            titulo: "Estatus",
-                            render: (valor) => (
-                                <Text
-                                    style={[
-                                        styles.texto,
-                                        valor === "En proceso" && { color: Colores.textoInfo },
-                                        valor === "Concluido" && { color: Colores.textoExito },
-                                        valor === "Candidato" && { color: Colores.textoError },
-                                        valor === "Aspirante" && { color: Colores.textoAdvertencia },
-                                    ]}
-                                >
-                                    {valor}
-                                </Text>
-                            ),
-                        },
-                        {
-                            key: "acciones",
-                            titulo: "Acciones",
-                            render: (_, fila) => (
-                                <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", margin: "auto" }}>
-                                    <Pressable
-                                        style={{
-                                            paddingVertical: 3,
-                                            paddingHorizontal: 4,
-                                            borderRadius: 5,
-                                            backgroundColor: Colores.textoInfo,
-                                        }}
-                                        onPress={() => abrirModalEditar(fila)}
+                <ScrollView horizontal={esPantallaPequeña}>
+                    <Tabla
+                        columnas={[
+                            { key: "boleta", titulo: "Boleta", ancho: 150 },
+                            { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "generacion", titulo: "Generación", ancho: 150 },
+                            {
+                                key: "estatus",
+                                titulo: "Estatus",
+                                ancho: 150,
+                                render: (valor) => (
+                                    <Text
+                                        style={[
+                                            styles.texto,
+                                            valor === "En proceso" && { color: Colores.textoInfo },
+                                            valor === "Concluido" && { color: Colores.textoExito },
+                                            valor === "Candidato" && { color: Colores.textoError },
+                                            valor === "Aspirante" && { color: Colores.textoAdvertencia },
+                                        ]}
                                     >
-                                        <Ionicons name="pencil" size={20} color={Colores.onPrimario} />
-                                    </Pressable>
-                                    <Pressable
-                                        style={{
-                                            paddingVertical: 3,
-                                            paddingHorizontal: 4,
-                                            borderRadius: 5,
-                                            backgroundColor: Colores.textoError,
-                                        }}
-                                        onPress={() => setModalEliminar(fila)}
-                                    >
-                                        <Ionicons name="trash" size={20} color={Colores.onPrimario} />
-                                    </Pressable>
-                                </View>
-                            ),
-                        },
-                    ]}
-                    datos={obtenerDatosFiltrados().map((fila) => ({
-                        ...fila,
-                        nombre_completo: `${fila.nombre} ${fila.apellidoPaterno} ${fila.apellidoMaterno}`,
-                        onPress: () => setAlumnoSeleccionado(fila),
-                    }))}
-                />
+                                        {valor}
+                                    </Text>
+                                ),
+                            },
+                            {
+                                key: "acciones",
+                                titulo: "Acciones",
+                                ancho: 110,
+                                render: (_, fila) => (
+                                    <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", margin: "auto" }}>
+                                        <Boton
+                                            title=""
+                                            onPress={() => { abrirModalEditar(fila) }}
+                                            icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ margin: -5 }} />}
+                                            color={Colores.textoInfo}
+                                        />
+                                        <Boton
+                                            title=""
+                                            onPress={() => { setModalEliminar(fila) }}
+                                            icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ margin: -5 }} />}
+                                            color={Colores.textoError}
+                                        />
+                                    </View>
+                                ),
+                            },
+                        ]}
+                        datos={obtenerDatosFiltrados().map((fila) => ({
+                            ...fila,
+                            nombre_completo: `${fila.nombre} ${fila.apellidoPaterno} ${fila.apellidoMaterno}`,
+                            onPress: () => setAlumnoSeleccionado(fila),
+                        }))}
+                    />
+                </ScrollView>
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                     <View style={{ flexDirection: "row", marginVertical: 15, gap: 6 }}>

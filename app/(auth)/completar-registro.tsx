@@ -1,6 +1,6 @@
 import Encabezado from "@/componentes/layout/Encabezado";
 import PiePagina from "@/componentes/layout/PiePagina";
-import Button from "@/componentes/ui/Boton";
+import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Selector from "@/componentes/ui/Selector";
 import { Colores, Fuentes } from '@/temas/colores';
@@ -138,7 +138,7 @@ export default function RegistroMultipasos() {
               <View style={{ flexDirection: "row", gap: 12 }}>
                 <View style={{ flex: 1 }} />
                 <View style={{ flex: 1 }}>
-                  <Button title="Siguiente" onPress={handleNext} />
+                  <Boton title="Siguiente" onPress={handleNext} />
                 </View>
               </View>
             </>
@@ -291,10 +291,10 @@ export default function RegistroMultipasos() {
 
               <View style={{ flexDirection: "row", gap: 12 }}>
                 <View style={{ flex: 1 }}>
-                  <Button title="Regresar" onPress={handleBack} />
+                  <Boton title="Regresar" onPress={handleBack} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Button
+                  <Boton
                     title={isSubmitting ? "Guardando…" : "Guardar Datos"}
                     onPress={handleSubmit(onSubmit)}
                     disabled={isSubmitting}

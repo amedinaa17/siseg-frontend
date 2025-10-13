@@ -1,4 +1,4 @@
-import Button from "@/componentes/ui/Boton";
+import Boton from "@/componentes/ui/Boton";
 import { Colores, Fuentes } from "@/temas/colores";
 import React from "react";
 import { Image, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
@@ -34,7 +34,7 @@ export default function CursoInduccion() {
 
 
                 <View style={{ marginTop: 15, alignItems: "center" }}>
-                    <Button title="Descargar QR" onPress={() => { }} />
+                    <Boton title="Descargar QR" onPress={() => { }} />
                 </View>
 
             </View>

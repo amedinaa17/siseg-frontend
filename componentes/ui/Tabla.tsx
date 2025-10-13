@@ -28,7 +28,7 @@ export default function Tabla({ columnas, datos }: Props) {
                         key={col.key}
                         style={[
                             styles.encabezado,
-                            col.ancho ? { flex: 0, width: col.ancho } : { flex: 1 },
+                            col.ancho ? { width: col.ancho } : { flex: 1 },
                         ]}
                         numberOfLines={1}
                         ellipsizeMode="tail"
@@ -54,7 +54,7 @@ export default function Tabla({ columnas, datos }: Props) {
                         {columnas.map((col) => (
                             <View key={col.key} style={[
                                 styles.celda,
-                                col.ancho ? { flex: 0, width: col.ancho } : { flex: 1 },
+                                col.ancho ? { width: col.ancho } : { flex: 1 },
                             ]}>
                                 {col.render ? (
                                     col.render(fila[col.key], fila)

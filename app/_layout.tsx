@@ -31,7 +31,7 @@ function AuthGate() {
       if (!enGrupoApp || enSubgrupo !== "(alumno)") {
         router.replace("/(app)/(alumno)");
       }
-    } else if (sesion?.rol === "ADMINISTRATIVO") {
+    } else if (sesion?.rol === "P_ADMIN") {
       if (!enGrupoApp || enSubgrupo !== "(administrativo)") {
         router.replace("/(app)/(administrativo)");
       }

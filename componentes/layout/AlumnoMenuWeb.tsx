@@ -36,24 +36,11 @@ export default function AlumnoMenuWeb() {
     await cerrarSesion();
   };
 
-  const toggleExpediente = () => {
-    const next = !mostrarSubmenuExpediente;
-    setMostrarSubmenuExpediente(next);
-    setMostrarSubmenuPlazas(false);
-    setMostrarSubmenuReportes(false);
-  };
-  const togglePlazas = () => {
-    const next = !mostrarSubmenuPlazas;
-    setMostrarSubmenuPlazas(next);
-    setMostrarSubmenuExpediente(false);
-    setMostrarSubmenuReportes(false);
-  };
-  const toggleReportes = () => {
-    const next = !mostrarSubmenuReportes;
-    setMostrarSubmenuReportes(next);
+  const toggleCerrar = () => {
     setMostrarSubmenuExpediente(false);
     setMostrarSubmenuPlazas(false);
-  };
+    setMostrarSubmenuReportes(false);
+  }
 
   return (
     <>
@@ -76,7 +63,7 @@ export default function AlumnoMenuWeb() {
                 onHoverIn={() => setmenuItemHoverItem("inicio")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
                 style={menuHamburguesa && { width: "100%" }}
-                onPress={() => setMenuHamburguesaVisible(false)}
+                onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
               >
                 <Text
                   style={[
@@ -97,7 +84,7 @@ export default function AlumnoMenuWeb() {
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("expediente")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
-                onPress={toggleExpediente}
+                onPress={() => { toggleCerrar(); setMostrarSubmenuExpediente(!mostrarSubmenuExpediente) }}
               >
                 <Text
                   style={[
@@ -121,10 +108,7 @@ export default function AlumnoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("acuse-solicitud")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => {
-                        setMostrarSubmenuExpediente(false);
-                        setMenuHamburguesaVisible(false);
-                      }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text
                         style={[
@@ -141,10 +125,7 @@ export default function AlumnoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("expediente-digital")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => {
-                        setMostrarSubmenuExpediente(false);
-                        setMenuHamburguesaVisible(false);
-                      }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text
                         style={[
@@ -165,7 +146,7 @@ export default function AlumnoMenuWeb() {
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("curso-induccion")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
-                onPress={() => setMenuHamburguesaVisible(false)}
+                onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                 style={menuHamburguesa && { width: "100%" }}
               >
                 <Text
@@ -187,7 +168,7 @@ export default function AlumnoMenuWeb() {
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("plazas")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
-                onPress={togglePlazas}
+                onPress={() => { toggleCerrar(); setMostrarSubmenuPlazas(!mostrarSubmenuPlazas) }}
               >
                 <Text
                   style={[
@@ -209,10 +190,7 @@ export default function AlumnoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("catalogo-plazas")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => {
-                        setMostrarSubmenuPlazas(false);
-                        setMenuHamburguesaVisible(false);
-                      }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text
                         style={[
@@ -230,10 +208,7 @@ export default function AlumnoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("plaza-asignada")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => {
-                        setMostrarSubmenuPlazas(false);
-                        setMenuHamburguesaVisible(false);
-                      }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text
                         style={[
@@ -254,7 +229,7 @@ export default function AlumnoMenuWeb() {
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("reportes")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
-                onPress={toggleReportes}
+                onPress={() => { toggleCerrar(); setMostrarSubmenuReportes(!mostrarSubmenuReportes) }}
               >
                 <Text
                   style={[
@@ -276,10 +251,7 @@ export default function AlumnoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("reportes-riesgo")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => {
-                        setMostrarSubmenuReportes(false);
-                        setMenuHamburguesaVisible(false);
-                      }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text
                         style={[
@@ -297,10 +269,7 @@ export default function AlumnoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("encuesta-satisfaccion")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => {
-                        setMostrarSubmenuReportes(false);
-                        setMenuHamburguesaVisible(false);
-                      }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text
                         style={[
@@ -317,12 +286,11 @@ export default function AlumnoMenuWeb() {
               )}
             </View>
 
-            {/* PERFIL */}
             <Link href="/mi-perfil" asChild>
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("perfil")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
-                onPress={() => setMenuHamburguesaVisible(false)}
+                onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                 style={menuHamburguesa && { width: "100%" }}
               >
                 <Text
@@ -340,7 +308,6 @@ export default function AlumnoMenuWeb() {
               </Pressable>
             </Link>
 
-            {/* CERRAR SESIÓN */}
             <Pressable
               onPress={handleLogout}
               onHoverIn={() => setmenuItemHoverItem("cerrar")}

@@ -108,7 +108,10 @@ export type RegistroFormulario = z.infer<typeof registroEsquema>;
 export const cambiarContraseñaEsquema = z
   .object({
     contraseña: contraseñaEsquema
-    .min(8, "La contraseña debe tener al menos 8 caracteres"),
+      .min(8, "La contraseña debe tener al menos 8 caracteres")
+      .regex(/[a-z]/, "La contraseña debe tener al menos una letra minúscula")
+      .regex(/[A-Z]/, "La contraseña debe tener al menos una letra mayúscula")
+      .regex(/\d/, "La contraseña debe tener al menos un número"),
     confirmarContraseña: z.string().nonempty("Debes confirmar la contraseña"),
   })
   .refine((data) => data.contraseña === data.confirmarContraseña, {
@@ -118,7 +121,7 @@ export const cambiarContraseñaEsquema = z
 
 export type CambiarContraseñaFormulario = z.infer<typeof cambiarContraseñaEsquema>;
 
-// Esquema para modificar datos del perfil
+// Esquema para modificar datos del perfil de alumno
 export const modificarPerfilEsquema = z.object({
   calle: z
     .string()
@@ -177,7 +180,30 @@ export const modificarPerfilEsquema = z.object({
 
 export type ModificarPerfilFormulario = z.infer<typeof modificarPerfilEsquema>;
 
-//La contraseña debe tener al menos 8 caracteres, incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial.
+// Esquema para modificar datos del perfil de personal administrativo
+export const modificarPerfilAdminEsquema = z.object({
+  telefonoCelular: z
+    .string()
+    .nonempty("El teléfono celular es obligatorio")
+    .refine((val) => /^\d+$/.test(val), {
+      message: "El número de celular solo debe contener dígitos",
+    })
+    .refine((val) => val.length === 10, {
+      message: "El número de celular debe contener exactamente 10 dígitos",
+    }),
+
+  telefonoLocal: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^\d+$/.test(val), {
+      message: "El número local solo debe contener dígitos",
+    })
+    .refine((val) => !val || (val.length >= 7 && val.length <= 10), {
+      message: "El número local debe tener entre 7 y 10 dígitos",
+    }),
+});
+
+export type ModificarPerfilAdminFormulario = z.infer<typeof modificarPerfilAdminEsquema>;
 
 // Esquema para alumnos
 export const alumnoEsquema = z.object({

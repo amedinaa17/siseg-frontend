@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions, } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 const datosAdministrativos = [
     {
@@ -573,49 +573,41 @@ export default function GestionPersonalAdministrativo() {
                     </View>
                 </View>
 
-
-                <Tabla
-                    columnas={[
-                        { key: "noEmpleado", titulo: "No. Empleado" },
-                        { key: "nombre_completo", titulo: "Nombre" },
-                        { key: "perfil", titulo: "Perfil" },
-                        {
-                            key: "acciones",
-                            titulo: "Acciones",
-                            render: (_, fila) => (
-                                <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", margin: "auto" }}>
-                                    <Pressable
-                                        style={{
-                                            paddingVertical: 3,
-                                            paddingHorizontal: 4,
-                                            borderRadius: 5,
-                                            backgroundColor: Colores.textoInfo,
-                                        }}
-                                        onPress={() => abrirModalEditar(fila)}
-                                    >
-                                        <Ionicons name="pencil" size={20} color={Colores.onPrimario} />
-                                    </Pressable>
-                                    <Pressable
-                                        style={{
-                                            paddingVertical: 3,
-                                            paddingHorizontal: 4,
-                                            borderRadius: 5,
-                                            backgroundColor: Colores.textoError,
-                                        }}
-                                        onPress={() => setModalEliminar(fila)}
-                                    >
-                                        <Ionicons name="trash" size={20} color={Colores.onPrimario} />
-                                    </Pressable>
-                                </View>
-                            ),
-                        },
-                    ]}
-                    datos={obtenerDatosFiltrados().map((fila) => ({
-                        ...fila,
-                        nombre_completo: `${fila.nombre} ${fila.apellidoPaterno} ${fila.apellidoMaterno}`,
-                        onPress: () => setAdminisrativoSeleccionado(fila),
-                    }))}
-                />
+                <ScrollView horizontal={esPantallaPequeña}>
+                    <Tabla
+                        columnas={[
+                            { key: "noEmpleado", titulo: "No. Empleado", ancho: 150 },
+                            { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "perfil", titulo: "Perfil", ...(esPantallaPequeña && { ancho: 250 }) },
+                            {
+                                key: "acciones",
+                                titulo: "Acciones",
+                                ancho: 110,
+                                render: (_, fila) => (
+                                    <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", margin: "auto" }}>
+                                        <Boton
+                                            title=""
+                                            onPress={() => { abrirModalEditar(fila) }}
+                                            icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ margin: -5 }} />}
+                                            color={Colores.textoInfo}
+                                        />
+                                        <Boton
+                                            title=""
+                                            onPress={() => { setModalEliminar(fila) }}
+                                            icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ margin: -5 }} />}
+                                            color={Colores.textoError}
+                                        />
+                                    </View>
+                                ),
+                            },
+                        ]}
+                        datos={obtenerDatosFiltrados().map((fila) => ({
+                            ...fila,
+                            nombre_completo: `${fila.nombre} ${fila.apellidoPaterno} ${fila.apellidoMaterno}`,
+                            onPress: () => setAdminisrativoSeleccionado(fila),
+                        }))}
+                    />
+                </ScrollView>
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                     <View style={{ flexDirection: "row", marginVertical: 15, gap: 6 }}>

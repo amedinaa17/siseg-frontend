@@ -9,7 +9,7 @@ export default function AdministrativoMenuWeb() {
   const router = useRouter();
 
   const { width } = useWindowDimensions();
-  const menuHamburguesa = width < 780;
+  const menuHamburguesa = width < 790;
   const [menuHamburguesaVisible, setMenuHamburguesaVisible] = useState(false);
 
   const [mostrarSubmenuAlumnos, setMostrarSubmenuAlumnos] = useState(false);
@@ -26,8 +26,8 @@ export default function AdministrativoMenuWeb() {
     if (["/validar-documentos", "/lista-asistencia", "/gestionar-alumnos"].includes(pathname)) return "alumnos";
     if (pathname === "/gestionar-personal") return "personal";
     if (["/catalogo-plazas", "/asignar-plaza", "/mapa-plazas"].includes(pathname)) return "plazas";
-    if (["/reportes-riesgo", "/reportes-encuestas"].includes(pathname)) return "reportes";
-    if (pathname === "/mi-perfil-administrativo") return "perfil";
+    if (["/revisar-reportes-riesgo", "/reportes-encuestas"].includes(pathname)) return "reportes";
+    if (pathname === "/perfil") return "perfil";
     return null;
   };
 
@@ -37,26 +37,11 @@ export default function AdministrativoMenuWeb() {
     await cerrarSesion();
   };
 
-  const toggleAlumnos = () => {
-    const nextState = !mostrarSubmenuAlumnos;
-    setMostrarSubmenuAlumnos(nextState);
-    setMostrarSubmenuPlazas(false);
+  const toggleCerrar = () => {
     setMostrarSubmenuReportes(false);
-  };
-
-  const togglePlazas = () => {
-    const nextState = !mostrarSubmenuPlazas;
-    setMostrarSubmenuPlazas(nextState);
-    setMostrarSubmenuAlumnos(false);
-    setMostrarSubmenuReportes(false);
-  };
-
-  const toggleReportes = () => {
-    const nextState = !mostrarSubmenuReportes;
-    setMostrarSubmenuReportes(nextState);
     setMostrarSubmenuAlumnos(false);
     setMostrarSubmenuPlazas(false);
-  };
+  }
 
   return (
     <>
@@ -77,7 +62,7 @@ export default function AdministrativoMenuWeb() {
                 onHoverIn={() => setmenuItemHoverItem("inicio")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
                 style={menuHamburguesa && { width: "100%" }}
-                onPress={() => { setMenuHamburguesaVisible(false) }}
+                onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
               >
                 <Text
                   style={[
@@ -96,7 +81,7 @@ export default function AdministrativoMenuWeb() {
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("alumnos")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
-                onPress={toggleAlumnos}
+                onPress={() => { toggleCerrar(); setMostrarSubmenuAlumnos(!mostrarSubmenuAlumnos) }}
               >
                 <Text
                   style={[
@@ -112,11 +97,11 @@ export default function AdministrativoMenuWeb() {
 
               {mostrarSubmenuAlumnos && (
                 <View style={menuHamburguesa ? styles.submenuHamburguesa : styles.submenu}>
-                  <Link href="/" asChild>
+                  <Link href="/validar-documentos" asChild>
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("validar-documentos")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => { setMostrarSubmenuAlumnos(false); setMenuHamburguesaVisible(false) }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text style={[
                         styles.submenuItem,
@@ -129,7 +114,7 @@ export default function AdministrativoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("lista-asistencia")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => { setMostrarSubmenuAlumnos(false); setMenuHamburguesaVisible(false) }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text style={[
                         styles.submenuItem,
@@ -143,7 +128,7 @@ export default function AdministrativoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("gestionar-alumnos")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => { setMostrarSubmenuAlumnos(false); setMenuHamburguesaVisible(false) }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text style={[
                         styles.submenuItem,
@@ -159,7 +144,7 @@ export default function AdministrativoMenuWeb() {
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("personal")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
-                onPress={() => { setMenuHamburguesaVisible(false) }}
+                onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                 style={menuHamburguesa && { width: "100%" }}
               >
                 <Text
@@ -179,7 +164,7 @@ export default function AdministrativoMenuWeb() {
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("plazas")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
-                onPress={togglePlazas}
+                onPress={() => { toggleCerrar(); setMostrarSubmenuPlazas(!mostrarSubmenuPlazas) }}
               >
                 <Text
                   style={[
@@ -199,7 +184,7 @@ export default function AdministrativoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("catalogo-plazas")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => { setMostrarSubmenuPlazas(false); setMenuHamburguesaVisible(false) }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text style={[
                         styles.submenuItem,
@@ -211,7 +196,7 @@ export default function AdministrativoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("asignar-plaza")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => { setMostrarSubmenuPlazas(false); setMenuHamburguesaVisible(false) }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text style={[
                         styles.submenuItem,
@@ -223,7 +208,7 @@ export default function AdministrativoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("mapa-plazas")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => { setMostrarSubmenuPlazas(false); setMenuHamburguesaVisible(false) }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text style={[
                         styles.submenuItem,
@@ -239,7 +224,7 @@ export default function AdministrativoMenuWeb() {
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("reportes")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
-                onPress={toggleReportes}
+                onPress={() => { toggleCerrar(); setMostrarSubmenuReportes(!mostrarSubmenuReportes) }}
               >
                 <Text
                   style={[
@@ -255,15 +240,15 @@ export default function AdministrativoMenuWeb() {
 
               {mostrarSubmenuReportes && (
                 <View style={menuHamburguesa ? styles.submenuHamburguesa : styles.submenu}>
-                  <Link href="/reportes-riesgo" asChild>
+                  <Link href="/revisar-reportes-riesgo" asChild>
                     <Pressable
-                      onHoverIn={() => setmenuItemHoverSubItem("reportes-riesgo")}
+                      onHoverIn={() => setmenuItemHoverSubItem("revisar-reportes-riesgo")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => { setMostrarSubmenuReportes(false); setMenuHamburguesaVisible(false) }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text style={[
                         styles.submenuItem,
-                        menuItemHoverSubItem === "reportes-riesgo" && styles.submenuItemHover
+                        menuItemHoverSubItem === "revisar-reportes-riesgo" && styles.submenuItemHover
                       ]}>
                         Reportes de Situación de Riesgo
                       </Text>
@@ -273,7 +258,7 @@ export default function AdministrativoMenuWeb() {
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("reportes-encuestas")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
-                      onPress={() => { setMostrarSubmenuReportes(false); setMenuHamburguesaVisible(false) }}
+                      onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text style={[
                         styles.submenuItem,
@@ -285,11 +270,11 @@ export default function AdministrativoMenuWeb() {
               )}
             </View>
 
-            <Link href="/mi-perfil-administrativo" asChild>
+            <Link href="/perfil" asChild>
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("perfil")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
-                onPress={() => { setMenuHamburguesaVisible(false) }}
+                onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                 style={menuHamburguesa && { width: "100%" }}
               >
                 <Text

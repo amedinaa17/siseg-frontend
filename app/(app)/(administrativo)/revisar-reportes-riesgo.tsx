@@ -82,7 +82,7 @@ const defaultValues = {
 
 export default function ReportesRiesgo() {
     const { width } = useWindowDimensions();
-    const esPantallaPequeña = width < 600;
+    const esPantallaPequeña = width < 790;
 
     // Estados modales
     const [modalDetalle, setModalDetalle] = useState(false);
@@ -354,7 +354,7 @@ export default function ReportesRiesgo() {
                             </Text>
                         </Text>
                     </View>
-                    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined: "padding"} keyboardVerticalOffset={80} >
+                    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
                         <View style={{ marginTop: 5, marginBottom: 20 }}>
                             <EntradaMultilinea
                                 label="Observación"
@@ -428,36 +428,39 @@ export default function ReportesRiesgo() {
                     </View>
                 </View>
 
-                <Tabla
-                    columnas={[
-                        { key: "fecha", titulo: "Fecha" },
-                        { key: "boleta", titulo: "Boleta" },
-                        { key: "nombre_completo", titulo: "Alumno" },
-                        { key: "carrera", titulo: "Carrera" },
-                        { key: "generacion", titulo: "Generación" },
-                        {
-                            key: "estatus",
-                            titulo: "Estatus",
-                            render: (valor) => (
-                                <Text
-                                    style={[
-                                        styles.texto,
-                                        valor === "En revisión" && { color: Colores.textoInfo },
-                                        valor === "Finalizado" && { color: Colores.textoExito },
-                                        valor === "Pendiente" && { color: Colores.textoAdvertencia },
-                                    ]}
-                                >
-                                    {valor}
-                                </Text>
-                            ),
-                        },
-                    ]}
-                    datos={obtenerDatosFiltrados().map((fila) => ({
-                        ...fila,
-                        nombre_completo: `${fila.nombre} ${fila.apellidoPaterno} ${fila.apellidoMaterno}`,
-                        onPress: () => abrirModalDetalle(fila),
-                    }))}
-                />
+                <ScrollView horizontal={esPantallaPequeña}>
+                    <Tabla
+                        columnas={[
+                            { key: "fecha", titulo: "Fecha", ancho: 120 },
+                            { key: "boleta", titulo: "Boleta", ancho: 150 },
+                            { key: "nombre_completo", titulo: "Alumno", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "generacion", titulo: "Generación", ancho: 150 },
+                            {
+                                key: "estatus",
+                                titulo: "Estatus",
+                                ancho: 150,
+                                render: (valor) => (
+                                    <Text
+                                        style={[
+                                            styles.texto,
+                                            valor === "En revisión" && { color: Colores.textoInfo },
+                                            valor === "Finalizado" && { color: Colores.textoExito },
+                                            valor === "Pendiente" && { color: Colores.textoAdvertencia },
+                                        ]}
+                                    >
+                                        {valor}
+                                    </Text>
+                                ),
+                            },
+                        ]}
+                        datos={obtenerDatosFiltrados().map((fila) => ({
+                            ...fila,
+                            nombre_completo: `${fila.nombre} ${fila.apellidoPaterno} ${fila.apellidoMaterno}`,
+                            onPress: () => abrirModalDetalle(fila),
+                        }))}
+                    />
+                </ScrollView>
 
                 <View style={{ marginTop: 15 }}>
                     <Paginacion

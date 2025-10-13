@@ -93,8 +93,6 @@ export default function MiPerfil() {
         }
     };
 
-
-    // Formulario Cambiar Contraseña
     const {
         control: controlContraseña,
         handleSubmit: handleContraseña,
@@ -105,13 +103,34 @@ export default function MiPerfil() {
         defaultValues: { contraseña: "", confirmarContraseña: "" },
     });
 
-    const onSubmitContraseña = (datos: CambiarContraseñaFormulario) => {
-        console.log(datos);
-        setVista("perfil");
+    const onSubmitContraseña = async (datos: CambiarContraseñaFormulario) => {
+        verificarToken();
+
+        try {
+            const response = await postData('users/restablecerPassword', {
+                password: datos.contraseña,
+                tk: sesion?.token,
+            });
+
+            if (response.error === 0) {
+                setVista("perfil");
+                setModalTipo(true)
+                setModalMensaje('Tu contraseña se ha cambiado correctamente.');
+                setModalVisible(true);
+            } else {
+                setModalTipo(false)
+                setModalMensaje('Hubo un problema al intentar actualizar tu contraseña.');
+                setModalVisible(true);
+            }
+        } catch (error) {
+            setModalTipo(false)
+            setModalMensaje('Error al conectar con el servidor. Intentalo de nuevo más tarde.');
+            setModalVisible(true);
+        }
     };
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined: "padding"} keyboardVerticalOffset={80} >
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                 <View
                     style={[

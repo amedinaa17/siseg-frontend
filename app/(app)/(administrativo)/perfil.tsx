@@ -3,8 +3,8 @@ import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import { useAuth } from "@/context/AuthProvider";
 import {
-    cambiarContraseñaEsquema, modificarPerfilEsquema,
-    type CambiarContraseñaFormulario, type ModificarPerfilFormulario
+    cambiarContraseñaEsquema, modificarPerfilAdminEsquema,
+    type CambiarContraseñaFormulario, type ModificarPerfilAdminFormulario
 } from "@/lib/validacion";
 import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
@@ -54,18 +54,18 @@ export default function MiPerfil() {
         handleSubmit: handlePerfil,
         reset: resetPerfil,
         formState: { errors: errorsPerfil, isSubmitting: enviandoPerfil },
-    } = useForm<ModificarPerfilFormulario>({
-        resolver: zodResolver(modificarPerfilEsquema),
+    } = useForm<ModificarPerfilAdminFormulario>({
+        resolver: zodResolver(modificarPerfilAdminEsquema),
     });
 
-    const onSubmitPerfil = async (data: ModificarPerfilFormulario) => {
+    const onSubmitPerfil = async (data: ModificarPerfilAdminFormulario) => {
         verificarToken();
 
         try {
             const payload = {
-                tk: sesion?.token,
                 telcelular: data.telefonoCelular,
-                tellocal: data.telefonoLocal
+                tellocal: data.telefonoLocal,
+                tk: sesion?.token
             };
             const response = await postData('users/modificarDatos', payload);
 
@@ -86,7 +86,6 @@ export default function MiPerfil() {
         }
     };
 
-    // Formulario Cambiar Contraseña
     const {
         control: controlContraseña,
         handleSubmit: handleContraseña,
@@ -97,13 +96,34 @@ export default function MiPerfil() {
         defaultValues: { contraseña: "", confirmarContraseña: "" },
     });
 
-    const onSubmitContraseña = (data: CambiarContraseñaFormulario) => {
-        console.log(data);
-        setVista("perfil");
+    const onSubmitContraseña = async (datos: CambiarContraseñaFormulario) => {
+        verificarToken();
+
+        try {
+            const response = await postData('users/restablecerPassword', {
+                password: datos.contraseña,
+                tk: sesion?.token,
+            });
+
+            if (response.error === 0) {
+                setVista("perfil");
+                setModalTipo(true)
+                setModalMensaje('Tu contraseña se ha cambiado correctamente.');
+                setModalVisible(true);
+            } else {
+                setModalTipo(false)
+                setModalMensaje('Hubo un problema al intentar actualizar tu contraseña.');
+                setModalVisible(true);
+            }
+        } catch (error) {
+            setModalTipo(false)
+            setModalMensaje('Error al conectar con el servidor. Intentalo de nuevo más tarde.');
+            setModalVisible(true);
+        }
     };
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined: "padding"} keyboardVerticalOffset={80} >
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                 <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }, vista != "perfil" && { marginTop: 100 }]}>
                     {vista === "perfil" && (

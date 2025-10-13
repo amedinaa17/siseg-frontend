@@ -1,5 +1,5 @@
 import Modal from "@/componentes/layout/Modal";
-import Button from "@/componentes/ui/Boton";
+import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import EntradaMultilinea from "@/componentes/ui/EntradaMultilinea";
 import SelectorArchivo from "@/componentes/ui/SelectorArchivo";
@@ -15,7 +15,7 @@ import { Linking, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensi
 export default function ExpedienteDigital() {
     const { sesion, verificarToken } = useAuth();
     const { width } = useWindowDimensions();
-    const esPantallaPequeña = width < 600;
+    const esPantallaPequeña = width < 790;
 
     const [documentos, setDocumentos] = useState<any[]>([]);
     const [docSeleccionado, setDocSeleccionado] = useState<any | null>(null);
@@ -84,7 +84,7 @@ export default function ExpedienteDigital() {
         if (!archivoSeleccionado) {
             setErrorArchivo("Selecciona un archivo para cargar.");
             return;
-        } else if ((archivoSeleccionado.size / (1024 * 1024)) > 2) {
+        } else if ((archivoSeleccionado.get("file").size / (1024 * 1024)) > 2) {
             return;
         }
 
@@ -99,9 +99,14 @@ export default function ExpedienteDigital() {
 
         return (
             <Modal visible={!!docSeleccionado} onClose={() => setDocSeleccionado(null)} titulo={nombreArchivo}
-                aceptar={estatus === "Rechazado" ? false : true} textoAceptar={estatus === "Sin cargar" ? "Cargar" : undefined}
-                onAceptar={() => estatus === "Sin cargar" ? handleSubirArchivo(nombreArchivo) : setDocSeleccionado(null)}
-                cancelar={estatus === "Sin cargar" ? true : false} onCancelar={() => { setArchivoSeleccionado(null); setDocSeleccionado(null); setErrorArchivo("") }}>
+                aceptar={true} 
+                textoAceptar={estatus === "Sin cargar" ? "Cargar" : estatus === "Rechazado" ? "Volver a Cargar" : undefined}
+                onAceptar={() => 
+                    estatus === "Sin cargar" ? handleSubirArchivo(nombreArchivo) 
+                        : estatus === "Rechazado" ? setDocSeleccionado({ ...docSeleccionado, estatus: "Sin cargar", color: Colores.textoAdvertencia, }) 
+                            : setDocSeleccionado(null)}
+                cancelar={estatus === "Sin cargar" ? true : false}
+                onCancelar={() => { setArchivoSeleccionado(null); setDocSeleccionado(null); setErrorArchivo("") }}>
                 <Text style={{ fontSize: 15, fontWeight: "600", marginBottom: 18, color: color }}>
                     {estatus}
                 </Text>
@@ -127,7 +132,7 @@ export default function ExpedienteDigital() {
                             <View style={{ flex: 1, pointerEvents: "none" }} >
                                 <Entrada label="Archivo" value={rutaArchivo.split('/').pop()} editable={false} />
                             </View>
-                            <Button
+                            <Boton
                                 title=""
                                 onPress={() => Linking.openURL(rutaArchivo)}
                                 icon={<Ionicons name="eye-outline" size={20} color="white" />}
@@ -151,7 +156,7 @@ export default function ExpedienteDigital() {
                             <View style={{ flex: 1, pointerEvents: "none" }} >
                                 <Entrada label="Archivo" value={rutaArchivo.split('/').pop()} editable={false} />
                             </View>
-                            <Button
+                            <Boton
                                 title=""
                                 onPress={() => Linking.openURL(rutaArchivo)}
                                 icon={<Ionicons name="eye-outline" size={20} color="white" />}
@@ -178,7 +183,7 @@ export default function ExpedienteDigital() {
                             <View style={{ flex: 1, pointerEvents: "none" }} >
                                 <Entrada label="Archivo" value={rutaArchivo.split('/').pop()} editable={false} />
                             </View>
-                            <Button
+                            <Boton
                                 title=""
                                 onPress={() => Linking.openURL(rutaArchivo)}
                                 icon={<Ionicons name="eye-outline" size={20} color="white" />}
@@ -196,18 +201,6 @@ export default function ExpedienteDigital() {
                                 value={observacion}
                             />
                         </View>
-                        <View style={{ marginTop: 15, flexDirection: "row", justifyContent: "flex-end" }}>
-                            <Button
-                                title="Volver a cargar"
-                                onPress={() => {
-                                    setDocSeleccionado({
-                                        ...docSeleccionado,
-                                        estatus: "Sin cargar",
-                                        color: Colores.textoAdvertencia,
-                                    });
-                                }}
-                            />
-                        </View>
                     </>
                 )}
             </Modal>
@@ -219,50 +212,57 @@ export default function ExpedienteDigital() {
             <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
                 <Text style={styles.titulo}>Expediente Digital</Text>
                 <Text style={styles.subtitulo}>Registro al servicio social</Text>
-                <Tabla
-                    columnas={[
-                        { key: "nombreArchivo", titulo: "Documento" },
-                        {
-                            key: "estatus",
-                            titulo: "Estatus",
-                            render: (valor, fila) => (
-                                <Text style={[styles.texto, { color: fila.color }]}>
-                                    {valor}
-                                </Text>
-                            ),
-                        },
-                        { key: "observacion", titulo: "Observaciones" },
-                    ]}
-                    datos={documentos
-                        .filter((d) => d.tipo === 1)
-                        .map((fila) => ({
-                            ...fila,
-                            onPress: () => setDocSeleccionado(fila),
-                        }))}
-                />
+                <ScrollView horizontal={esPantallaPequeña}>
+                    <Tabla
+                        columnas={[
+                            { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
+                            {
+                                key: "estatus",
+                                titulo: "Estatus",
+                                render: (valor, fila) => (
+                                    <Text style={[styles.texto, { color: fila.color }]}>
+                                        {valor}
+                                    </Text>
+                                ),
+                                ...(esPantallaPequeña && { ancho: 150 })
+                            },
+                            { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
+                        ]}
+                        datos={documentos
+                            .filter((d) => d.tipo === 1)
+                            .map((fila) => ({
+                                ...fila,
+                                onPress: () => setDocSeleccionado(fila),
+                            }))}
+                    />
+                </ScrollView>
 
                 <Text style={styles.subtitulo}>Término del servicio social</Text>
-                <Tabla
-                    columnas={[
-                        { key: "nombreArchivo", titulo: "Documento" },
-                        {
-                            key: "estatus",
-                            titulo: "Estatus",
-                            render: (valor, fila) => (
-                                <Text style={[styles.texto, { color: fila.color }]}>
-                                    {valor}
-                                </Text>
-                            ),
-                        },
-                        { key: "observacion", titulo: "Observaciones" },
-                    ]}
-                    datos={documentos
-                        .filter((d) => d.tipo === 2)
-                        .map((fila) => ({
-                            ...fila,
-                            onPress: () => setDocSeleccionado(fila),
-                        }))}
-                />
+
+                <ScrollView horizontal={esPantallaPequeña}>
+                    <Tabla
+                        columnas={[
+                            { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
+                            {
+                                key: "estatus",
+                                titulo: "Estatus",
+                                render: (valor, fila) => (
+                                    <Text style={[styles.texto, { color: fila.color }]}>
+                                        {valor}
+                                    </Text>
+                                ),
+                                ...(esPantallaPequeña && { ancho: 150 })
+                            },
+                            { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
+                        ]}
+                        datos={documentos
+                            .filter((d) => d.tipo === 2)
+                            .map((fila) => ({
+                                ...fila,
+                                onPress: () => setDocSeleccionado(fila),
+                            }))}
+                    />
+                </ScrollView>
             </View>
             {renderModal()}
             < Modal
@@ -283,7 +283,6 @@ export default function ExpedienteDigital() {
                     <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center" }}>{modalMensaje}</Text>
                 </View>
             </Modal>
-
         </ScrollView >
     );
 }

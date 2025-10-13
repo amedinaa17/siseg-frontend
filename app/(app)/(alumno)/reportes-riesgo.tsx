@@ -1,12 +1,14 @@
 import Modal from "@/componentes/layout/Modal";
-import Button from "@/componentes/ui/Boton";
+import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import EntradaMultilinea from "@/componentes/ui/EntradaMultilinea";
 import Tabla from "@/componentes/ui/Tabla";
+import { useAuth } from "@/context/AuthProvider";
+import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     KeyboardAvoidingView,
     Platform,
@@ -18,53 +20,48 @@ import {
     View
 } from "react-native";
 
-const datosReportes = [
-    {
-        descripcion: "La zona donde realizo el servicio es insegura.",
-        fecha: "13/11/2024",
-        estatus: "Finalizado",
-        evidencias: [
-            { nombre: "foto1.jpg", peso: "211 KB", tipo: "image" },
-            { nombre: "audio1.mp3", peso: "321 KB", tipo: "audio" },
-            { nombre: "archivo1.pdf", peso: "90 KB", tipo: "pdf" },
-        ],
-        observaciones: [
-            { fecha: "24/11/2024", observacion: "Se aprobó cambio de plaza a zona segura." },
-            { fecha: "20/11/2024", observacion: "Se envió la solicitud de cambio de plaza a secretaría de salud." },
-            { fecha: "14/11/2024", observacion: "Se evaluará la situación Jefe del Departamento de Extensión y Apoyos Educativos." },
-            { fecha: "13/11/2024", observacion: "Reporte enviado, en espera de revisión" }
-        ],
-    },
-    {
-        descripcion: "No me permiten salir a tiempo.",
-        fecha: "06/03/2025",
-        estatus: "En revisión",
-        evidencias: [],
-        observaciones: [
-            { fecha: "07/03/2025", observacion: "Se contactó a la institución." },
-            { fecha: "06/03/2025", observacion: "Reporte enviado, en espera de revisión" }
-        ],
-    },
-    {
-        descripcion: "Me siento vigilado por un personal de la institución.",
-        fecha: "25/04/2025",
-        estatus: "Pendiente",
-        evidencias: [],
-        observaciones: [{ fecha: "25/04/2025", observacion: "Reporte enviado, en espera de revisión" }],
-    },
-];
-
 export default function ReportesRiesgo() {
+    const { sesion, verificarToken } = useAuth();
+
     const { width } = useWindowDimensions();
-    const esPantallaPequeña = width < 600;
+    const esPantallaPequeña = width < 790;
 
     const [reporteSeleccionado, setReporteSeleccionado] = useState<any | null>(null);
     const [modalAgregar, setModalAgregar] = useState(false);
 
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMensaje, setModalMensaje] = useState('');
+    const [modalTipo, setModalTipo] = useState(false);
+
+    const [reportes, setReportes] = useState<any[]>([]);
     const [descripcionNueva, setDescripcionNueva] = useState("");
     const [evidenciasNueva, setEvidenciasNueva] = useState<
         { nombre: string; peso: string; tipo: "image" | "audio" | "pdf" }[]
     >([]);
+
+    const obtenerReportes = async () => {
+        verificarToken();
+
+        try {
+            const response = await fetchData(`reportes/obtenerReportesAlumno?tk=${sesion.token}`);
+
+            if (response.error === 0) {
+                setReportes(response.reportes);
+            } else {
+                setModalTipo(false);
+                setModalMensaje("Hubo un error al obtener tus datos del servidor. Intentalo de nuevo más tarde.")
+                setModalVisible(true)
+            }
+        } catch (error) {
+            setModalTipo(false);
+            setModalMensaje("Hubo un error al conectar con el servidor. Intentalo de nuevo más tarde.")
+            setModalVisible(true)
+        }
+    };
+
+    useEffect(() => {
+        obtenerReportes();
+    }, []);
 
     const cerrarModal = () => setReporteSeleccionado(null);
 
@@ -118,7 +115,7 @@ export default function ReportesRiesgo() {
                 }}
             >
                 <ScrollView>
-                    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined: "padding"} keyboardVerticalOffset={80} >
+                    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
                         <View style={{ marginTop: 5, marginBottom: 20 }}>
                             <EntradaMultilinea
                                 label="Descripción"
@@ -129,7 +126,7 @@ export default function ReportesRiesgo() {
                     </KeyboardAvoidingView>
 
                     <View style={{ marginBottom: 15, flexDirection: "row", justifyContent: "flex-end" }}>
-                        <Button title="+ Agregar evidencia" onPress={handleAgregarEvidencia} />
+                        <Boton title="+ Agregar evidencia" onPress={handleAgregarEvidencia} />
                     </View>
 
                     {evidenciasNueva.length > 0 && <Text style={styles.seccionTitulo}>Evidencias</Text>}
@@ -258,42 +255,63 @@ export default function ReportesRiesgo() {
                 <Text style={styles.titulo}>Reportes de Situación de Riesgo</Text>
 
                 <View style={{ marginBottom: 15, alignItems: "flex-start" }}>
-                    <Button title="Agregar reporte" onPress={() => setModalAgregar(true)} />
+                    <Boton title="Agregar reporte" onPress={() => setModalAgregar(true)} />
                 </View>
 
-                <Tabla
-                    columnas={[
-                        { key: "descripcion", titulo: "Descripción" },
-                        { key: "fecha", titulo: "Fecha" },
-                        {
-                            key: "estatus",
-                            titulo: "Estatus",
-                            render: (valor) => (
-                                <Text
-                                    style={[
-                                        styles.texto,
-                                        valor === "Finalizado" && { color: Colores.textoExito },
-                                        valor === "En revisión" && { color: Colores.textoInfo },
-                                        valor === "Pendiente" && { color: Colores.textoAdvertencia },
-                                    ]}
-                                >
-                                    {valor}
-                                </Text>
-                            ),
-                        },
-                        { key: "observaciones", titulo: "Observaciones" },
-                    ]}
-                    datos={datosReportes.map((fila) => {
-                        return {
-                            ...fila,
-                            observaciones: fila.observaciones[0].observacion,
-                            onPress: () => setReporteSeleccionado(fila),
-                        };
-                    })}
-                />
+                <ScrollView horizontal={esPantallaPequeña}>
+                    <Tabla
+                        columnas={[
+                            { key: "descripcion", titulo: "Descripción", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "fechaRegistro", titulo: "Fecha", ancho: 150 },
+                            {
+                                key: "estatus",
+                                titulo: "Estatus",
+                                ancho: 150,
+                                render: (valor) => (
+                                    <Text
+                                        style={[
+                                            styles.texto,
+                                            valor === "Finalizado" && { color: Colores.textoExito },
+                                            valor === "En revisión" && { color: Colores.textoInfo },
+                                            valor === "Pendiente" && { color: Colores.textoAdvertencia },
+                                        ]}
+                                    >
+                                        {valor}
+                                    </Text>
+                                ),
+                            },
+                            { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
+                        ]}
+                        datos={reportes.map((fila) => {
+                            return {
+                                ...fila,
+                                //observaciones: fila.observaciones[0].observacion,
+                                onPress: () => setReporteSeleccionado(fila),
+                            };
+                        })}
+                    />
+                </ScrollView>
             </View>
             {renderModalAgregar()}
             {renderModalDetalle()}
+            < Modal
+                visible={modalVisible}
+                titulo={modalTipo ? "" : ""}
+                cerrar={false}
+                onClose={() => setModalVisible(false)}
+            >
+                <View style={{ alignItems: "center" }}>
+                    <Ionicons
+                        name={modalTipo ? "checkmark-circle-outline" : "close-circle-outline"}
+                        size={80}
+                        color={modalTipo ? Colores.textoExito : Colores.textoError}
+                    />
+                    <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoClaro, marginBottom: 8 }}>
+                        {modalTipo ? "¡Todo Listo!" : "¡Algo Salió Mal!"}
+                    </Text>
+                    <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center" }}>{modalMensaje}</Text>
+                </View>
+            </Modal>
         </ScrollView>
     );
 }

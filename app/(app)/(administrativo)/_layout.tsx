@@ -29,9 +29,9 @@ export default function AdministrativoLayout() {
         <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
         <Drawer.Screen name="asignar-plaza" options={{ title: "Asignar Plaza" }} />
         <Drawer.Screen name="mapa-plazas" options={{ title: "Mapa de Plazas" }} />
-        <Drawer.Screen name="reportes-riesgo" options={{ title: "Reportes de Situación de Riesgo" }} />
+        <Drawer.Screen name="revisar-reportes-riesgo" options={{ title: "Reportes de Situación de Riesgo" }} />
         <Drawer.Screen name="reportes-encuestas" options={{ title: "Encuestas de Satisfacción" }} />
-        <Drawer.Screen name="mi-perfil-administrativo" options={{ title: "Mi Perfil" }} />
+        <Drawer.Screen name="perfil" options={{ title: "Mi Perfil" }} />
       </Drawer>
     );
   }
@@ -76,7 +76,7 @@ function AdministrativoDrawerContent(props) {
         <View style={drawerStyles.submenuContenedor}>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/validar-documentos")}
           >
             <Text style={drawerStyles.submenuText}>Validar Documentos</Text>
           </TouchableOpacity>
@@ -143,7 +143,7 @@ function AdministrativoDrawerContent(props) {
         <View style={drawerStyles.submenuContenedor}>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/reportes-riesgo")}
+            onPress={() => router.push("/revisar-reportes-riesgo")}
           >
             <Text style={drawerStyles.submenuText}>Reportes de Situación de Riesgo</Text>
           </TouchableOpacity>
@@ -158,7 +158,7 @@ function AdministrativoDrawerContent(props) {
 
       <DrawerItem
         label="MI PERFIL"
-        onPress={() => router.push("/mi-perfil-administrativo")}
+        onPress={() => router.push("/perfil")}
       />
 
       <View><Text style={{ color: Colores.borderColor }}>──────────────────</Text></View>

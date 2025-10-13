@@ -42,7 +42,6 @@ export default function SelectorArchivo({
 
   const seleccionarArchivo = async () => {
     setFocused(true);
-    setErrorArchivo("");
 
     try {
       if (Platform.OS === "web") {
@@ -56,13 +55,6 @@ export default function SelectorArchivo({
         input.onchange = async (e: any) => {
           const file = e.target.files[0];
           if (file) {
-            const tamanoMB = file.size / (1024 * 1024);
-            if (tamanoMB > tamanoMaximoMB) {
-              setErrorArchivo("El archivo es demasiado grande.");
-              setArchivo(null);
-              return;
-            }
-
             const archivoInfo: ArchivoInfo = {
               uri: URL.createObjectURL(file),
               name: file.name,
@@ -70,6 +62,13 @@ export default function SelectorArchivo({
               size: file.size,
               file: file,
             };
+
+            const tamanoMB = file.size / (1024 * 1024);
+            if (tamanoMB > tamanoMaximoMB) {
+              setErrorArchivo("El archivo es demasiado grande.");
+            } else {
+              setErrorArchivo("");
+            }
 
             setArchivo(archivoInfo);
 
@@ -98,7 +97,8 @@ export default function SelectorArchivo({
             const tamanoMB = archivoInfo.size / (1024 * 1024);
             if (tamanoMB > tamanoMaximoMB) {
               setErrorArchivo("El archivo es demasiado grande.");
-              return;
+            } else {
+              setErrorArchivo("");
             }
 
             setArchivo(archivoInfo);
@@ -155,13 +155,13 @@ export default function SelectorArchivo({
           </Text>
         </Pressable>
       </View>
-      <View style={{ flexDirection: Platform.OS === "web" ? "row" : "column", justifyContent: errorArchivo ? "space-between" : "flex-end" }}>
-        {(error || errorArchivo) && <Text style={styles.errorTexto}>{error ? error : errorArchivo}</Text>}
-        {archivo && (
+      <View style={{ flexDirection: Platform.OS === "web" ? "row" : "column", justifyContent: errorArchivo ? "space-between" : error ? "flex-start" : "flex-end" }}>
+        {(error || errorArchivo) ? (<Text style={styles.errorTexto}>{errorArchivo ? errorArchivo : error}</Text>) : null}
+        {archivo ? (
           <Text style={{ color: errorArchivo ? Colores.textoError : Colores.textoInfo, fontSize: Fuentes.caption, marginTop: 5 }}>
             ({(archivo.size / (1024 * 1024)).toFixed(2)} MB)
           </Text>
-        )}
+        ) : null}
       </View>
     </View>
   );

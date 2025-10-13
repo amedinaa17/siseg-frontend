@@ -7,15 +7,17 @@ type PropiedadesBoton = {
   onPress: () => void;
   disabled?: boolean;
   icon?: React.ReactNode;
+  color?: string;
 };
 
-export default function Boton({ title, onPress, disabled, icon }: PropiedadesBoton) {
+export default function Boton({ title, onPress, disabled, icon, color }: PropiedadesBoton) {
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
       style={({ hovered, pressed }) => [
         styles.base,
+        { backgroundColor: color || Colores.textoSecundario },
         hovered && styles.hover,
         pressed && styles.hover,
         disabled && styles.deshabilitado,
@@ -31,7 +33,6 @@ export default function Boton({ title, onPress, disabled, icon }: PropiedadesBot
 
 const styles = StyleSheet.create({
   base: {
-    backgroundColor: Colores.textoSecundario,
     fontSize: Fuentes.cuerpo,
     paddingVertical: 10,
     paddingHorizontal: 10,

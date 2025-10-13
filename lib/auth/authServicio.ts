@@ -40,11 +40,16 @@ export const login = async (boleta: string, password: string) => {
                 nombre: tokenDecodificado.username,
             };
         } else {
-            throw new Error("Boleta o contraseña incorrecto.");
+            throw new Error(data.error);
         }
-    } catch (error) {
-        throw new Error("Error al conectar con el servidor. Intentalo de nuevo más tarde.");
+    } catch (error: any) {
+        if (error.message === "1") {
+            throw new Error("Boleta o contraseña incorrectos.");
+        } else {
+            throw new Error("Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+        }
     }
+
 };
 
 // Función para cerrar sesión
