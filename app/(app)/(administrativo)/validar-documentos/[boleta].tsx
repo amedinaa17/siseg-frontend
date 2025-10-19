@@ -1,4 +1,5 @@
 import Modal from "@/componentes/layout/Modal";
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import EntradaMultilinea from "@/componentes/ui/EntradaMultilinea";
@@ -6,7 +7,7 @@ import Tabla from "@/componentes/ui/Tabla";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Linking, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { WebView } from "react-native-webview";
 
@@ -51,18 +52,16 @@ const datosAlumnos = [
 ];
 
 export default function RevisarExpediente() {
-  const { boleta } = useLocalSearchParams<{ boleta: string }>();
   const router = useRouter();
+
+  const { boleta } = useLocalSearchParams<{ boleta: string }>();
+  const modalAPI = useRef<ModalAPIRef>(null);
 
   const { width } = useWindowDimensions();
   const esPantallaPequeña = width < 790;
 
   const [documentos, setDocumentos] = useState<any[]>([]);
   const [docSeleccionado, setDocSeleccionado] = useState<any | null>(null);
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMensaje, setModalMensaje] = useState('');
-  const [modalTipo, setModalTipo] = useState(false);
 
   const [accionSeleccionada, setAccionSeleccionada] = useState<"Aprobado" | "Rechazado" | null>(null);
   const [modalConfirmacionVisible, setModalConfirmacionVisible] = useState(false);
@@ -133,15 +132,11 @@ export default function RevisarExpediente() {
     try {
       setModalConfirmacionVisible(false);
       setDocSeleccionado(null);
-      setModalMensaje(`Documento ${accionSeleccionada.toLowerCase()} correctamente.`);
-      setModalTipo(true);
-      setModalVisible(true);
+      modalAPI.current?.show(true, `Documento ${accionSeleccionada.toLowerCase()} correctamente.`);
     } catch (error) {
       setModalConfirmacionVisible(false);
       setDocSeleccionado(null);
-      setModalMensaje("Ocurrió un error al procesar la validación.");
-      setModalTipo(false);
-      setModalVisible(true);
+      modalAPI.current?.show(false, "Hubo un problema al procesar la validación. Inténtalo de nuevo más tarde.");
     }
   };
 
@@ -191,11 +186,11 @@ export default function RevisarExpediente() {
               <Boton
                 title=""
                 onPress={() => Linking.openURL(rutaArchivo)}
-                icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} />}
+                icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} style={{ paddingHorizontal: 10 }} />}
               />
             </View>
             <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-              <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleString()} editable={false} />
+              <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
             </View>
 
             <View style={{ height: 520, borderWidth: 1, borderColor: Colores.borde, borderRadius: 8, overflow: "hidden" }}>
@@ -231,11 +226,11 @@ export default function RevisarExpediente() {
               <Boton
                 title=""
                 onPress={() => Linking.openURL(rutaArchivo)}
-                icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} />}
+                icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} style={{ paddingHorizontal: 10 }} />}
               />
             </View>
             <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-              <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleString()} editable={false} />
+              <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
             </View>
             <View style={{ pointerEvents: "none", marginBottom: 15 }} >
               <Entrada label="Reviso" value="{adminEncargado}" editable={false} />
@@ -258,11 +253,11 @@ export default function RevisarExpediente() {
               <Boton
                 title=""
                 onPress={() => Linking.openURL(rutaArchivo)}
-                icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} />}
+                icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} style={{ paddingHorizontal: 10 }} />}
               />
             </View>
             <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-              <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleString()} editable={false} />
+              <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
             </View>
             <View style={{ pointerEvents: "none", marginBottom: 15 }} >
               <Entrada label="Reviso" value="{adminEncargado}" editable={false} />
@@ -288,7 +283,6 @@ export default function RevisarExpediente() {
         visible={modalConfirmacionVisible}
         titulo={nombreArchivo}
         onClose={() => setModalConfirmacionVisible(false)}
-        cancelar onCancelar={() => setModalConfirmacionVisible(false)}
         textoAceptar="Guardar" onAceptar={onSubmitValidacion}
       >
         <View style={{ marginBottom: 15 }}>
@@ -309,11 +303,18 @@ export default function RevisarExpediente() {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-        <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-          <Boton
-            title="Regresar"
-            onPress={() => router.push("/validar-documentos")}
-          />
+        <View style={[{ flexDirection: "row", justifyContent: "flex-end"}, esPantallaPequeña && { marginBottom: 5 }]}>
+          {esPantallaPequeña ?
+            <Boton
+              onPress={() => router.push("/validar-documentos")}
+              icon={<Ionicons name="arrow-back-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+            />
+            :
+            <Boton
+              title="Regresar"
+              onPress={() => router.push("/validar-documentos")}
+            />
+          }
         </View>
         <Text style={styles.titulo}>Expediente Digital</Text>
         <Text style={styles.alumno}>{alumno.nombre + " " + alumno.apellidoPaterno + " " + alumno.apellidoMaterno}</Text>
@@ -373,24 +374,7 @@ export default function RevisarExpediente() {
       </View>
       {renderModal()}
       {renderModalValidar()}
-      < Modal
-        visible={modalVisible}
-        titulo={modalTipo ? "" : ""}
-        cerrar={false}
-        onClose={() => setModalVisible(false)}
-      >
-        <View style={{ alignItems: "center" }}>
-          <Ionicons
-            name={modalTipo ? "checkmark-circle-outline" : "close-circle-outline"}
-            size={80}
-            color={modalTipo ? Colores.textoExito : Colores.textoError}
-          />
-          <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoClaro, marginBottom: 8 }}>
-            {modalTipo ? "¡Todo Listo!" : "¡Algo Salió Mal!"}
-          </Text>
-          <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center" }}>{modalMensaje}</Text>
-        </View>
-      </Modal>
+      <ModalAPI ref={modalAPI} />
     </ScrollView>
   );
 }

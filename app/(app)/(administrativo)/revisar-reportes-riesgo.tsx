@@ -375,16 +375,18 @@ export default function ReportesRiesgo() {
 
                 <View style={styles.controlesSuperiores}>
                     <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                        <Selector
-                            label=""
-                            selectedValue={String(filasPorPagina)}
-                            onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                            items={[
-                                { label: "5", value: "5" },
-                                { label: "10", value: "10" },
-                                { label: "20", value: "20" },
-                            ]}
-                        />
+                        <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                            <Selector
+                                label=""
+                                selectedValue={String(filasPorPagina)}
+                                onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                                items={[
+                                    { label: "5", value: "5" },
+                                    { label: "10", value: "10" },
+                                    { label: "20", value: "20" },
+                                ]}
+                            />
+                        </View>
                         <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
                     </View>
 

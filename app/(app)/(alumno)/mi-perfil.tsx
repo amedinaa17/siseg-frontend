@@ -1,4 +1,4 @@
-import Modal from "@/componentes/layout/Modal";
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Selector from "@/componentes/ui/Selector";
@@ -9,9 +9,8 @@ import {
 } from "@/lib/validacion";
 import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
-import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
@@ -19,36 +18,32 @@ export default function MiPerfil() {
     const { sesion, verificarToken } = useAuth();
     const [datosAlumno, setDatosAlumno] = useState<any>(null);
 
-    const [modalVisible, setModalVisible] = useState(false);
-    const [modalMensaje, setModalMensaje] = useState('');
-    const [modalTipo, setModalTipo] = useState(false);
-    const [vista, setVista] = useState<"perfil" | "modificar" | "contraseña">("perfil");
+    const modalAPI = useRef<ModalAPIRef>(null);
+    const [vista, setVista] = useState<1 | 2 | 3>(1);
 
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 600;
 
     useEffect(() => {
         const obtenerDatos = async () => {
+            verificarToken();
+
             if (sesion?.token) {
                 try {
                     const response = await fetchData(`users/obtenerTodosDatosAlumno?tk=${sesion.token}`);
                     if (response.error === 0) {
                         setDatosAlumno(response.data);
                     } else {
-                        setModalTipo(false);
-                        setModalMensaje("Hubo un error al obtener tus datos del servidor. Intentalo de nuevo más tarde.")
-                        setModalVisible(true)
+                        modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
                     }
                 } catch (error) {
-                    setModalTipo(false);
-                    setModalMensaje("Hubo un error al conectar con el servidor. Intentalo de nuevo más tarde.")
-                    setModalVisible(true)
+                    modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
                 }
             }
         };
 
         obtenerDatos();
-    }, [sesion, vista]);
+    }, [vista]);
 
     const {
         control: controlPerfil,
@@ -77,19 +72,13 @@ export default function MiPerfil() {
             const response = await postData('users/modificarDatos', datosActualizar);
 
             if (response.error === 0) {
-                setVista("perfil");
-                setModalTipo(true)
-                setModalMensaje('Tus datos se han actualizado correctamente.');
-                setModalVisible(true);
+                setVista(1);
+                modalAPI.current?.show(true, "Tus datos se han actualizado correctamente.");
             } else {
-                setModalTipo(false)
-                setModalMensaje('Hubo un problema al intentar actualizar tus datos.');
-                setModalVisible(true);
+                modalAPI.current?.show(false, "Hubo un problema al actualizar tus datos. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
-            setModalTipo(false)
-            setModalMensaje('Error al conectar con el servidor. Intentalo de nuevo más tarde.');
-            setModalVisible(true);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
     };
 
@@ -100,7 +89,6 @@ export default function MiPerfil() {
         formState: { errors: errorsContraseña, isSubmitting: enviandoContraseña },
     } = useForm<CambiarContraseñaFormulario>({
         resolver: zodResolver(cambiarContraseñaEsquema),
-        defaultValues: { contraseña: "", confirmarContraseña: "" },
     });
 
     const onSubmitContraseña = async (datos: CambiarContraseñaFormulario) => {
@@ -113,19 +101,13 @@ export default function MiPerfil() {
             });
 
             if (response.error === 0) {
-                setVista("perfil");
-                setModalTipo(true)
-                setModalMensaje('Tu contraseña se ha cambiado correctamente.');
-                setModalVisible(true);
+                setVista(1);
+                modalAPI.current?.show(true, "Tu contraseña se ha cambiado correctamente.");
             } else {
-                setModalTipo(false)
-                setModalMensaje('Hubo un problema al intentar actualizar tu contraseña.');
-                setModalVisible(true);
+                modalAPI.current?.show(false, "Hubo un problema al actualizar tu contraseña. Inténtalo de nuevo más tarde..");
             }
         } catch (error) {
-            setModalTipo(false)
-            setModalMensaje('Error al conectar con el servidor. Intentalo de nuevo más tarde.');
-            setModalVisible(true);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
     };
 
@@ -136,85 +118,85 @@ export default function MiPerfil() {
                     style={[
                         styles.contenedorFormulario,
                         esPantallaPequeña && { maxWidth: "95%" },
-                        vista === "contraseña" && { marginTop: 100 }
+                        vista === 3 && { marginTop: 100 }
                     ]}
                 >
-                    {vista === "perfil" && (
+                    {vista === 1 && (
                         <>
                             <Text style={styles.titulo}>Mi Perfil</Text>
 
                             <View style={{ marginBottom: 15, pointerEvents: "none" }} >
-                                <Entrada label="Nombre" value={datosAlumno?.nombre} editable={false} />
+                                <Entrada label="Nombre" value={datosAlumno?.nombre || ""} editable={false} />
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Apellido Paterno" value={datosAlumno?.apellido_paterno} editable={false} />
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Apellido Paterno" value={datosAlumno?.apellido_paterno || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Apellido Materno" value={datosAlumno?.apellido_materno} editable={false} />
-                                </View>
-                            </View>
-
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="CURP" value={datosAlumno?.curp} editable={false} />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="RFC" value={datosAlumno?.rfc} editable={false} />
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Apellido Materno" value={datosAlumno?.apellido_materno || ""} editable={false} />
                                 </View>
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Boleta" value={datosAlumno?.boleta} keyboardType="numeric" editable={false} />
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="CURP" value={datosAlumno?.curp || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Carrera" value={datosAlumno ? ("Médico Cirujano y " + datosAlumno.carrera) : ""} editable={false} />
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="RFC" value={datosAlumno?.rfc || ""} editable={false} />
                                 </View>
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Generación" value={datosAlumno?.generacion} editable={false} />
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Boleta" value={datosAlumno?.boleta || ""} keyboardType="numeric" editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Promedio" value={datosAlumno?.promedio} keyboardType="decimal-pad" editable={false} />
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Carrera" value={datosAlumno?.carrera || ""} editable={false} />
+                                </View>
+                            </View>
+
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Generación" value={datosAlumno?.generacion || ""} editable={false} />
+                                </View>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Promedio" value={datosAlumno?.promedio || ""} keyboardType="decimal-pad" editable={false} />
                                 </View>
                             </View>
 
                             <View style={{ marginBottom: 15, pointerEvents: "none" }}>
                                 <Entrada
                                     label="Correo Electrónico Institucional"
-                                    value={datosAlumno?.correo}
+                                    value={datosAlumno?.correo || ""}
                                     keyboardType="email-address"
                                     editable={false}
                                 />
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Calle y Número" value={datosAlumno?.calle_y_numero} editable={false} />
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Calle y Número" value={datosAlumno?.calle_y_numero || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Colonia" value={datosAlumno?.colonia} editable={false} />
-                                </View>
-                            </View>
-
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Delegación / Municipio" value={datosAlumno?.delegacion} editable={false} />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Estado de Procedencia" value={datosAlumno?.estado} editable={false} />
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Colonia" value={datosAlumno?.colonia || ""} editable={false} />
                                 </View>
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Código Postal" value={datosAlumno?.cp} keyboardType="numeric" editable={false} />
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Delegación / Municipio" value={datosAlumno?.delegacion || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Estado de Procedencia" value={datosAlumno?.estado || ""} editable={false} />
+                                </View>
+                            </View>
+
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Código Postal" value={datosAlumno?.cp || ""} keyboardType="numeric" editable={false} />
+                                </View>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
                                     <Selector
                                         label="Sexo"
                                         selectedValue={datosAlumno ? (datosAlumno.sexo === "F" ? "Femenino" : "Masculino") : ""}
@@ -227,36 +209,36 @@ export default function MiPerfil() {
                                 </View>
                             </View>
 
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular} keyboardType="phone-pad" editable={false} />
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                    <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular || ""} keyboardType="phone-pad" editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Teléfono Local" value={datosAlumno?.tellocal} keyboardType="phone-pad" editable={false} />
+                                <View style={{ flex: 1, marginBottom: 25, pointerEvents: "none" }}>
+                                    <Entrada label="Teléfono Local" value={datosAlumno?.tellocal || ""} keyboardType="phone-pad" editable={false} />
                                 </View>
                             </View>
                             {datosAlumno &&
                                 <View style={{ flexDirection: "row", gap: 12 }}>
                                     <View style={{ flex: 1 }}>
-                                        <Boton title="Modificar Datos" onPress={() => setVista("modificar")} />
+                                        <Boton title="Modificar datos" onPress={() => setVista(2)} />
                                     </View>
                                     <View style={{ flex: 1 }}>
-                                        <Boton title="Cambiar Contraseña" onPress={() => setVista("contraseña")} />
+                                        <Boton title="Cambiar contraseña" onPress={() => setVista(3)} />
                                     </View>
                                 </View>
                             }
                         </>
                     )}
-                    {vista === "modificar" && (
+                    {vista === 2 && (
                         <>
                             <Text style={styles.titulo}>Modificar Datos</Text>
 
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 5 }}>
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.calle && !errorsPerfil.colonia ? 30 : 15 }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="calle"
-                                        defaultValue={datosAlumno?.calle_y_numero}
+                                        defaultValue={datosAlumno?.calle_y_numero || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Calle y Número"
@@ -266,11 +248,11 @@ export default function MiPerfil() {
                                         )}
                                     />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.colonia && !errorsPerfil.municipio ? 30 : 15 }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="colonia"
-                                        defaultValue={datosAlumno?.colonia}
+                                        defaultValue={datosAlumno?.colonia || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Colonia"
@@ -282,13 +264,13 @@ export default function MiPerfil() {
                                 </View>
                             </View>
                             <View
-                                style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}
+                                style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}
                             >
-                                <View style={{ flex: 1, marginBottom: 5 }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.municipio && !errorsPerfil.estado ? 30 : 15 }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="municipio"
-                                        defaultValue={datosAlumno?.delegacion}
+                                        defaultValue={datosAlumno?.delegacion || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Delegación / Municipio"
@@ -298,11 +280,11 @@ export default function MiPerfil() {
                                         )}
                                     />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.estado && !errorsPerfil.codigoPostal ? 30 : 15 }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="estado"
-                                        defaultValue={datosAlumno?.estado}
+                                        defaultValue={datosAlumno?.estado || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Estado de Procedencia"
@@ -314,13 +296,13 @@ export default function MiPerfil() {
                                 </View>
                             </View>
                             <View
-                                style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}
+                                style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}
                             >
-                                <View style={{ flex: 1, marginBottom: errorsPerfil.sexo ? 0 : 5 }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.codigoPostal ? 30 : 15 }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="codigoPostal"
-                                        defaultValue={datosAlumno?.cp}
+                                        defaultValue={datosAlumno?.cp || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Código Postal"
@@ -331,11 +313,11 @@ export default function MiPerfil() {
                                         )}
                                     />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15, marginTop: errorsPerfil.codigoPostal && esPantallaPequeña && !errorsPerfil.sexo ? 15 : 0 }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && !errorsPerfil.telefonoCelular ? 15 : 20 }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="sexo"
-                                        defaultValue={datosAlumno?.sexo}
+                                        defaultValue={datosAlumno?.sexo || ""}
                                         render={({ field: { onChange, value } }) => (
                                             <Selector
                                                 label="Sexo"
@@ -351,12 +333,12 @@ export default function MiPerfil() {
                                     />
                                 </View>
                             </View>
-                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 5 }}>
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.telefonoCelular && !errorsPerfil.telefonoLocal ? 30 : 15  }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="telefonoCelular"
-                                        defaultValue={datosAlumno?.telcelular}
+                                        defaultValue={datosAlumno?.telcelular || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Teléfono Celular"
@@ -367,11 +349,11 @@ export default function MiPerfil() {
                                         )}
                                     />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 25 }}>
+                                <View style={{ flex: 1, marginBottom: 30 }}>
                                     <Controller
                                         control={controlPerfil}
-                                        defaultValue={datosAlumno?.tellocal}
                                         name="telefonoLocal"
+                                        defaultValue={datosAlumno?.tellocal || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Teléfono Local"
@@ -386,19 +368,20 @@ export default function MiPerfil() {
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Boton title="Regresar" onPress={() => { resetPerfil(); setVista("perfil") }} disabled={enviandoPerfil} />
+                                    <Boton title="Regresar" onPress={() => { resetPerfil(); setVista(1) }} disabled={enviandoPerfil} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Boton
                                         title={enviandoPerfil ? "Guardando…" : "Guardar Cambios"}
                                         onPress={handlePerfil(onSubmitPerfil)}
+                                        disabled={enviandoPerfil}
                                     />
                                 </View>
                             </View>
                         </>
                     )}
 
-                    {vista === "contraseña" && (
+                    {vista === 3 && (
                         <>
                             <Text style={styles.titulo}>Cambiar Contraseña</Text>
 
@@ -406,10 +389,12 @@ export default function MiPerfil() {
                                 <Controller
                                     control={controlContraseña}
                                     name="contraseña"
+                                    defaultValue=""
                                     render={({ field: { onChange, value } }) => (
                                         <Entrada
                                             label="Nueva Contraseña"
                                             secureTextEntry
+                                            defaultValue=""
                                             value={value}
                                             onChangeText={onChange}
                                             error={errorsContraseña.contraseña?.message}
@@ -422,10 +407,12 @@ export default function MiPerfil() {
                                 <Controller
                                     control={controlContraseña}
                                     name="confirmarContraseña"
+                                    defaultValue=""
                                     render={({ field: { onChange, value } }) => (
                                         <Entrada
                                             label="Confirmar Contraseña"
                                             secureTextEntry
+                                            defaultValue=""
                                             value={value}
                                             onChangeText={onChange}
                                             error={errorsContraseña.confirmarContraseña?.message}
@@ -436,35 +423,19 @@ export default function MiPerfil() {
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Boton title="Regresar" onPress={() => { resetContraseña(); setVista("perfil") }} disabled={enviandoContraseña} />
+                                    <Boton title="Regresar" onPress={() => { resetContraseña(); setVista(1) }} disabled={enviandoContraseña} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Boton
-                                        title={enviandoContraseña ? "Guardando…" : "Guardar Contraseña"}
+                                        title={enviandoContraseña ? "Guardando…" : "Guardar contraseña"}
                                         onPress={handleContraseña(onSubmitContraseña)}
+                                        disabled={enviandoContraseña}
                                     />
                                 </View>
                             </View>
                         </>
                     )}
-                    <Modal
-                        visible={modalVisible}
-                        titulo={modalTipo ? "" : ""}
-                        cerrar={false}
-                        onClose={() => setModalVisible(false)}
-                    >
-                        <View style={{ alignItems: "center" }}>
-                            <Ionicons
-                                name={modalTipo ? "checkmark-circle-outline" : "close-circle-outline"}
-                                size={80}
-                                color={modalTipo ? Colores.textoExito : Colores.textoError}
-                            />
-                            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoClaro, marginBottom: 8 }}>
-                                {modalTipo ? "¡Todo Listo!" : "¡Algo Salió Mal!"}
-                            </Text>
-                            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center" }}>{modalMensaje}</Text>
-                        </View>
-                    </Modal>
+                    <ModalAPI ref={modalAPI} />
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -495,10 +466,5 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginBottom: 24,
         color: Colores.textoPrincipal,
-    },
-    row: {
-        flexDirection: "row",
-        gap: 12,
-        marginBottom: 15,
     },
 });

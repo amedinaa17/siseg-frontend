@@ -243,8 +243,16 @@ export default function GestionPersonalAdministrativo() {
                             <Controller
                                 control={control}
                                 name="curp"
-                                render={({ field }) => (
-                                    <Entrada label="CURP" {...field} error={errors.curp?.message} style={{ flex: 1 }} />
+                                defaultValue=""
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                    <Entrada
+                                        label="CURP"
+                                        value={value}
+                                        onBlur={onBlur}
+                                        onChangeText={(text) => onChange(text.toUpperCase())}
+                                        error={errors.curp?.message}
+                                        autoCapitalize="characters"
+                                    />
                                 )}
                             />
                         </View>
@@ -537,16 +545,18 @@ export default function GestionPersonalAdministrativo() {
 
                 <View style={styles.controlesSuperiores}>
                     <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                        <Selector
-                            label=""
-                            selectedValue={String(filasPorPagina)}
-                            onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                            items={[
-                                { label: "5", value: "5" },
-                                { label: "10", value: "10" },
-                                { label: "20", value: "20" },
-                            ]}
-                        />
+                        <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                            <Selector
+                                label=""
+                                selectedValue={String(filasPorPagina)}
+                                onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                                items={[
+                                    { label: "5", value: "5" },
+                                    { label: "10", value: "10" },
+                                    { label: "20", value: "20" },
+                                ]}
+                            />
+                        </View>
                         <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
                     </View>
 
@@ -586,15 +596,13 @@ export default function GestionPersonalAdministrativo() {
                                 render: (_, fila) => (
                                     <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", margin: "auto" }}>
                                         <Boton
-                                            title=""
                                             onPress={() => { abrirModalEditar(fila) }}
-                                            icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ margin: -5 }} />}
+                                            icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
                                             color={Colores.textoInfo}
                                         />
                                         <Boton
-                                            title=""
                                             onPress={() => { setModalEliminar(fila) }}
-                                            icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ margin: -5 }} />}
+                                            icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
                                             color={Colores.textoError}
                                         />
                                     </View>

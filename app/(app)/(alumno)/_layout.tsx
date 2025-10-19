@@ -52,7 +52,6 @@ function AlumnoDrawerContent(props) {
 
   const handleLogout = async () => {
     await cerrarSesion();
-    router.replace("/(auth)/iniciar-sesion");
   };
 
   return (

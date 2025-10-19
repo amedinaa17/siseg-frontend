@@ -23,6 +23,7 @@ export default function AdministrativoLayout() {
       >
         <Drawer.Screen name="index" options={{ title: "Inicio" }} />
         <Drawer.Screen name="validar-documentos" options={{ title: "Validar Documentos" }} />
+        <Drawer.Screen name="validar-documentos/[boleta]" options={{ title: "Validar Documentos" }} />
         <Drawer.Screen name="lista-asistencia" options={{ title: "Lista de Asistencia al Curso de Inducción" }} />
         <Drawer.Screen name="gestionar-alumnos" options={{ title: "Gestionar Alumnos" }} />
         <Drawer.Screen name="gestionar-personal" options={{ title: "Personal Administrativo" }} />
@@ -54,7 +55,6 @@ function AdministrativoDrawerContent(props) {
 
   const handleLogout = async () => {
     await cerrarSesion();
-    router.replace("/(auth)/iniciar-sesion");
   };
 
   return (

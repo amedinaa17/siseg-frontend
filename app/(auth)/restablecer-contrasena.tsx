@@ -1,22 +1,20 @@
 import Encabezado from "@/componentes/layout/Encabezado";
-import Modal from "@/componentes/layout/Modal";
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import { correoEsquema, type CorreoFormulario } from "@/lib/validacion";
 import { postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
-import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ResetPassword() {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMensaje, setModalMensaje] = useState('');
-  const [modalTipo, setModalTipo] = useState(true);
+  const modalAPI = useRef<ModalAPIRef>(null);
+  const [error, setError] = useState<string>("");
 
   const {
     control,
@@ -29,19 +27,19 @@ export default function ResetPassword() {
   });
 
   const onSubmit = async ({ correo }: CorreoFormulario) => {
+    setError("");
     try {
       const response = await postData('users/restablecerPasswordEmail', { email: correo });
 
       if (response.error === 0) {
-        setModalTipo(true);
-        setModalMensaje(correo);
-        setModalVisible(true);
+        modalAPI.current?.show(true, `Para continuar, hemos enviado un correo electrónico a ${correo}. Revisa tu bandeja de entrada y sigue las instrucciones.`);
         reset();
       } else {
-        setModalMensaje("No existe una cuenta registrada con ese correo.");
+        setError("No existe una cuenta registrada con este correo electrónico.");
       }
     } catch (error) {
-      setModalMensaje("Error al conectar con el servidor. Intentalo de nuevo más tarde.");
+      console.log(error)
+      setError("Error al conectar con el servidor. Inténtalo de nuevo más tarde");
     }
   };
 
@@ -52,7 +50,7 @@ export default function ResetPassword() {
         <View style={styles.contenedorFormulario}>
           <Text style={styles.titulo}>Restablecer Contraseña</Text>
 
-          <View style={{ marginBottom: modalMensaje.includes("@") || modalMensaje === "" ? 25 : 15 }}>
+          <View style={{ marginBottom: error.includes("@") || error === "" ? 25 : 10 }}>
             <Controller
               control={control}
               name="correo"
@@ -60,7 +58,10 @@ export default function ResetPassword() {
                 <Entrada
                   label="Correo Electrónico Institucional"
                   value={value}
-                  onChangeText={onChange}
+                  onChangeText={(text) => {
+                    setError("");
+                    onChange(text);
+                  }}
                   autoCapitalize="none"
                   keyboardType="email-address"
                   error={errors.correo?.message}
@@ -69,12 +70,12 @@ export default function ResetPassword() {
             />
           </View>
 
-          {!modalMensaje.includes("@") && modalMensaje != '' && (
-            <Text style={styles.errorRestablecerContrasena}>{modalMensaje}</Text>
+          {!error.includes("@") && error != '' && (
+            <Text style={styles.errorRestablecerContrasena}>{error}</Text>
           )}
 
           <Boton
-            title={isSubmitting ? "Enviando…" : "Recuperar contraseña"}
+            title={isSubmitting ? "Enviando…" : "Restablecer contraseña"}
             onPress={handleSubmit(onSubmit)}
             disabled={isSubmitting}
           />
@@ -89,29 +90,7 @@ export default function ResetPassword() {
           </View>
         </View>
         <PiePagina />
-        <Modal visible={modalVisible} titulo={modalTipo ? "" : ""} cerrar={false} onClose={() => setModalVisible(false)} >
-          <View style={{ alignItems: "center" }}>
-            <Ionicons
-              name={modalTipo ? "checkmark-circle-outline" : "close-circle-outline"}
-              size={80}
-              color={modalTipo ? Colores.textoExito : Colores.textoError}
-            />
-            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoClaro, marginBottom: 8 }}>
-              {modalTipo ? "¡Todo Listo!" : "¡Algo Salió Mal!"}
-            </Text>
-            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center" }}>
-              {modalTipo ? (
-                <>
-                  Para continuar, hemos enviado un correo electrónico a{" "}
-                  <Text style={{ color: Colores.textoInfo }}>
-                    {modalMensaje}
-                  </Text>
-                  . Revisa tu bandeja de entrada y sigue las instrucciones.
-                </>
-              ) : modalMensaje}
-            </Text>
-          </View>
-        </Modal>
+        <ModalAPI ref={modalAPI} />
       </ScrollView>
     </KeyboardAvoidingView>
   );

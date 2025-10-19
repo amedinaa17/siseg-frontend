@@ -73,7 +73,7 @@ export default function SelectorArchivo({
             setArchivo(archivoInfo);
 
             const formData = new FormData();
-            formData.append('file', archivoInfo.file || archivoInfo);
+            formData.append('file', archivoInfo.file);
             onArchivoSeleccionado?.(formData);
           }
         };
@@ -88,10 +88,11 @@ export default function SelectorArchivo({
           const file = result.assets[0];
           if (file) {
             const archivoInfo: ArchivoInfo = {
-              name: file.name,
               uri: file.uri,
-              type: file.mimeType || 'application/pdf',
+              name: file.name,
+              type: file.mimeType || 'application/octet-stream',
               size: file.size || 0,
+              file: file,
             };
 
             const tamanoMB = archivoInfo.size / (1024 * 1024);
@@ -104,11 +105,7 @@ export default function SelectorArchivo({
             setArchivo(archivoInfo);
 
             const formData = new FormData();
-            formData.append('file', {
-              uri: archivoInfo.uri,
-              name: archivoInfo.name,
-              type: archivoInfo.type,
-            } as any);
+            formData.append('file', archivoInfo.file);
             onArchivoSeleccionado?.(formData);
           }
         }

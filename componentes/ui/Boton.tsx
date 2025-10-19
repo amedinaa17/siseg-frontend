@@ -3,7 +3,7 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type PropiedadesBoton = {
-  title: string;
+  title?: string;
   onPress: () => void;
   disabled?: boolean;
   icon?: React.ReactNode;
@@ -21,11 +21,12 @@ export default function Boton({ title, onPress, disabled, icon, color }: Propied
         hovered && styles.hover,
         pressed && styles.hover,
         disabled && styles.deshabilitado,
+        !icon && { paddingVertical: 10, paddingHorizontal: 10 }
       ]}
     >
       <View style={styles.contenedorBoton}>
         {icon && <View>{icon}</View>}
-        <Text style={styles.texto}>{title}</Text>
+        {title && <Text style={styles.texto}>{title}</Text>}
       </View>
     </Pressable>
   );
@@ -34,8 +35,6 @@ export default function Boton({ title, onPress, disabled, icon, color }: Propied
 const styles = StyleSheet.create({
   base: {
     fontSize: Fuentes.cuerpo,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
     borderRadius: 6,
     alignItems: "center",
   },

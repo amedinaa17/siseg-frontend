@@ -10,7 +10,7 @@ export default function Encabezado() {
   return (
     <SafeAreaView edges={["top"]} style={styles.seguro}>
       <View style={styles.encabezado}>
-        <Link href="/">
+        <Link href="/(auth)/iniciar-sesion">
           <Image
             source={require('@/activos/imagenes/enmyh.png')}
             style={styles.logo}

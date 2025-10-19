@@ -1,93 +1,36 @@
 import Modal from "@/componentes/layout/Modal";
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Paginacion from "@/componentes/ui/Paginacion";
 import Selector from "@/componentes/ui/Selector";
 import SelectorArchivo from "@/componentes/ui/SelectorArchivo";
 import Tabla from "@/componentes/ui/Tabla";
+import { useAuth } from "@/context/AuthProvider";
 import { alumnoEsquema, type AlumnoFormulario } from "@/lib/validacion";
+import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
-const datosAlumnos = [
-    {
-        boleta: "2022630301", nombre: "Andrea", apellidoPaterno: "Salgado", apellidoMaterno: "Ramírez", carrera: "Médico Cirujano y Partero",
-        generacion: "2025", estatus: "En proceso", correo: "asalga@alumno.ipn.mx", promedio: "9.1", curp: "SARA010312MDFLND09",
-        rfc: "SARA010312T55", telefonoCelular: "5512345678", telefonoLocal: "5553123456", sexo: "F", calleNumero: "Cedros 134",
-        colonia: "San Miguel", delegacionMunicipio: "2022630301", estadoProcedencia: "Iztapalapa", codigoPostal: "09830"
-    },
-    {
-        boleta: "2022630320", nombre: "Mariana", apellidoPaterno: "Torres", apellidoMaterno: "López", carrera: "Médico Cirujano y Partero",
-        generacion: "2025", estatus: "En proceso", correo: "mariana.tl@alumno.ipn.mx", promedio: "9.3", curp: "TOLM010215MDFLNS09",
-        rfc: "TOLM010215RT5", telefonoCelular: "5511223344", telefonoLocal: "5556789123", sexo: "F", calleNumero: "Insurgentes Sur 900",
-        colonia: "Del Valle", delegacionMunicipio: "Benito Juárez", estadoProcedencia: "CDMX", codigoPostal: "03100"
-    },
-    {
-        boleta: "2022630312", nombre: "Alejandro", apellidoPaterno: "Vega", apellidoMaterno: "Domínguez", carrera: "Médico Cirujano y Homeópata",
-        generacion: "2024", estatus: "Concluido", correo: "alejandro@alumno.ipn.mx", promedio: "8.5", curp: "ALEA010112MDFLND09",
-        rfc: "ALEA010112T55", telefonoCelular: "5544332211", telefonoLocal: "5553445566", sexo: "M", calleNumero: "Av. Hidalgo 45",
-        colonia: "Centro", delegacionMunicipio: "Cuauhtémoc", estadoProcedencia: "CDMX", codigoPostal: "06000"
-    },
-    {
-        boleta: "2022630333", nombre: "Jorge", apellidoPaterno: "Hernández", apellidoMaterno: "Castillo", carrera: "Médico Cirujano y Homeópata",
-        generacion: "-", estatus: "Aspirante", correo: "jorgehc@alumno.ipn.mx", promedio: "8.1", curp: "HECJ991120MDFRNL08",
-        rfc: "HECJ991120KL9", telefonoCelular: "5522334455", telefonoLocal: "5559876543", sexo: "M", calleNumero: "Reforma 100",
-        colonia: "Juárez", delegacionMunicipio: "Cuauhtémoc", estadoProcedencia: "CDMX", codigoPostal: "06600"
-    },
-    {
-        boleta: "2022630345", nombre: "Paola", apellidoPaterno: "Méndez", apellidoMaterno: "García", carrera: "Médico Cirujano y Partero",
-        generacion: "-", estatus: "Candidato", correo: "paolamg@alumno.ipn.mx", promedio: "9.7", curp: "MEGP000305MDFLNR07",
-        rfc: "MEGP000305PR2", telefonoCelular: "5533445566", telefonoLocal: "5552233445", sexo: "F", calleNumero: "Av. Universidad 320",
-        colonia: "Copilco", delegacionMunicipio: "Coyoacán", estadoProcedencia: "CDMX", codigoPostal: "04360"
-    },
-    {
-        boleta: "2022630363", nombre: "Joel", apellidoPaterno: "Mora", apellidoMaterno: "Castañeda", carrera: "Médico Cirujano y Partero",
-        generacion: "-", estatus: "Candidato", correo: "joelmc@alumno.ipn.mx", promedio: "8.7", curp: "MOCJ000305MDFLNR07",
-        rfc: "MOCJ000305PR2", telefonoCelular: "5533445566", telefonoLocal: "5552233445", sexo: "F", calleNumero: "Av. Universidad 350",
-        colonia: "Copilco", delegacionMunicipio: "Coyoacán", estadoProcedencia: "CDMX", codigoPostal: "04360"
-    },
-];
-
-const defaultValues: AlumnoFormulario = {
-    nombre: "",
-    apellidoPaterno: "",
-    apellidoMaterno: "",
-    boleta: "",
-    carrera: "",
-    generacion: "",
-    estatus: "",
-    correo: "",
-    promedio: "",
-    curp: "",
-    rfc: "",
-    telefonoCelular: "",
-    telefonoLocal: "",
-    sexo: "",
-    calleNumero: "",
-    colonia: "",
-    delegacionMunicipio: "",
-    estadoProcedencia: "",
-    codigoPostal: "",
-};
-
 export default function GestionAlumnos() {
-    const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<AlumnoFormulario>({
-        resolver: zodResolver(alumnoEsquema),
-        defaultValues: defaultValues,
-    });
+    const { sesion, verificarToken } = useAuth();
+
+    const modalAPI = useRef<ModalAPIRef>(null);
+    const [alumnos, setAlumnos] = useState<any[]>([]);
 
     // Estados modales
     const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any | null>(null);
+    const [modalDetalle, setModalDetalle] = useState(false);
     const [modalAgregar, setModalAgregar] = useState(false);
     const [modalEditar, setModalEditar] = useState(false);
-    const [modalEliminar, setModalEliminar] = useState<any | null>(null);
-    const [modalEliminarAlumnos, setModalEliminarAlumnos] = useState(false);
+    const [modalDarBaja, setModalDarBaja] = useState<any | null>(null);
     const [modalCargar, setModalCargar] = useState(false);
-    const [archivoSeleccionado, setArchivoSeleccionado] = useState<any | null>(null);
+    const [archivoSeleccionado, setArchivoSeleccionado] = useState<any>();
+    const [errorArchivo, setErrorArchivo] = useState<string>("");
 
     // --- Estados para búsqueda, filtros y paginación ---
     const [busqueda, setBusqueda] = useState("");
@@ -99,178 +42,312 @@ export default function GestionAlumnos() {
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
 
-    const abrirModalAgregar = () => {
-        setModalAgregar(true);
+    const obtenerAlumnos = async () => {
+        verificarToken();
+
+        try {
+            const response = await fetchData(`users/obtenerTodosAlumnos?tk=${sesion.token}`);
+            if (response.error === 0) {
+                setAlumnos(response.data);
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
+            }
+        } catch (error) {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+        }
     };
 
-    const onSubmit = (data: AlumnoFormulario) => {
-        reset(defaultValues);
-        setModalAgregar(false);
-    };
-
-    const abrirModalEditar = (alumno) => {
-        reset(alumno);
-        setModalEditar(alumno);
-    };
-
-    const eliminarAlumno = () => {
-        setModalEliminar(null);
-    };
-
-    const eliminarAlumnos = () => {
-        setModalEliminarAlumnos(false);
-    };
+    useEffect(() => {
+        obtenerAlumnos();
+    }, []);
 
     // --- Filtrado y paginación de los datos ---
-    const obtenerDatosFiltrados = () => {
-        let datos = [...datosAlumnos];
+    const alumnosFiltrados = alumnos.filter(alumno => (
+        `${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`
+            .toLowerCase()
+            .includes(busqueda.toLowerCase()) ||
+        alumno.boleta.toLowerCase().includes(busqueda.toLowerCase())
+    ) &&
+        (filtroEstatus === "Todos" || alumno.estatus.DESCRIPCION === filtroEstatus) &&
+        (filtroCarrera === "Todos" || alumno.carrera.NOMBRE === "Médico Cirujano y " + filtroCarrera)
+    );
 
-        // Búsqueda por nombre completo o boleta del alumno
-        if (busqueda) {
-            datos = datos.filter(alumno =>
-                `${alumno.nombre} ${alumno.apellidoPaterno} ${alumno.apellidoMaterno}`
-                    .toLowerCase()
-                    .includes(busqueda.toLowerCase()) ||
-                alumno.boleta.includes(busqueda.toLowerCase())
-            );
+    const totalPaginas = Math.ceil(alumnosFiltrados.length / filasPorPagina);
+    const alumnosMostrados = alumnosFiltrados.slice(
+        (paginaActual - 1) * filasPorPagina,
+        paginaActual * filasPorPagina
+    );
+
+    const {
+        control: controlAgregar,
+        handleSubmit: handleSubmitAgregar,
+        reset: resetAgregar,
+        formState: { errors: errorsAgregar, isSubmitting: isSubmittingAgregar } } = useForm<AlumnoFormulario>({
+            resolver: zodResolver(alumnoEsquema),
+        });
+
+    const onSubmitAgregar = async (data: AlumnoFormulario) => {
+        verificarToken();
+
+        try {
+            const alumnoData = {
+                ...data,
+                carrera: data.carrera === "Médico Cirujano y Homeópata" ? 1 : 0,
+                estatus: data.estatus === "Candidato" ? 1 :
+                    data.estatus === "Aspirante" ? 2 :
+                        data.estatus === "En proceso" ? 3 :
+                            data.estatus === "Concluido" ? 4 : 0,
+                tk: sesion.token,
+            };
+            const response = await postData("users/agregarAlumno", alumnoData);
+
+            if (response.error === 0) {
+                resetAgregar();
+                setModalAgregar(false);
+                obtenerAlumnos();
+                modalAPI.current?.show(true, "El alumno se ha registrado correctamente.");
+            } else {
+                if (response.message.includes("La boleta ya está registrada"))
+                    modalAPI.current?.show(false, "El número de boleta o CURP ya está registrado. Verifica los datos e inténtalo de nuevo.");
+                else
+                    modalAPI.current?.show(false, "Hubo un problema al registrar al alumno. Inténtalo de nuevo más tarde.");
+            }
+        } catch (error) {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
-
-        // Filtros por carrera y estatus
-        if (filtroCarrera && filtroCarrera != "Todos") datos = datos.filter(a => a.carrera === "Médico Cirujano y " + filtroCarrera);
-        if (filtroEstatus && filtroEstatus != "Todos") datos = datos.filter(a => a.estatus === filtroEstatus);
-
-        // Paginación
-        const inicio = (paginaActual - 1) * filasPorPagina;
-        const fin = inicio + filasPorPagina;
-
-        return datos.slice(inicio, fin);
     };
 
-    const totalRegistros = (() => {
-        let datos = [...datosAlumnos];
-        if (busqueda) {
-            datos = datos.filter(alumno =>
-                `${alumno.nombre} ${alumno.apellidoPaterno} ${alumno.apellidoMaterno}`
-                    .toLowerCase()
-                    .includes(busqueda.toLowerCase())
-            );
-        }
-        if (filtroCarrera && filtroCarrera != "Todos") datos = datos.filter(a => a.carrera === "Médico Cirujano y " + filtroCarrera);
-        if (filtroEstatus && filtroEstatus != "Todos") datos = datos.filter(a => a.estatus === filtroEstatus);
-        return datos.length;
-    })();
-    const totalPaginas = Math.ceil(totalRegistros / filasPorPagina);
+    const {
+        control: controlEditar,
+        handleSubmit: handleSubmitEditar,
+        reset: resetEditar,
+        formState: { errors: errorsEditar, isSubmitting: isSubmittingEditar } } = useForm<AlumnoFormulario>({
+            resolver: zodResolver(alumnoEsquema),
+        });
 
+    const onSubmitEditar = async (data: AlumnoFormulario) => {
+        verificarToken();
+
+        try {
+            const alumnoData = {
+                ...data,
+                carrera: data.carrera === "Médico Cirujano y Homeópata" ? 1 : 2,
+                estatus: data.estatus === "Candidato" ? 1 :
+                    data.estatus === "Aspirante" ? 2 :
+                        data.estatus === "En proceso" ? 3 :
+                            data.estatus === "Concluido" ? 4 : 0,
+                tk: sesion.token,
+            };
+            const response = await postData("users/editarAlumno", alumnoData);
+
+            if (response.error === 0) {
+                resetEditar();
+                setModalEditar(false);
+                obtenerAlumnos();
+                modalAPI.current?.show(true, "Los datos del alumno se han actualizado correctamente.");
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al actualizar los datos del alumno. Inténtalo de nuevo más tarde.");
+            }
+        } catch (error) {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+        }
+    };
+
+    const {
+        control: controlDarBaja,
+        handleSubmit: handleSubmitDarBaja,
+        formState: { isSubmitting: isSubmittingDarBaja } } = useForm<any>();
+
+    const darBajaAlumno = async (boleta: String) => {
+        verificarToken();
+
+        try {
+            const response = await postData("users/desactivarAlumno", {
+                boleta: boleta,
+                tk: sesion.token,
+            });
+            setModalDarBaja(false);
+
+            if (response.error === 0) {
+                modalAPI.current?.show(true, "El alumno se ha dado de baja correctamente.");
+                obtenerAlumnos();
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al dar de baja al alumno. Inténtalo de nuevo más tarde.");
+            }
+        } catch (error) {
+            setModalDarBaja(false);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+        }
+    };
+
+    const {
+        handleSubmit: handleSubmitCargar,
+        formState: { isSubmitting: isSubmittingCargar } } = useForm<any>();
+
+    const subirArchivo = async (formData: FormData) => {
+        verificarToken();
+
+        try {
+            const response = await postData(
+                `users/cargarAlumnos?tk=${sesion?.token}&nombre=excel`,
+                formData
+            );
+
+            if (response.error === 0) {
+                setModalCargar(false);
+                setArchivoSeleccionado(null);
+                obtenerAlumnos();
+
+                const totalErrores = response.errores.length;
+                const totalCorrectos = response.totalAlumnos - totalErrores - 1;
+                const resumen =
+                    `${totalCorrectos} alumno(s) se han registrado correctamente.\n` +
+                    `${totalErrores} errores encontrados.\n\nDetalles:\n` +
+                    (totalErrores > 0
+                        ? response.errores
+                            .map((e, i) => {
+                                const match = e.error.match(/(\d+)$/);
+                                const boleta = match ? match[1] : "Desconocido";
+
+                                const mensaje = e.error.includes("ya está registrada")
+                                    ? "Boleta duplicada"
+                                    : e.error.includes("inválida")
+                                        ? "Matrícula inválida"
+                                        : e.error;
+
+                                return `${i + 1}. [${boleta}] ${mensaje}.`;
+                            })
+                            .join('\n')
+                        : ""
+                    );
+                modalAPI.current?.show(true, resumen);
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al subir el archivo. Verifica el formato e inténtalo de nuevo.");
+            }
+        } catch (error) {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+        }
+    };
+
+    const handleSubirArchivo = () => {
+        if (!archivoSeleccionado) {
+            setErrorArchivo("Selecciona un archivo para cargar.");
+            return;
+        } else if ((archivoSeleccionado.get("file").size / (1024 * 1024)) > 2) {
+            return;
+        }
+
+        setErrorArchivo("");
+        handleSubmitCargar(() => subirArchivo(archivoSeleccionado))();
+    };
 
     // --- Render de modales ---
     const renderModalDetalle = () => {
         if (!alumnoSeleccionado) return null;
-        const { nombre, apellidoPaterno, apellidoMaterno, boleta, carrera, generacion, estatus, correo,
-            promedio, curp, rfc, telefonoCelular, telefonoLocal, sexo, calleNumero, colonia, delegacionMunicipio,
-            estadoProcedencia, codigoPostal } = alumnoSeleccionado;
+        const { nombre, apellido_paterno, apellido_materno, boleta, carrera, generacion, estatus, correo,
+            promedio, curp, rfc, telcelular, tellocal, sexo, calle_y_numero, colonia, delegacion,
+            estado, cp } = alumnoSeleccionado;
 
         return (
-            <Modal visible={!!alumnoSeleccionado} onClose={() => setAlumnoSeleccionado(null)} titulo="Datos del Alumno" maxWidth={750}>
+            <Modal visible={modalDetalle} onClose={() => { setAlumnoSeleccionado(null); setModalDetalle(false); }} titulo="Datos del Alumno" maxWidth={750}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
-                    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                        <View style={{ marginTop: 5, marginBottom: 15, pointerEvents: "none" }} >
-                            <Entrada label="Nombre" value={nombre} editable={false} />
-                        </View>
+                    <View style={{ marginTop: 5, marginBottom: 15, pointerEvents: "none" }} >
+                        <Entrada label="Nombre" value={nombre || ""} editable={false} />
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Apellido Paterno" value={apellidoPaterno} editable={false} />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Apellido Materno" value={apellidoMaterno} editable={false} />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Apellido Paterno" value={apellido_paterno || ""} editable={false} />
                         </View>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Apellido Materno" value={apellido_materno || ""} editable={false} />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="CURP" value={curp} editable={false} />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="RFC" value={rfc} editable={false} />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="CURP" value={curp || ""} editable={false} />
                         </View>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="RFC" value={rfc || ""} editable={false} />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Boleta" value={boleta} keyboardType="numeric" editable={false} />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Carrera" value={carrera} editable={false} />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Boleta" value={boleta || ""} keyboardType="numeric" editable={false} />
                         </View>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Carrera" value={carrera.NOMBRE || ""} editable={false} />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Generación" value={generacion} editable={false} />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Promedio" value={promedio} keyboardType="decimal-pad" editable={false} />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Generación" value={generacion || ""} editable={false} />
                         </View>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Promedio" value={promedio || ""} keyboardType="decimal-pad" editable={false} />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada
-                                    label="Correo Electrónico Institucional"
-                                    value={correo}
-                                    keyboardType="email-address"
-                                    editable={false}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Estatus" value={estatus} editable={false} />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada
+                                label="Correo Electrónico Institucional"
+                                value={correo || ""}
+                                keyboardType="email-address"
+                                editable={false}
+                            />
                         </View>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Estatus" value={estatus.DESCRIPCION || ""} editable={false} />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Calle y Número" value={calleNumero} editable={false} />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Colonia" value={colonia} editable={false} />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Calle y Número" value={calle_y_numero || ""} editable={false} />
                         </View>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Colonia" value={colonia || ""} editable={false} />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Delegación / Municipio" value={delegacionMunicipio} editable={false} />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Estado de Procedencia" value={estadoProcedencia} editable={false} />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Delegación / Municipio" value={delegacion || ""} editable={false} />
                         </View>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Estado de Procedencia" value={estado || ""} editable={false} />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Código Postal" value={codigoPostal} keyboardType="numeric" editable={false} />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Selector
-                                    label="Sexo"
-                                    selectedValue={sexo === "F" ? "Femenino" : sexo === "M" ? "Masculino" : ""}
-                                    items={[
-                                        { label: "Masculino", value: "M" },
-                                        { label: "Femenino", value: "F" },
-                                    ]}
-                                    onValueChange={() => { }}
-                                />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Código Postal" value={cp || ""} keyboardType="numeric" editable={false} />
                         </View>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Selector
+                                label="Sexo"
+                                selectedValue={sexo === "F" ? "Femenino" : sexo === "M" ? "Masculino" : ""}
+                                items={[
+                                    { label: "Masculino", value: "M" },
+                                    { label: "Femenino", value: "F" },
+                                ]}
+                                onValueChange={() => { }}
+                            />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Teléfono Celular" value={telefonoCelular} keyboardType="phone-pad" editable={false} />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                <Entrada label="Teléfono Local" value={telefonoLocal} keyboardType="phone-pad" editable={false} />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Teléfono Celular" value={telcelular || ""} keyboardType="phone-pad" editable={false} />
                         </View>
-                    </ScrollView>
+                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <Entrada label="Teléfono Local" value={tellocal || ""} keyboardType="phone-pad" editable={false} />
+                        </View>
+                    </View>
                 </KeyboardAvoidingView>
             </Modal>
         );
@@ -278,601 +355,384 @@ export default function GestionAlumnos() {
 
     const renderModalAgregar = () => {
         return (
-            <Modal visible={modalAgregar} onClose={() => { setModalAgregar(false); reset(defaultValues); }} titulo="Agregar Alumno" maxWidth={700} cancelar textoAceptar="Agregar alumno" onAceptar={handleSubmit(onSubmit)}>
+            <Modal
+                visible={modalAgregar} onClose={() => { setModalAgregar(false); resetAgregar(); }}
+                titulo="Agregar Alumno" maxWidth={700} cancelar deshabilitado={isSubmittingAgregar}
+                textoAceptar={isSubmittingAgregar ? "Agregando…" : "Agregar alumno"} onAceptar={handleSubmitAgregar(onSubmitAgregar)}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
-                    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                        <View style={{ marginTop: 5, marginBottom: 15 }}>
+                    <View style={{ marginTop: 5, marginBottom: 15 }}>
+                        <Controller
+                            control={controlAgregar}
+                            name="nombre"
+                            defaultValue=""
+                            render={({ field }) => (
+                                <Entrada label="Nombre" {...field} error={errorsAgregar.nombre?.message} />
+                            )}
+                        />
+                    </View>
+
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.apellido_paterno && !errorsAgregar.apellido_materno ? 30 : 15 }}>
                             <Controller
-                                control={control}
-                                name="nombre"
+                                control={controlAgregar}
+                                name="apellido_paterno"
+                                defaultValue=""
                                 render={({ field }) => (
-                                    <Entrada label="Nombre" {...field} error={errors.nombre?.message} />
+                                    <Entrada label="Apellido Paterno" {...field} error={errorsAgregar.apellido_paterno?.message} />
                                 )}
                             />
                         </View>
-
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="apellidoPaterno"
-                                    render={({ field }) => (
-                                        <Entrada label="Apellido Paterno" {...field} error={errors.apellidoPaterno?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="apellidoMaterno"
-                                    render={({ field }) => (
-                                        <Entrada label="Apellido Materno" {...field} error={errors.apellidoMaterno?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.apellido_materno && !errorsAgregar.apellido_paterno ? 30 : 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="apellido_materno"
+                                defaultValue=""
+                                render={({ field }) => (
+                                    <Entrada label="Apellido Materno" {...field} error={errorsAgregar.apellido_materno?.message} />
+                                )}
+                            />
                         </View>
+                    </View>
+                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.curp && !errorsAgregar.boleta ? 30 : 15 }}>
+                        <Controller
+                            control={controlAgregar}
+                            name="curp"
+                            defaultValue=""
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Entrada
+                                    label="CURP"
+                                    value={value}
+                                    onBlur={onBlur}
+                                    onChangeText={(text) => onChange(text.toUpperCase())}
+                                    error={errorsAgregar.curp?.message}
+                                    autoCapitalize="characters"
+                                />
+                            )}
+                        />
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="curp"
-                                    render={({ field }) => (
-                                        <Entrada label="CURP" {...field} error={errors.curp?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="rfc"
-                                    render={({ field }) => (
-                                        <Entrada label="RFC" {...field} error={errors.rfc?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                        </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="boleta"
-                                    render={({ field }) => (
-                                        <Entrada label="Boleta" keyboardType="numeric" {...field} error={errors.boleta?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="carrera"
-                                    render={({ field }) => (
-                                        <Entrada label="Carrera" {...field} error={errors.carrera?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.boleta && !errorsAgregar.carrera ? 30 : 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="boleta"
+                                defaultValue=""
+                                render={({ field }) => (
+                                    <Entrada label="Boleta" keyboardType="numeric" {...field} error={errorsAgregar.boleta?.message} />
+                                )}
+                            />
                         </View>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.carrera && !errorsAgregar.generacion ? 30 : 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="carrera"
+                                defaultValue=""
+                                render={({ field: { onChange, value } }) => (
+                                    <Selector
+                                        label="Carrera"
+                                        selectedValue={value}
+                                        onValueChange={onChange}
+                                        items={[
+                                            { label: "Médico Cirujano y Homeópata", value: "Médico Cirujano y Homeópata" },
+                                            { label: "Médico Cirujano y Partero", value: "Médico Cirujano y Partero" },
+                                        ]}
+                                        error={errorsAgregar.carrera?.message}
+                                    />
+                                )}
+                            />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="generacion"
-                                    render={({ field }) => (
-                                        <Entrada label="Generación" {...field} error={errors.generacion?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="promedio"
-                                    render={({ field }) => (
-                                        <Entrada label="Promedio" keyboardType="decimal-pad" {...field} error={errors.promedio?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.generacion && !errorsAgregar.promedio ? 30 : 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="generacion"
+                                defaultValue=""
+                                render={({ field }) => (
+                                    <Entrada label="Generación" {...field} error={errorsAgregar.generacion?.message} />
+                                )}
+                            />
                         </View>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.promedio && !errorsAgregar.estatus ? 30 : 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="promedio"
+                                defaultValue=""
+                                render={({ field }) => (
+                                    <Entrada label="Promedio" keyboardType="decimal-pad" {...field} error={errorsAgregar.promedio?.message} />
+                                )}
+                            />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="correo"
-                                    render={({ field }) => (
-                                        <Entrada label="Correo Electrónico" keyboardType="email-address" {...field} error={errors.correo?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="estatus"
-                                    render={({ field: { onChange, value } }) => (
-                                        <Selector
-                                            label="Estatus"
-                                            selectedValue={value}
-                                            onValueChange={onChange}
-                                            items={[
-                                                { label: "Candidato", value: "Candidato" },
-                                                { label: "Aspirante", value: "Aspirante" },
-                                                { label: "En proceso", value: "En proceso" },
-                                                { label: "Concluido", value: "Concluido" },
-                                            ]}
-                                            error={errors.estatus?.message}
-                                        />
-                                    )}
-                                />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.estatus && !errorsAgregar.correo ? 30 : 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="estatus"
+                                defaultValue=""
+                                render={({ field: { onChange, value } }) => (
+                                    <Selector
+                                        label="Estatus"
+                                        selectedValue={value}
+                                        onValueChange={onChange}
+                                        items={[
+                                            { label: "Baja", value: "Baja" },
+                                            { label: "Candidato", value: "Candidato" },
+                                            { label: "Aspirante", value: "Aspirante" },
+                                            { label: "En proceso", value: "En proceso" },
+                                            { label: "Concluido", value: "Concluido" },
+                                        ]}
+                                        error={errorsAgregar.estatus?.message}
+                                    />
+                                )}
+                            />
                         </View>
-
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="calleNumero"
-                                    render={({ field }) => (
-                                        <Entrada label="Calle y Número" {...field} error={errors.calleNumero?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="colonia"
-                                    render={({ field }) => (
-                                        <Entrada label="Colonia" {...field} error={errors.colonia?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.correo ? 30 : 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="correo"
+                                defaultValue=""
+                                render={({ field }) => (
+                                    <Entrada
+                                        label="Correo Electrónico"
+                                        keyboardType="email-address"
+                                        {...field}
+                                        error={errorsAgregar.correo?.message}
+                                    />
+                                )}
+                            />
                         </View>
-
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="delegacionMunicipio"
-                                    render={({ field }) => (
-                                        <Entrada label="Delegación / Municipio" {...field} error={errors.delegacionMunicipio?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="estadoProcedencia"
-                                    render={({ field }) => (
-                                        <Entrada label="Estado de Procedencia" {...field} error={errors.estadoProcedencia?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                        </View>
-
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="codigoPostal"
-                                    render={({ field }) => (
-                                        <Entrada label="Código Postal" keyboardType="numeric" {...field} error={errors.codigoPostal?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="sexo"
-                                    defaultValue={""}
-                                    render={({ field: { onChange, value } }) => (
-                                        <Selector
-                                            label="Sexo"
-                                            selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
-                                            onValueChange={onChange}
-                                            items={[
-                                                { label: "Masculino", value: "M" },
-                                                { label: "Femenino", value: "F" },
-                                            ]}
-                                            error={errors.sexo?.message}
-                                        />
-                                    )}
-                                />
-                            </View>
-                        </View>
-
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="telefonoCelular"
-                                    render={({ field }) => (
-                                        <Entrada label="Teléfono Celular" keyboardType="phone-pad" {...field} error={errors.telefonoCelular?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="telefonoLocal"
-                                    render={({ field }) => (
-                                        <Entrada label="Teléfono Local" keyboardType="phone-pad" {...field} error={errors.telefonoLocal?.message} style={{ flex: 1 }} />
-                                    )}
-                                />
-                            </View>
-                        </View>
-                    </ScrollView>
+                    </View>
                 </KeyboardAvoidingView>
             </Modal>
         );
     };
 
     const renderModalEditar = () => {
+        if (!alumnoSeleccionado) return null;
+        const { nombre, apellido_paterno, apellido_materno, boleta, carrera, generacion, estatus, correo,
+            promedio, curp } = alumnoSeleccionado;
+
         return (
-            <Modal visible={modalEditar}
-                onClose={() => { setAlumnoSeleccionado(null); setModalEditar(false); reset(defaultValues); }}
-                titulo="Editar Alumno" maxWidth={750} cancelar textoAceptar="Guardar Cambios" onAceptar={handleSubmit(onSubmit)}
+            <Modal visible={modalEditar} titulo="Editar Alumno" maxWidth={750}
+                onClose={() => { setAlumnoSeleccionado(null); setModalEditar(false); resetEditar(); }}
+                cancelar deshabilitado={isSubmittingEditar}
+                textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar Cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
             >
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
-                    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                        <View style={{ marginTop: 10, marginBottom: 15 }} >
+                    <View style={{ marginTop: 10, marginBottom: 15 }} >
+                        <Controller
+                            control={controlEditar}
+                            name="nombre"
+                            defaultValue={nombre || ""}
+                            render={({ field }) => (
+                                <Entrada label="Nombre" {...field} error={errorsEditar.nombre?.message} />
+                            )}
+                        />
+                    </View>
+
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.apellido_paterno && !errorsEditar.apellido_materno ? 30 : 15 }}>
                             <Controller
-                                control={control}
-                                name="nombre"
+                                control={controlEditar}
+                                name="apellido_paterno"
+                                defaultValue={apellido_paterno || ""}
                                 render={({ field }) => (
-                                    <Entrada label="Nombre" {...field} error={errors.nombre?.message} />
+                                    <Entrada
+                                        label="Apellido Paterno"
+                                        {...field}
+                                        error={errorsEditar.apellido_paterno?.message}
+                                    />
                                 )}
                             />
                         </View>
-
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="apellidoPaterno"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Apellido Paterno"
-                                            {...field}
-                                            error={errors.apellidoPaterno?.message}
-                                        />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="apellidoMaterno"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Apellido Materno"
-                                            {...field}
-                                            error={errors.apellidoMaterno?.message}
-                                        />
-                                    )}
-                                />
-                            </View>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.apellido_materno && !errorsEditar.apellido_paterno ? 30 : 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="apellido_materno"
+                                defaultValue={apellido_materno || ""}
+                                render={({ field }) => (
+                                    <Entrada
+                                        label="Apellido Materno"
+                                        {...field}
+                                        error={errorsEditar.apellido_materno?.message}
+                                    />
+                                )}
+                            />
                         </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="curp"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="CURP"
-                                            {...field}
-                                            error={errors.curp?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
+                    <View style={{ flex: 1, pointerEvents: "none", marginBottom: 15 }}>
+                        <Controller
+                            control={controlEditar}
+                            name="curp"
+                            defaultValue={curp || ""}
+                            render={({ field }) => (
+                                <Entrada
+                                    label="CURP"
+                                    {...field}
+                                    error={errorsEditar.curp?.message}
+                                    editable={false}
                                 />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="rfc"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="RFC"
-                                            {...field}
-                                            error={errors.rfc?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-                        </View>
+                            )}
+                        />
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="boleta"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Boleta"
-                                            keyboardType="numeric"
-                                            {...field}
-                                            error={errors.boleta?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="carrera"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Carrera"
-                                            {...field}
-                                            error={errors.carrera?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, pointerEvents: "none", marginBottom: esPantallaPequeña && errorsEditar.carrera ? 5 : 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="boleta"
+                                defaultValue={boleta || ""}
+                                render={({ field }) => (
+                                    <Entrada
+                                        label="Boleta"
+                                        keyboardType="numeric"
+                                        {...field}
+                                        error={errorsEditar.boleta?.message}
+                                        editable={false}
+                                    />
+                                )}
+                            />
                         </View>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.carrera ? 30 : 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="carrera"
+                                defaultValue={carrera || ""}
+                                render={({ field: { onChange, value } }) => (
+                                    <Selector
+                                        label="Carrera"
+                                        selectedValue={value}
+                                        onValueChange={onChange}
+                                        items={[
+                                            { label: "Médico Cirujano y Homeópata", value: "Médico Cirujano y Homeópata" },
+                                            { label: "Médico Cirujano y Partero", value: "Médico Cirujano y Partero" },
+                                        ]}
+                                        error={errorsEditar.carrera?.message}
+                                    />
+                                )}
+                            />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="generacion"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Generación"
-                                            {...field}
-                                            error={errors.generacion?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="promedio"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Promedio"
-                                            keyboardType="decimal-pad"
-                                            {...field}
-                                            error={errors.promedio?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.generacion && !errorsEditar.promedio ? 30 : 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="generacion"
+                                defaultValue={generacion || ""}
+                                render={({ field }) => (
+                                    <Entrada
+                                        label="Generación"
+                                        {...field}
+                                        error={errorsEditar.generacion?.message}
+                                        style={{ flex: 1 }}
+                                    />
+                                )}
+                            />
                         </View>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.promedio && !errorsEditar.correo ? 30 : 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="promedio"
+                                defaultValue={promedio || ""}
+                                render={({ field }) => (
+                                    <Entrada
+                                        label="Promedio"
+                                        keyboardType="decimal-pad"
+                                        {...field}
+                                        error={errorsEditar.promedio?.message}
+                                        style={{ flex: 1 }}
+                                    />
+                                )}
+                            />
+                        </View>
+                    </View>
 
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="correo"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Correo Electrónico"
-                                            keyboardType="email-address"
-                                            {...field}
-                                            error={errors.correo?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="estatus"
-                                    render={({ field: { onChange, value } }) => (
-                                        <Selector
-                                            label="Estatus"
-                                            selectedValue={value}
-                                            onValueChange={onChange}
-                                            items={[
-                                                { label: "Candidato", value: "Candidato" },
-                                                { label: "Aspirante", value: "Aspirante" },
-                                                { label: "En proceso", value: "En proceso" },
-                                                { label: "Concluido", value: "Concluido" },
-                                            ]}
-                                            error={errors.estatus?.message}
-                                        />
-                                    )}
-                                />
-                            </View>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.correo && !errorsEditar.estatus ? 30 : 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="correo"
+                                defaultValue={correo || ""}
+                                render={({ field }) => (
+                                    <Entrada
+                                        label="Correo Electrónico"
+                                        keyboardType="email-address"
+                                        {...field}
+                                        error={errorsEditar.correo?.message}
+                                        style={{ flex: 1 }}
+                                    />
+                                )}
+                            />
                         </View>
-
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="calleNumero"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Calle y Número"
-                                            {...field}
-                                            error={errors.calleNumero?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="colonia"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Colonia"
-                                            {...field}
-                                            error={errors.colonia?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="estatus"
+                                defaultValue={estatus || ""}
+                                render={({ field: { onChange, value } }) => (
+                                    <Selector
+                                        label="Estatus"
+                                        selectedValue={value}
+                                        onValueChange={onChange}
+                                        items={[
+                                            { label: "Baja", value: "Baja" },
+                                            { label: "Candidato", value: "Candidato" },
+                                            { label: "Aspirante", value: "Aspirante" },
+                                            { label: "En proceso", value: "En proceso" },
+                                            { label: "Concluido", value: "Concluido" },
+                                        ]}
+                                        error={errorsEditar.estatus?.message}
+                                    />
+                                )}
+                            />
                         </View>
-
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="delegacionMunicipio"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Delegación / Municipio"
-                                            {...field}
-                                            error={errors.delegacionMunicipio?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="estadoProcedencia"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Estado de Procedencia"
-                                            {...field}
-                                            error={errors.estadoProcedencia?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-                        </View>
-
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="codigoPostal"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Código Postal"
-                                            keyboardType="numeric"
-                                            {...field}
-                                            error={errors.codigoPostal?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="sexo"
-                                    render={({ field: { onChange, value } }) => (
-                                        <Selector
-                                            label="Sexo"
-                                            selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
-                                            onValueChange={onChange}
-                                            items={[
-                                                { label: "Masculino", value: "M" },
-                                                { label: "Femenino", value: "F" },
-                                            ]}
-                                            error={errors.sexo?.message}
-                                        />
-                                    )}
-                                />
-                            </View>
-                        </View>
-
-                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="telefonoCelular"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Teléfono Celular"
-                                            keyboardType="phone-pad"
-                                            {...field}
-                                            error={errors.telefonoCelular?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-                            <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Controller
-                                    control={control}
-                                    name="telefonoLocal"
-                                    render={({ field }) => (
-                                        <Entrada
-                                            label="Teléfono Local"
-                                            keyboardType="phone-pad"
-                                            {...field}
-                                            error={errors.telefonoLocal?.message}
-                                            style={{ flex: 1 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-                        </View>
-                    </ScrollView>
+                    </View>
                 </KeyboardAvoidingView>
             </Modal>
         );
     };
 
-    const renderModalEliminar = () => {
-        if (!modalEliminar) return null;
+    const renderModalDarBaja = () => {
+        if (!modalDarBaja) return null;
+
         return (
-            <Modal visible={modalEliminar} onClose={() => setModalEliminar(null)} titulo="Eliminar Alumno" maxWidth={500}
-                cancelar textoAceptar="Eliminar alumno" onAceptar={eliminarAlumno}>
+            <Modal visible={modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de Baja Alumno" maxWidth={500}
+                cancelar deshabilitado={isSubmittingDarBaja}
+                textoAceptar={isSubmittingDarBaja ? "Enviando…" : "Dar de baja"} onAceptar={() => { handleSubmitDarBaja(() => darBajaAlumno(modalDarBaja.boleta))(); }}>
                 <Text style={{ marginBottom: 20 }}>
-                    ¿Estás seguro de que deseas eliminar al alumno con número de boleta{" "}
-                    <Text style={{ fontWeight: "700" }}>{modalEliminar.boleta}</Text>?
+                    ¿Estás seguro de que deseas dar de baja al alumno con número de boleta{" "}
+                    <Text style={{ fontWeight: "700" }}>{modalDarBaja.boleta}</Text>?
                 </Text>
             </Modal>
         );
-    };
-
-    const renderModalEliminarAlumnos = () => {
-        if (!modalEliminarAlumnos) return null;
-        return (
-            <Modal visible={modalEliminarAlumnos} onClose={() => setModalEliminarAlumnos(false)} titulo="Eliminar Alumnos" maxWidth={500}
-                cancelar textoAceptar="Eliminar alumnos" onAceptar={eliminarAlumnos}>
-                <Text style={{ marginBottom: 20 }}>
-                    ¿Estás seguro de que deseas eliminar todos los alumnos registrados?
-                </Text>
-            </Modal>
-        );
-    };
-
-    const handleArchivoSeleccionado = (file: { name: string; uri: string; mimeType?: string }) => {
-        setArchivoSeleccionado(file);
-    };
-
-    const manejarSubidaArchivo = () => {
-        if (!archivoSeleccionado) {
-            return;
-        }
-        setModalCargar(false);
     };
 
     const renderModalCargarAlumnos = () => {
         return (
-            <Modal visible={modalCargar} onClose={() => setModalCargar(false)} titulo="Cargar Alumnos" maxWidth={600}
-                cancelar onAceptar={manejarSubidaArchivo}>
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    <Text>
-                        Para cargar alumnos al sistema, el archivo debe estar en formato Excel (.xls, .xlsx) y no puede exceder un tamaño de 2MB.
-                    </Text>
-                    <View style={{ marginTop: 20, marginBottom: 5 }}>
-                        <SelectorArchivo
-                            label="Selecciona el archivo"
-                            onArchivoSeleccionado={(file) => { setArchivoSeleccionado(file); }}
-                            allowedTypes={[".csv", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]} />
-                    </View>
-                </ScrollView>
+            <Modal visible={modalCargar} titulo="Cargar Alumnos" maxWidth={600}
+                onClose={() => { setModalCargar(false); setArchivoSeleccionado(null); }}
+                textoAceptar={isSubmittingCargar ? "Cargando…" : "Cargar archivo"}
+                cancelar onAceptar={handleSubirArchivo} deshabilitado={isSubmittingCargar}>
+                <Text>
+                    Para cargar alumnos al sistema, el archivo debe estar en formato Excel (.xls, .xlsx) y no puede exceder un tamaño de 2MB.
+                </Text>
+                <View style={{ marginTop: 20, marginBottom: 5 }}>
+                    <SelectorArchivo
+                        label="Archivo"
+                        allowedTypes={[".xls", ".xlsx", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]}
+                        onArchivoSeleccionado={(file) => {
+                            setArchivoSeleccionado(file);
+                            setErrorArchivo("");
+                        }}
+                        error={errorArchivo}
+                    />
+                </View>
             </Modal>
         );
     };
@@ -883,7 +743,7 @@ export default function GestionAlumnos() {
                 <Text style={styles.titulo}>Gestionar Alumnos</Text>
                 <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
                     <View style={[esPantallaPequeña && { flex: 1 }]}>
-                        <Boton title="Agregar alumno" onPress={abrirModalAgregar} />
+                        <Boton title="Agregar alumno" onPress={() => { setModalAgregar(true) }} />
                     </View>
                     <View style={[esPantallaPequeña && { flex: 1 }]}>
                         <Boton title="Cargar alumnos" onPress={() => setModalCargar(true)} />
@@ -892,20 +752,22 @@ export default function GestionAlumnos() {
 
                 <View style={styles.controlesSuperiores}>
                     <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                        <Selector
-                            label=""
-                            selectedValue={String(filasPorPagina)}
-                            onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                            items={[
-                                { label: "5", value: "5" },
-                                { label: "10", value: "10" },
-                                { label: "20", value: "20" },
-                            ]}
-                        />
+                        <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                            <Selector
+                                label=""
+                                selectedValue={String(filasPorPagina)}
+                                onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                                items={[
+                                    { label: "5", value: "5" },
+                                    { label: "10", value: "10" },
+                                    { label: "20", value: "20" },
+                                ]}
+                            />
+                        </View>
                         <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
                     </View>
 
-                    <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "50%" }]}>
+                    <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
                         <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
                             <Entrada
                                 label="Buscar"
@@ -935,10 +797,11 @@ export default function GestionAlumnos() {
                                     onValueChange={setFiltroEstatus}
                                     items={[
                                         { label: "Todos", value: "Todos" },
-                                        { label: "En proceso", value: "En proceso" },
-                                        { label: "Concluido", value: "Concluido" },
+                                        { label: "Baja", value: "Baja" },
                                         { label: "Aspirante", value: "Aspirante" },
                                         { label: "Candidato", value: "Candidato" },
+                                        { label: "En proceso", value: "En proceso" },
+                                        { label: "Concluido", value: "Concluido" },
                                     ]}
                                 />
                             </View>
@@ -961,10 +824,11 @@ export default function GestionAlumnos() {
                                     <Text
                                         style={[
                                             styles.texto,
+                                            valor === "Baja" && { color: Colores.textoError },
+                                            valor === "Candidato" && { color: Colores.textoAdvertencia },
+                                            valor === "Aspirante" && { color: Colores.textoAdvertencia },
                                             valor === "En proceso" && { color: Colores.textoInfo },
                                             valor === "Concluido" && { color: Colores.textoExito },
-                                            valor === "Candidato" && { color: Colores.textoError },
-                                            valor === "Aspirante" && { color: Colores.textoAdvertencia },
                                         ]}
                                     >
                                         {valor}
@@ -976,27 +840,28 @@ export default function GestionAlumnos() {
                                 titulo: "Acciones",
                                 ancho: 110,
                                 render: (_, fila) => (
-                                    <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", margin: "auto" }}>
+                                    <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
                                         <Boton
-                                            title=""
-                                            onPress={() => { abrirModalEditar(fila) }}
-                                            icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ margin: -5 }} />}
+                                            onPress={() => { setAlumnoSeleccionado(fila); setModalEditar(true); }}
+                                            icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
                                             color={Colores.textoInfo}
                                         />
                                         <Boton
-                                            title=""
-                                            onPress={() => { setModalEliminar(fila) }}
-                                            icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ margin: -5 }} />}
+                                            onPress={() => { setModalDarBaja(fila) }}
+                                            icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
                                             color={Colores.textoError}
+                                            disabled={fila.estatus === "Baja" ? true : false}
                                         />
                                     </View>
                                 ),
                             },
                         ]}
-                        datos={obtenerDatosFiltrados().map((fila) => ({
+                        datos={alumnosMostrados.map((fila) => ({
                             ...fila,
-                            nombre_completo: `${fila.nombre} ${fila.apellidoPaterno} ${fila.apellidoMaterno}`,
-                            onPress: () => setAlumnoSeleccionado(fila),
+                            nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                            carrera: fila.carrera.NOMBRE,
+                            estatus: fila.estatus.DESCRIPCION,
+                            onPress: () => { setAlumnoSeleccionado(fila); setModalDetalle(true); },
                         }))}
                     />
                 </ScrollView>
@@ -1009,20 +874,15 @@ export default function GestionAlumnos() {
                             setPaginaActual={setPaginaActual}
                         />
                     </View>
-
-
-                    <View style={{ marginTop: 15, alignItems: "flex-end" }}>
-                        <Boton title="Eliminar alumnos" onPress={() => setModalEliminarAlumnos(true)} />
-                    </View>
                 </View>
 
             </View>
             {renderModalDetalle()}
             {renderModalAgregar()}
             {renderModalEditar()}
-            {renderModalEliminar()}
-            {renderModalEliminarAlumnos()}
+            {renderModalDarBaja()}
             {renderModalCargarAlumnos()}
+            <ModalAPI ref={modalAPI} />
         </ScrollView >
     );
 }
@@ -1056,11 +916,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         paddingVertical: 8,
         fontWeight: "500",
-    },
-    row: {
-        flexDirection: "row",
-        gap: 12,
-        marginBottom: 15,
     },
     controlesSuperiores: {
         flexDirection: "row",

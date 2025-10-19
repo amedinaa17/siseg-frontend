@@ -35,6 +35,7 @@ export function completarDocumentos(docsBackend: any[]) {
                         : doc.estatus === 2 ? "Pendiente"
                             : doc.estatus === 3 ? "Aprobado"
                                 : "Rechazado",
+                observacion: doc.observacion || "Sin observaciones.",
                 tipo: item.tipo,
             };
         } else {

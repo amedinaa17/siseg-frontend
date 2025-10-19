@@ -1,11 +1,47 @@
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import { useAuth } from "@/context/AuthProvider";
+import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
-import React from "react";
+import { Link } from 'expo-router';
+import React, { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function InicioPersonalAdministrativo() {
-  const { sesion } = useAuth();
+  const { sesion, verificarToken } = useAuth();
   const esMovil = Platform.OS === "ios" || Platform.OS === "android";
+
+  const modalAPI = useRef<ModalAPIRef>(null);
+
+  const [kpis, setKpis] = useState({
+    alumnosRegistrados: 0,
+    alumnosRealizandoSS: 0,
+    reportesdeIncidencias: 0,
+  });
+
+  useEffect(() => {
+    const obtenerKpis = async () => {
+      verificarToken();
+
+      try {
+        const response = await fetchData(`users/obtenerkpis?tk=${sesion.token}`);
+        const data = await response;
+
+        if (data.error === 0) {
+          setKpis({
+            alumnosRegistrados: data.alumnosRegistrados,
+            alumnosRealizandoSS: data.alumnosRealizandoSS,
+            reportesdeIncidencias: data.reportesdeIncidencias,
+          });
+        } else {
+          modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
+        }
+      } catch (error) {
+        modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+      }
+    };
+
+    obtenerKpis();
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colores.background }}>
@@ -25,18 +61,24 @@ export default function InicioPersonalAdministrativo() {
           <Text style={styles.idPersonalAdministrativo}>{sesion?.boleta || ""}</Text>
 
           <View style={styles.tarjetaContenedor}>
-            <View style={styles.tarjeta}>
-              <Text style={styles.tarjetaTitulo}>Alumnos registrados</Text>
-              <Text style={styles.tarjetaValor}>250</Text>
-            </View>
-            <View style={styles.tarjeta}>
-              <Text style={styles.tarjetaTitulo}>Alumnos realizando su servicio social</Text>
-              <Text style={styles.tarjetaValor}>238</Text>
-            </View>
-            <View style={styles.tarjeta}>
-              <Text style={styles.tarjetaTitulo}>Reportes de incidencia nuevos</Text>
-              <Text style={styles.tarjetaValor}>3</Text>
-            </View>
+            <Link href="/(app)/(administrativo)/gestionar-alumnos">
+              <View style={styles.tarjeta}>
+                <Text style={styles.tarjetaTitulo}>Alumnos registrados</Text>
+                <Text style={styles.tarjetaValor}>{kpis.alumnosRegistrados}</Text>
+              </View>
+            </Link>
+            <Link href="/(app)/(administrativo)/gestionar-alumnos">
+              <View style={styles.tarjeta}>
+                <Text style={styles.tarjetaTitulo}>Alumnos realizando su servicio social</Text>
+                <Text style={styles.tarjetaValor}>{kpis.alumnosRealizandoSS}</Text>
+              </View>
+            </Link>
+            <Link href="/(app)/(administrativo)/revisar-reportes-riesgo">
+              <View style={styles.tarjeta}>
+                <Text style={styles.tarjetaTitulo}>Reportes de incidencia nuevos</Text>
+                <Text style={styles.tarjetaValor}>{kpis.reportesdeIncidencias}</Text>
+              </View>
+            </Link>
           </View>
 
           <View style={styles.piePagina}>
@@ -49,6 +91,7 @@ export default function InicioPersonalAdministrativo() {
             </View>
           </View>
         </View>
+        <ModalAPI ref={modalAPI} />
       </ScrollView>
     </View>
   );
@@ -121,10 +164,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     flexWrap: "wrap",
     marginVertical: 20,
+    width:"100%"
   },
   tarjeta: {
     flex: 1,
-    minWidth: 200,
+    minWidth: 300,
     margin: 8,
     backgroundColor: Colores.fondos,
     padding: 16,

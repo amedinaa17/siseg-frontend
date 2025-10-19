@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       setSesion(usuario);
     } catch (error) {
+      router.replace("/(auth)/iniciar-sesion");
       setErrorMessage(error instanceof Error ? error.message : "Error al verificar el token.");
       setSesion(null);
     }
@@ -41,8 +42,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         rol: usuario.rol,
         nombre: usuario.nombre,
       });
-
-      router.replace("/(app)");
+      if (usuario.rol === "ALUMNO")
+        router.replace("/(app)/(alumno)/");
+      else if (usuario.rol === "P_ADMIN")
+        router.replace("/(app)/(administrativo)/");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Error desconocido");
     }

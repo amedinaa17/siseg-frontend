@@ -1,4 +1,5 @@
 import Modal from "@/componentes/layout/Modal";
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import EntradaMultilinea from "@/componentes/ui/EntradaMultilinea";
@@ -9,22 +10,21 @@ import { completarDocumentos } from "@/lib/documentosHelper";
 import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Linking, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function ExpedienteDigital() {
     const { sesion, verificarToken } = useAuth();
+
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
 
+    const modalAPI = useRef<ModalAPIRef>(null);
     const [documentos, setDocumentos] = useState<any[]>([]);
     const [docSeleccionado, setDocSeleccionado] = useState<any | null>(null);
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<any>();
     const [errorArchivo, setErrorArchivo] = useState<string>("");
-
-    const [modalVisible, setModalVisible] = useState(false);
-    const [modalMensaje, setModalMensaje] = useState('');
-    const [modalTipo, setModalTipo] = useState(false);
 
     const obtenerDocumentos = async () => {
         verificarToken();
@@ -36,20 +36,20 @@ export default function ExpedienteDigital() {
                 const docsBackend = response.documents;
                 setDocumentos(completarDocumentos(docsBackend));
             } else {
-                setModalTipo(false);
-                setModalMensaje("Hubo un error al obtener tus datos del servidor. Intentalo de nuevo más tarde.")
-                setModalVisible(true)
+                modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
-            setModalTipo(false);
-            setModalMensaje("Hubo un error al conectar con el servidor. Intentalo de nuevo más tarde.")
-            setModalVisible(true)
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
     };
 
     useEffect(() => {
         obtenerDocumentos();
     }, []);
+
+    const {
+        handleSubmit,
+        formState: { isSubmitting } } = useForm<any>();
 
     const subirArchivo = async (formData: FormData, documento: String) => {
         verificarToken();
@@ -61,22 +61,14 @@ export default function ExpedienteDigital() {
             );
 
             if (response?.message) {
-                setDocSeleccionado(null)
-                setModalTipo(true);
-                setModalMensaje("El archivo se ha subido correctamente.");
-                setModalVisible(true);
+                setDocSeleccionado(null);
                 obtenerDocumentos();
+                modalAPI.current?.show(true, "El archivo se ha subido correctamente.");
             } else {
-                setDocSeleccionado(null)
-                setModalTipo(false);
-                setModalMensaje("Hubo un error al subir el archivo. Inténtalo de nuevo más tarde.");
-                setModalVisible(true);
+                modalAPI.current?.show(false, "Hubo un problema al subir el archivo. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
-            setDocSeleccionado(null)
-            setModalTipo(false);
-            setModalMensaje("Hubo un error al conectar con el servidor. Inténtalo de nuevo más tarde.");
-            setModalVisible(true);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
     };
 
@@ -89,7 +81,7 @@ export default function ExpedienteDigital() {
         }
 
         setErrorArchivo("");
-        subirArchivo(archivoSeleccionado, documento);
+        handleSubmit(() => subirArchivo(archivoSeleccionado, documento))();
     };
 
     const renderModal = () => {
@@ -98,15 +90,16 @@ export default function ExpedienteDigital() {
             observacion, rutaArchivo, color } = docSeleccionado;
 
         return (
-            <Modal visible={!!docSeleccionado} onClose={() => setDocSeleccionado(null)} titulo={nombreArchivo}
-                aceptar={true} 
-                textoAceptar={estatus === "Sin cargar" ? "Cargar" : estatus === "Rechazado" ? "Volver a Cargar" : undefined}
-                onAceptar={() => 
-                    estatus === "Sin cargar" ? handleSubirArchivo(nombreArchivo) 
-                        : estatus === "Rechazado" ? setDocSeleccionado({ ...docSeleccionado, estatus: "Sin cargar", color: Colores.textoAdvertencia, }) 
-                            : setDocSeleccionado(null)}
-                cancelar={estatus === "Sin cargar" ? true : false}
-                onCancelar={() => { setArchivoSeleccionado(null); setDocSeleccionado(null); setErrorArchivo("") }}>
+            <Modal visible={!!docSeleccionado}
+                onClose={() => { setArchivoSeleccionado(null); setDocSeleccionado(null); setErrorArchivo(""); }} titulo={nombreArchivo}
+                aceptar={true} textoAceptar={isSubmitting ? "Cargando…" : estatus === "Sin cargar" ? "Cargar archivo" : estatus === "Rechazado" ? "Volver a cargar" : undefined}
+                onAceptar={() => {
+                    estatus === "Sin cargar" ? handleSubirArchivo(nombreArchivo)
+                        : estatus === "Rechazado" ? setDocSeleccionado({ ...docSeleccionado, estatus: "Sin cargar", color: Colores.textoAdvertencia, })
+                            : setDocSeleccionado(null)
+                }}
+                cancelar={estatus === "Sin cargar" ? true : false} deshabilitado={isSubmitting}
+            >
                 <Text style={{ fontSize: 15, fontWeight: "600", marginBottom: 18, color: color }}>
                     {estatus}
                 </Text>
@@ -135,11 +128,11 @@ export default function ExpedienteDigital() {
                             <Boton
                                 title=""
                                 onPress={() => Linking.openURL(rutaArchivo)}
-                                icon={<Ionicons name="eye-outline" size={20} color="white" />}
+                                icon={<Ionicons name="eye-outline" size={20} color="white" style={{ paddingHorizontal: 10 }} />}
                             />
                         </View>
                         <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-                            <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleString()} editable={false} />
+                            <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
                         </View>
                         <View style={{ pointerEvents: "none" }}>
                             <EntradaMultilinea
@@ -159,14 +152,14 @@ export default function ExpedienteDigital() {
                             <Boton
                                 title=""
                                 onPress={() => Linking.openURL(rutaArchivo)}
-                                icon={<Ionicons name="eye-outline" size={20} color="white" />}
+                                icon={<Ionicons name="eye-outline" size={20} color="white" style={{ paddingHorizontal: 10 }} />}
                             />
                         </View>
                         <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-                            <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleString()} editable={false} />
+                            <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
                         </View>
                         <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-                            <Entrada label="Reviso" value="{adminEncargado}" editable={false} />
+                            <Entrada label="Revisado por" value={adminEncargado.nombre + " " + adminEncargado.APELLIDO_PATERNO + " " + adminEncargado.APELLIDO_MATERNO} editable={false} />
                         </View>
                         <View style={{ pointerEvents: "none" }}>
                             <EntradaMultilinea
@@ -186,14 +179,14 @@ export default function ExpedienteDigital() {
                             <Boton
                                 title=""
                                 onPress={() => Linking.openURL(rutaArchivo)}
-                                icon={<Ionicons name="eye-outline" size={20} color="white" />}
+                                icon={<Ionicons name="eye-outline" size={20} color="white" style={{ paddingHorizontal: 10 }} />}
                             />
                         </View>
                         <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-                            <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleString()} editable={false} />
+                            <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
                         </View>
                         <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-                            <Entrada label="Reviso" value="{adminEncargado}" editable={false} />
+                            <Entrada label="Revisado por" value={adminEncargado.nombre + " " + adminEncargado.APELLIDO_PATERNO + " " + adminEncargado.APELLIDO_MATERNO} editable={false} />
                         </View>
                         <View style={{ pointerEvents: "none" }}>
                             <EntradaMultilinea
@@ -265,24 +258,7 @@ export default function ExpedienteDigital() {
                 </ScrollView>
             </View>
             {renderModal()}
-            < Modal
-                visible={modalVisible}
-                titulo={modalTipo ? "" : ""}
-                cerrar={false}
-                onClose={() => setModalVisible(false)}
-            >
-                <View style={{ alignItems: "center" }}>
-                    <Ionicons
-                        name={modalTipo ? "checkmark-circle-outline" : "close-circle-outline"}
-                        size={80}
-                        color={modalTipo ? Colores.textoExito : Colores.textoError}
-                    />
-                    <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoClaro, marginBottom: 8 }}>
-                        {modalTipo ? "¡Todo Listo!" : "¡Algo Salió Mal!"}
-                    </Text>
-                    <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center" }}>{modalMensaje}</Text>
-                </View>
-            </Modal>
+            <ModalAPI ref={modalAPI} />
         </ScrollView >
     );
 }

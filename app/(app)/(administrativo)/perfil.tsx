@@ -1,4 +1,4 @@
-import Modal from "@/componentes/layout/Modal";
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import { useAuth } from "@/context/AuthProvider";
@@ -8,46 +8,42 @@ import {
 } from "@/lib/validacion";
 import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
-import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function MiPerfil() {
     const { sesion, verificarToken } = useAuth();
-    const [datosAdministrativo, setDatosAdministrativo] = useState<any>(null);
 
-    const [modalVisible, setModalVisible] = useState(false);
-    const [modalMensaje, setModalMensaje] = useState('');
-    const [modalTipo, setModalTipo] = useState(false);
-    const [vista, setVista] = useState<"perfil" | "modificar" | "contraseña">("perfil");
+    const modalAPI = useRef<ModalAPIRef>(null);
+
+    const [datosAdministrativo, setDatosAdministrativo] = useState<any>(null);
+    const [vista, setVista] = useState<1 | 2 | 3>(1);
 
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 600;
 
     useEffect(() => {
         const obtenerDatos = async () => {
+            verificarToken();
+
             if (sesion?.token) {
                 try {
                     const response = await fetchData(`users/obtenerTodosDatosAdmin?tk=${sesion.token}`);
                     if (response.error === 0) {
                         setDatosAdministrativo(response.data);
                     } else {
-                        setModalTipo(false);
-                        setModalMensaje("Hubo un error al obtener tus datos del servidor. Intentalo de nuevo más tarde.")
-                        setModalVisible(true)
+                        modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
                     }
                 } catch (error) {
-                    setModalTipo(false);
-                    setModalMensaje("Hubo un error al conectar con el servidor. Intentalo de nuevo más tarde.")
-                    setModalVisible(true)
+                    modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
                 }
             }
         };
 
         obtenerDatos();
-    }, [sesion, vista]);
+    }, [vista]);
 
     const {
         control: controlPerfil,
@@ -65,24 +61,18 @@ export default function MiPerfil() {
             const payload = {
                 telcelular: data.telefonoCelular,
                 tellocal: data.telefonoLocal,
-                tk: sesion?.token
+                tk: sesion.token
             };
             const response = await postData('users/modificarDatos', payload);
 
             if (response.error === 0) {
-                setVista("perfil");
-                setModalTipo(true)
-                setModalMensaje('Tus datos se han actualizado correctamente.');
-                setModalVisible(true);
+                modalAPI.current?.show(true, "Tus datos se han actualizado correctamente.");
+                setVista(1);
             } else {
-                setModalTipo(false)
-                setModalMensaje('Hubo un problema al intentar actualizar tus datos.');
-                setModalVisible(true);
+                modalAPI.current?.show(false, "Hubo un problema al actualizar tus datos. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
-            setModalTipo(false)
-            setModalMensaje('Error al conectar con el servidor. Intentalo de nuevo más tarde.');
-            setModalVisible(true);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
     };
 
@@ -93,7 +83,6 @@ export default function MiPerfil() {
         formState: { errors: errorsContraseña, isSubmitting: enviandoContraseña },
     } = useForm<CambiarContraseñaFormulario>({
         resolver: zodResolver(cambiarContraseñaEsquema),
-        defaultValues: { contraseña: "", confirmarContraseña: "" },
     });
 
     const onSubmitContraseña = async (datos: CambiarContraseñaFormulario) => {
@@ -102,64 +91,58 @@ export default function MiPerfil() {
         try {
             const response = await postData('users/restablecerPassword', {
                 password: datos.contraseña,
-                tk: sesion?.token,
+                tk: sesion.token,
             });
 
             if (response.error === 0) {
-                setVista("perfil");
-                setModalTipo(true)
-                setModalMensaje('Tu contraseña se ha cambiado correctamente.');
-                setModalVisible(true);
+                setVista(1);
+                modalAPI.current?.show(true, "Tu contraseña se ha cambiado correctamente.");
             } else {
-                setModalTipo(false)
-                setModalMensaje('Hubo un problema al intentar actualizar tu contraseña.');
-                setModalVisible(true);
+                modalAPI.current?.show(false, "Hubo un problema al actualizar tu contraseña. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
-            setModalTipo(false)
-            setModalMensaje('Error al conectar con el servidor. Intentalo de nuevo más tarde.');
-            setModalVisible(true);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
     };
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }, vista != "perfil" && { marginTop: 100 }]}>
-                    {vista === "perfil" && (
+                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }, vista != 1 && { marginTop: 100 }]}>
+                    {vista === 1 && (
                         <>
                             <Text style={styles.titulo}>Mi Perfil</Text>
 
                             <View style={{ marginBottom: 15, pointerEvents: "none" }}>
-                                <Entrada label="Nombre" value={datosAdministrativo?.nombre} editable={false} />
+                                <Entrada label="Nombre" value={datosAdministrativo?.nombre || ""} editable={false} />
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Apellido Paterno" value={datosAdministrativo?.apellido_paterno} editable={false} />
+                                    <Entrada label="Apellido Paterno" value={datosAdministrativo?.apellido_paterno || ""} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Apellido Materno" value={datosAdministrativo?.apellido_materno} editable={false} />
+                                    <Entrada label="Apellido Materno" value={datosAdministrativo?.apellido_materno || ""} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="CURP" value={datosAdministrativo?.curp} editable={false} />
+                                    <Entrada label="CURP" value={datosAdministrativo?.curp || ""} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Perfil" value={datosAdministrativo?.perfil} editable={false} />
+                                    <Entrada label="Perfil" value={datosAdministrativo?.perfil || ""} editable={false} />
                                 </View>
                             </View>
 
                             <View style={{ marginBottom: 15, pointerEvents: "none" }}>
-                                <Entrada label="Número de Empleado" value={datosAdministrativo?.numempleado} keyboardType="numeric" editable={false} />
+                                <Entrada label="Número de Empleado" value={datosAdministrativo?.numempleado || ""} keyboardType="numeric" editable={false} />
                             </View>
 
                             <View style={{ marginBottom: 15, pointerEvents: "none" }}>
                                 <Entrada
                                     label="Correo Electrónico Institucional"
-                                    value={datosAdministrativo?.correo}
+                                    value={datosAdministrativo?.correo || ""}
                                     keyboardType="email-address"
                                     editable={false}
                                 />
@@ -167,34 +150,34 @@ export default function MiPerfil() {
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Teléfono Celular" value={datosAdministrativo?.telcelular} keyboardType="phone-pad" editable={false} />
+                                    <Entrada label="Teléfono Celular" value={datosAdministrativo?.telcelular || ""} keyboardType="phone-pad" editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Teléfono Local" value={datosAdministrativo?.tellocal} keyboardType="phone-pad" editable={false} />
+                                <View style={{ flex: 1, marginBottom: 25, pointerEvents: "none" }}>
+                                    <Entrada label="Teléfono Local" value={datosAdministrativo?.tellocal || ""} keyboardType="phone-pad" editable={false} />
                                 </View>
                             </View>
 
                             {datosAdministrativo &&
                                 <View style={{ flexDirection: "row", gap: 12 }}>
                                     <View style={{ flex: 1 }}>
-                                        <Boton title="Modificar Datos" onPress={() => setVista("modificar")} />
+                                        <Boton title="Modificar datos" onPress={() => setVista(2)} />
                                     </View>
                                     <View style={{ flex: 1 }}>
-                                        <Boton title="Cambiar Contraseña" onPress={() => setVista("contraseña")} />
+                                        <Boton title="Cambiar contraseña" onPress={() => setVista(3)} />
                                     </View>
                                 </View>
                             }
                         </>
                     )}
-                    {vista === "modificar" && (
+                    {vista === 2 && (
                         <>
                             <Text style={styles.titulo}>Modificar Datos</Text>
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 5 }}>
+                                <View style={{ flex: 1, marginBottom: errorsPerfil.telefonoCelular && !errorsPerfil.telefonoLocal ? 15 : 5 }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="telefonoCelular"
-                                        defaultValue={datosAdministrativo?.telcelular}
+                                        defaultValue={datosAdministrativo?.telcelular || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Teléfono Celular"
@@ -224,19 +207,19 @@ export default function MiPerfil() {
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Boton title="Regresar" onPress={() => { resetPerfil(); setVista("perfil") }} disabled={enviandoPerfil} />
+                                    <Boton title="Regresar" onPress={() => { resetPerfil(); setVista(1) }} disabled={enviandoPerfil} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Boton
-                                        title={enviandoPerfil ? "Guardando…" : "Guardar Cambios"}
+                                        title={enviandoPerfil ? "Guardando…" : "Guardar cambios"}
                                         onPress={handlePerfil(onSubmitPerfil)}
+                                        disabled={enviandoPerfil}
                                     />
                                 </View>
                             </View>
                         </>
                     )}
-
-                    {vista === "contraseña" && (
+                    {vista === 3 && (
                         <>
                             <Text style={styles.titulo}>Cambiar Contraseña</Text>
 
@@ -244,6 +227,7 @@ export default function MiPerfil() {
                                 <Controller
                                     control={controlContraseña}
                                     name="contraseña"
+                                    defaultValue=""
                                     render={({ field: { onChange, value } }) => (
                                         <Entrada
                                             label="Nueva Contraseña"
@@ -260,6 +244,7 @@ export default function MiPerfil() {
                                 <Controller
                                     control={controlContraseña}
                                     name="confirmarContraseña"
+                                    defaultValue=""
                                     render={({ field: { onChange, value } }) => (
                                         <Entrada
                                             label="Confirmar Contraseña"
@@ -274,35 +259,19 @@ export default function MiPerfil() {
 
                             <View style={{ flexDirection: "row", gap: 12 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Boton title="Regresar" onPress={() => { resetContraseña(); setVista("perfil") }} disabled={enviandoContraseña} />
+                                    <Boton title="Regresar" onPress={() => { resetContraseña(); setVista(1) }} disabled={enviandoContraseña} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Boton
-                                        title={enviandoContraseña ? "Guardando…" : "Guardar Contraseña"}
+                                        title={enviandoContraseña ? "Guardando…" : "Guardar contraseña"}
                                         onPress={handleContraseña(onSubmitContraseña)}
+                                        disabled={enviandoContraseña}
                                     />
                                 </View>
                             </View>
                         </>
                     )}
-                    <Modal
-                        visible={modalVisible}
-                        titulo={modalTipo ? "" : ""}
-                        cerrar={false}
-                        onClose={() => setModalVisible(false)}
-                    >
-                        <View style={{ alignItems: "center" }}>
-                            <Ionicons
-                                name={modalTipo ? "checkmark-circle-outline" : "close-circle-outline"}
-                                size={80}
-                                color={modalTipo ? Colores.textoExito : Colores.textoError}
-                            />
-                            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoClaro, marginBottom: 8 }}>
-                                {modalTipo ? "¡Todo Listo!" : "¡Algo Salió Mal!"}
-                            </Text>
-                            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center" }}>{modalMensaje}</Text>
-                        </View>
-                    </Modal>
+                    <ModalAPI ref={modalAPI} />
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>

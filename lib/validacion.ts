@@ -5,10 +5,9 @@ export const correoEsquema = z.object({
   correo: z
     .string()
     .nonempty("Este campo es obligatorio")
-    .email("El formato de correo es inválido")
     .endsWith(
       "@alumno.ipn.mx",
-      "El correo electrónico debe ser institucional"
+      "El correo electrónico debe ser institucional (@alumno.ipn.mx)"
     ),
 });
 
@@ -215,7 +214,7 @@ export const alumnoEsquema = z.object({
       message: "El nombre no puede contener dígitos",
     }),
 
-  apellidoPaterno: z
+  apellido_paterno: z
     .string()
     .nonempty("El apellido paterno es obligatorio")
     .min(3, "Debe tener al menos 3 caracteres")
@@ -223,7 +222,7 @@ export const alumnoEsquema = z.object({
       message: "El apellido paterno no puede contener dígitos",
     }),
 
-  apellidoMaterno: z
+  apellido_materno: z
     .string()
     .nonempty("El apellido materno es obligatorio")
     .min(3, "Debe tener al menos 3 caracteres")
@@ -241,17 +240,9 @@ export const alumnoEsquema = z.object({
       "Formato de CURP inválido"
     ),
 
-  rfc: z
-    .string()
-    .nonempty("El RFC es obligatorio")
-    .min(12, "El RFC debe tener al menos 12 caracteres")
-    .max(13, "El RFC no puede tener más de 13 caracteres")
-    .regex(/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/, "Formato de RFC inválido"),
-
   carrera: z
     .string()
-    .nonempty("La carrera es obligatoria")
-    .min(5, "Debe tener al menos 5 caracteres"),
+    .nonempty("La carrera es obligatoria"),
 
   generacion: z
     .string()
@@ -271,61 +262,11 @@ export const alumnoEsquema = z.object({
     .string()
     .nonempty("El correo es obligatorio")
     .email("Formato de correo inválido")
-    .endsWith("@alumno.ipn.mx", "Debe ser un correo institucional"),
+    .endsWith("@alumno.ipn.mx", "Debe ser un correo institucional (@alumno.ipn.mx)"),
 
   estatus: z
     .string()
     .nonempty("El estatus es obligatorio"),
-
-  calleNumero: z
-    .string()
-    .nonempty("La calle y número son obligatorios"),
-
-  colonia: z
-    .string()
-    .nonempty("La colonia es obligatoria"),
-
-  delegacionMunicipio: z
-    .string()
-    .nonempty("La delegación o municipio es obligatorio"),
-
-  estadoProcedencia: z
-    .string()
-    .nonempty("El estado de procedencia es obligatorio"),
-
-  codigoPostal: z
-    .string()
-    .nonempty("El código postal es obligatorio")
-    .refine((val) => /^\d+$/.test(val), {
-      message: "El código postal solo debe contener dígitos",
-    })
-    .refine((val) => val.length === 5, {
-      message: "El código postal debe contener exactamente 5 dígitos",
-    }),
-
-  sexo: z
-    .string()
-    .nonempty("El sexo es obligatorio"),
-
-  telefonoCelular: z
-    .string()
-    .nonempty("El teléfono celular es obligatorio")
-    .refine((val) => /^\d+$/.test(val), {
-      message: "El número de celular solo debe contener dígitos",
-    })
-    .refine((val) => val.length === 10, {
-      message: "El número de celular debe contener exactamente 10 dígitos",
-    }),
-
-  telefonoLocal: z
-    .string()
-    .optional()
-    .refine((val) => !val || /^\d+$/.test(val), {
-      message: "El número local solo debe contener dígitos",
-    })
-    .refine((val) => !val || (val.length >= 7 && val.length <= 10), {
-      message: "El número local debe tener entre 7 y 10 dígitos",
-    }),
 });
 
 export type AlumnoFormulario = z.infer<typeof alumnoEsquema>;
@@ -374,7 +315,7 @@ export const personalEsquema = z.object({
     .string()
     .nonempty("El correo es obligatorio")
     .email("Formato de correo inválido")
-    .endsWith("@alumno.ipn.mx", "Debe ser un correo institucional"),
+    .endsWith("@alumno.ipn.mx", "Debe ser un correo institucional (@alumno.ipn.mx)"),
 
   telefonoCelular: z
     .string()
@@ -398,3 +339,17 @@ export const personalEsquema = z.object({
 });
 
 export type PersonalFormulario = z.infer<typeof personalEsquema>;
+
+// Esquema para reportes
+export const reporteEsquema = z.object({
+    descripcion: z.string().min(1, "La descripción no puede estar vacía."),
+    evidencias: z
+        .array(z.object({
+            nombre: z.string(),
+            peso: z.string(),
+            tipo: z.enum(["image", "audio", "pdf"]),
+        }))
+        .max(5, "No puedes agregar más de 5 evidencias."),
+});
+
+export type ReporteFormulario = z.infer<typeof reporteEsquema>;
