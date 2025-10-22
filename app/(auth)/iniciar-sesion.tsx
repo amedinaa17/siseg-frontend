@@ -9,10 +9,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'expo-router';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 export default function IniciarSesion() {
   const { iniciarSesion, errorMessage } = useAuth();
+
+  const { width } = useWindowDimensions();
+  const esPantallaPequeña = width < 768;
+
   const {
     control,
     handleSubmit,
@@ -30,74 +34,115 @@ export default function IniciarSesion() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
-        <View style={styles.contenedorFormulario}>
-          <Text style={styles.titulo}>Inicio de Sesión</Text>
-
-          <View style={{ marginBottom: 15 }}>
-            <Controller
-              control={control}
-              name="boleta"
-              render={({ field: { onChange, value } }) => (
-                <Entrada
-                  label="Boleta"
-                  value={value}
-                  onChangeText={onChange}
-                  autoCapitalize="none"
-                  keyboardType="numeric"
-                  error={errors.boleta?.message}
+        <View style={[styles.contenedorPrincipal, esPantallaPequeña ? { flexDirection: 'column', marginVertical: 35 } : { flexDirection: 'row' }]}>
+          {!esPantallaPequeña && (
+            <>
+              <View style={[styles.textoContainer, { width: esPantallaPequeña ? '90%' : '30%', }]}>
+                <Image
+                  source={require('@/activos/imagenes/siseg.png')}
+                  style={{ width: 160, height: 160, marginBottom: 10 }}
                 />
-              )}
+
+                <Text style={styles.bienvenidaSubtitulo}>
+                  Sistema de Seguimiento del Servicio Social para la ENMyH
+                </Text>
+                <Text style={styles.bienvenidaDescripcion}>
+                  <Text style={{ color: Colores.primario, fontWeight: '600' }}>SISEG</Text> es una herramienta informática diseñada para dar seguimiento al servicio social de la <Text style={{ fontWeight: '600' }}>Escuela Nacional de Medicina y Homeopatía</Text>.
+                </Text>
+              </View>
+            </>
+          )}
+
+          <View style={[styles.contenedorFormulario, { width: esPantallaPequeña ? '90%' : '70%' }]}>
+            <Text style={styles.titulo}>Inicio de Sesión</Text>
+            <View style={{ marginBottom: 15 }}>
+              <Controller
+                control={control}
+                name="boleta"
+                render={({ field: { onChange, value } }) => (
+                  <Entrada
+                    label="Boleta"
+                    value={value}
+                    onChangeText={onChange}
+                    autoCapitalize="none"
+                    keyboardType="numeric"
+                    error={errors.boleta?.message}
+                  />
+                )}
+              />
+            </View>
+
+            <View style={{ marginBottom: 15 }}>
+              <Controller
+                control={control}
+                name="contraseña"
+                render={({ field: { onChange, value } }) => (
+                  <Entrada
+                    label="Contraseña"
+                    secureTextEntry
+                    value={value}
+                    onChangeText={onChange}
+                    error={errors.contraseña?.message}
+                  />
+                )}
+              />
+            </View>
+
+            {errorMessage ? (
+              <Text style={styles.errorIniciarSesion}>{errorMessage}</Text>
+            ) : null}
+
+            <Link href="/(auth)/restablecer-contrasena" style={styles.olvidarContraseña}>¿Olvidaste tu contraseña?</Link>
+
+            <Boton
+              title={isSubmitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
             />
-          </View>
 
-          <View style={{ marginBottom: 15 }}>
-            <Controller
-              control={control}
-              name="contraseña"
-              render={({ field: { onChange, value } }) => (
-                <Entrada
-                  label="Contraseña"
-                  secureTextEntry
-                  value={value}
-                  onChangeText={onChange}
-                  error={errors.contraseña?.message}
-                />
-              )}
-            />
-          </View>
+            <View style={styles.separador} />
 
-          {errorMessage ? (
-            <Text style={styles.errorIniciarSesion}>{errorMessage}</Text>
-          ) : null}
-
-          <Link href="/(auth)/restablecer-contrasena" style={styles.olvidarContraseña}>¿Olvidaste tu contraseña?</Link>
-
-          <Boton
-            title={isSubmitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
-            onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-          />
-
-          <View style={styles.separador} />
-
-          <View style={styles.iniciarSesionTexto}>
-            <Text>¿Aún no tienes una cuenta?</Text>
-            <Link href="/(auth)/registrar-cuenta" style={styles.iniciarSesionLink}>
-              Regístrate aquí
-            </Link>
+            <View style={styles.iniciarSesionTexto}>
+              <Text>¿Aún no tienes una cuenta?</Text>
+              <Link href="/(auth)/registrar-cuenta" style={styles.iniciarSesionLink}>
+                Regístrate aquí
+              </Link>
+            </View>
           </View>
         </View>
         <PiePagina />
       </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingView >
   );
 }
 
 const styles = StyleSheet.create({
+  contenedorPrincipal: {
+    flex: 1,
+    justifyContent: "space-evenly",
+    alignItems: 'center',
+  },
+  textoContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  bienvenidaSubtitulo: {
+    fontSize: Fuentes.subtitulo,
+    fontWeight: '600',
+    color: Colores.textoPrincipal,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  bienvenidaDescripcion: {
+    fontSize: Fuentes.cuerpo,
+    color: Colores.textoSecundario,
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 22,
+  },
   contenedorFormulario: {
-    width: "90%",
     maxWidth: 500,
-    margin: "auto",
     padding: 24,
     borderWidth: 1,
     borderRadius: 12,

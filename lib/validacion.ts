@@ -4,7 +4,7 @@ import { z } from "zod";
 export const correoEsquema = z.object({
   correo: z
     .string()
-    .nonempty("Este campo es obligatorio")
+    .nonempty("El correo electrónico institucional es obligatorio")
     .endsWith(
       "@alumno.ipn.mx",
       "El correo electrónico debe ser institucional (@alumno.ipn.mx)"
@@ -16,12 +16,12 @@ export type CorreoFormulario = z.infer<typeof correoEsquema>;
 // Validación para boleta
 export const boletaEsquema = z
   .string()
-  .nonempty("Este campo es obligatorio")
+  .nonempty("El número de boleta es obligatorio")
   .refine((val) => /^\d+$/.test(val), {
-    message: "La boleta solo debe contener dígitos",
+    message: "El número de boleta solo debe contener dígitos",
   })
   .refine((val) => val.length === 10, {
-    message: "La boleta debe contener exactamente 10 dígitos",
+    message: "El número de boleta debe contener exactamente 10 dígitos",
   });
 
 // Validación para contraseña
@@ -48,22 +48,22 @@ export const registroEsquema = z.object({
 
   calle: z
     .string()
-    .nonempty("Este campo es obligatorio")
+    .nonempty("La calle es obligatoria")
     .min(3, "Debe tener al menos 3 caracteres"),
 
   colonia: z
     .string()
-    .nonempty("Este campo es obligatorio")
+    .nonempty("La colonia es obligatoria")
     .min(3, "Debe tener al menos 3 caracteres"),
 
   municipio: z
     .string()
-    .nonempty("Este campo es obligatorio")
+    .nonempty("El municipio es obligatorio")
     .min(3, "Debe tener al menos 3 caracteres"),
 
   estado: z
     .string()
-    .nonempty("Este campo es obligatorio")
+    .nonempty("El estado es obligatorio")
     .min(3, "Debe tener al menos 3 caracteres"),
 
   codigoPostal: z
@@ -78,7 +78,7 @@ export const registroEsquema = z.object({
 
   sexo: z
     .string()
-    .nonempty("Este campo es obligatorio"),
+    .nonempty("El sexo es obligatorio"),
 
   telefonoCelular: z
     .string()
@@ -281,7 +281,7 @@ export const personalEsquema = z.object({
       message: "El nombre no puede contener dígitos",
     }),
 
-  apellidoPaterno: z
+  apellido_paterno: z
     .string()
     .nonempty("El apellido paterno es obligatorio")
     .min(3, "Debe tener al menos 3 caracteres")
@@ -289,12 +289,21 @@ export const personalEsquema = z.object({
       message: "El apellido paterno no puede contener dígitos",
     }),
 
-  apellidoMaterno: z
+  apellido_materno: z
     .string()
     .nonempty("El apellido materno es obligatorio")
     .min(3, "Debe tener al menos 3 caracteres")
     .refine((val) => /^\D*$/.test(val), {
       message: "El apellido materno no puede contener dígitos",
+    }),
+
+  numempleado: z.string()
+    .nonempty("El número de empleado es obligatorio")
+    .refine((val) => /^\d+$/.test(val), {
+      message: "El número de empleado solo debe contener dígitos",
+    })
+    .refine((val) => val.length === 10, {
+      message: "El número de empleado debe contener exactamente 10 dígitos",
     }),
 
   curp: z
@@ -305,7 +314,13 @@ export const personalEsquema = z.object({
       "Formato de CURP inválido"
     ),
 
-  noEmpleado: boletaEsquema,
+  sexo: z
+    .string()
+    .nonempty("El sexo es obligatorio"),
+
+  estatus: z
+    .string()
+    .nonempty("El estatus es obligatorio"),
 
   perfil: z
     .string()
@@ -317,7 +332,7 @@ export const personalEsquema = z.object({
     .email("Formato de correo inválido")
     .endsWith("@alumno.ipn.mx", "Debe ser un correo institucional (@alumno.ipn.mx)"),
 
-  telefonoCelular: z
+  telcelular: z
     .string()
     .nonempty("El teléfono celular es obligatorio")
     .refine((val) => /^\d+$/.test(val), {
@@ -327,7 +342,7 @@ export const personalEsquema = z.object({
       message: "El número de celular debe contener exactamente 10 dígitos",
     }),
 
-  telefonoLocal: z
+  tellocal: z
     .string()
     .optional()
     .refine((val) => !val || /^\d+$/.test(val), {
@@ -342,14 +357,14 @@ export type PersonalFormulario = z.infer<typeof personalEsquema>;
 
 // Esquema para reportes
 export const reporteEsquema = z.object({
-    descripcion: z.string().min(1, "La descripción no puede estar vacía."),
-    evidencias: z
-        .array(z.object({
-            nombre: z.string(),
-            peso: z.string(),
-            tipo: z.enum(["image", "audio", "pdf"]),
-        }))
-        .max(5, "No puedes agregar más de 5 evidencias."),
+  descripcion: z.string().min(1, "La descripción no puede estar vacía."),
+  evidencias: z
+    .array(z.object({
+      nombre: z.string(),
+      peso: z.string(),
+      tipo: z.enum(["image", "audio", "pdf"]),
+    }))
+    .max(5, "No puedes agregar más de 5 evidencias."),
 });
 
 export type ReporteFormulario = z.infer<typeof reporteEsquema>;
