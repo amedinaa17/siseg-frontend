@@ -1,54 +1,23 @@
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Paginacion from "@/componentes/ui/Paginacion";
 import Selector from "@/componentes/ui/Selector";
 import Tabla from "@/componentes/ui/Tabla";
+import { useAuth } from "@/context/AuthProvider";
+import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
-const datosAlumnos = [
-    {
-        boleta: "2022630301", nombre: "Andrea", apellidoPaterno: "Salgado", apellidoMaterno: "Ramírez", carrera: "Médico Cirujano y Partero",
-        generacion: "2025", estatus: "En proceso", correo: "asalga@alumno.ipn.mx", promedio: "9.1", curp: "SARA010312MDFLND09",
-        rfc: "SARA010312T55", telefonoCelular: "5512345678", telefonoLocal: "5553123456", sexo: "F", calleNumero: "Cedros 134",
-        colonia: "San Miguel", delegacionMunicipio: "2022630301", estadoProcedencia: "Iztapalapa", codigoPostal: "09830"
-    },
-    {
-        boleta: "2022630320", nombre: "Mariana", apellidoPaterno: "Torres", apellidoMaterno: "López", carrera: "Médico Cirujano y Partero",
-        generacion: "2025", estatus: "En proceso", correo: "mariana.tl@alumno.ipn.mx", promedio: "9.3", curp: "TOLM010215MDFLNS09",
-        rfc: "TOLM010215RT5", telefonoCelular: "5511223344", telefonoLocal: "5556789123", sexo: "F", calleNumero: "Insurgentes Sur 900",
-        colonia: "Del Valle", delegacionMunicipio: "Benito Juárez", estadoProcedencia: "CDMX", codigoPostal: "03100"
-    },
-    {
-        boleta: "2022630312", nombre: "Alejandro", apellidoPaterno: "Vega", apellidoMaterno: "Domínguez", carrera: "Médico Cirujano y Homeópata",
-        generacion: "2024", estatus: "Concluido", correo: "alejandro@alumno.ipn.mx", promedio: "8.5", curp: "ALEA010112MDFLND09",
-        rfc: "ALEA010112T55", telefonoCelular: "5544332211", telefonoLocal: "5553445566", sexo: "M", calleNumero: "Av. Hidalgo 45",
-        colonia: "Centro", delegacionMunicipio: "Cuauhtémoc", estadoProcedencia: "CDMX", codigoPostal: "06000"
-    },
-    {
-        boleta: "2022630333", nombre: "Jorge", apellidoPaterno: "Hernández", apellidoMaterno: "Castillo", carrera: "Médico Cirujano y Homeópata",
-        generacion: "-", estatus: "Aspirante", correo: "jorgehc@alumno.ipn.mx", promedio: "8.1", curp: "HECJ991120MDFRNL08",
-        rfc: "HECJ991120KL9", telefonoCelular: "5522334455", telefonoLocal: "5559876543", sexo: "M", calleNumero: "Reforma 100",
-        colonia: "Juárez", delegacionMunicipio: "Cuauhtémoc", estadoProcedencia: "CDMX", codigoPostal: "06600"
-    },
-    {
-        boleta: "2022630345", nombre: "Paola", apellidoPaterno: "Méndez", apellidoMaterno: "García", carrera: "Médico Cirujano y Partero",
-        generacion: "-", estatus: "Candidato", correo: "paolamg@alumno.ipn.mx", promedio: "9.7", curp: "MEGP000305MDFLNR07",
-        rfc: "MEGP000305PR2", telefonoCelular: "5533445566", telefonoLocal: "5552233445", sexo: "F", calleNumero: "Av. Universidad 320",
-        colonia: "Copilco", delegacionMunicipio: "Coyoacán", estadoProcedencia: "CDMX", codigoPostal: "04360"
-    },
-    {
-        boleta: "2022630363", nombre: "Joel", apellidoPaterno: "Mora", apellidoMaterno: "Castañeda", carrera: "Médico Cirujano y Partero",
-        generacion: "-", estatus: "Candidato", correo: "joelmc@alumno.ipn.mx", promedio: "8.7", curp: "MOCJ000305MDFLNR07",
-        rfc: "MOCJ000305PR2", telefonoCelular: "5533445566", telefonoLocal: "5552233445", sexo: "F", calleNumero: "Av. Universidad 350",
-        colonia: "Copilco", delegacionMunicipio: "Coyoacán", estadoProcedencia: "CDMX", codigoPostal: "04360"
-    },
-];
-
 export default function ValidarDocumentos() {
+    const { sesion, verificarToken } = useAuth();
+
+    const modalAPI = useRef<ModalAPIRef>(null);
+    const [alumnos, setAlumnos] = useState<any[]>([]);
+
     // Estados modales
     const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any | null>(null);
 
@@ -62,45 +31,41 @@ export default function ValidarDocumentos() {
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
 
-    // --- Filtrado y paginación de los datos ---
-    const obtenerDatosFiltrados = () => {
-        let datos = [...datosAlumnos];
+    const obtenerAlumnos = async () => {
+        verificarToken();
 
-        // Búsqueda por nombre completo o boleta del alumno
-        if (busqueda) {
-            datos = datos.filter(alumno =>
-                `${alumno.nombre} ${alumno.apellidoPaterno} ${alumno.apellidoMaterno}`
-                    .toLowerCase()
-                    .includes(busqueda.toLowerCase()) ||
-                alumno.boleta.includes(busqueda.toLowerCase())
-            );
+        try {
+            const response = await fetchData(`users/obtenerTodosAlumnos?tk=${sesion.token}`);
+            if (response.error === 0) {
+                setAlumnos(response.data.filter((alumno) => alumno.estatus.DESCRIPCION !== "Baja"));
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
+            }
+        } catch (error) {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
-
-        // Filtros por carrera y estatus
-        if (filtroCarrera && filtroCarrera != "Todos") datos = datos.filter(a => a.carrera === "Médico Cirujano y " + filtroCarrera);
-        if (filtroEstatus && filtroEstatus != "Todos") datos = datos.filter(a => a.estatus === filtroEstatus);
-
-        // Paginación
-        const inicio = (paginaActual - 1) * filasPorPagina;
-        const fin = inicio + filasPorPagina;
-
-        return datos.slice(inicio, fin);
     };
 
-    const totalRegistros = (() => {
-        let datos = [...datosAlumnos];
-        if (busqueda) {
-            datos = datos.filter(alumno =>
-                `${alumno.nombre} ${alumno.apellidoPaterno} ${alumno.apellidoMaterno}`
-                    .toLowerCase()
-                    .includes(busqueda.toLowerCase())
-            );
-        }
-        if (filtroCarrera && filtroCarrera != "Todos") datos = datos.filter(a => a.carrera === "Médico Cirujano y " + filtroCarrera);
-        if (filtroEstatus && filtroEstatus != "Todos") datos = datos.filter(a => a.estatus === filtroEstatus);
-        return datos.length;
-    })();
-    const totalPaginas = Math.ceil(totalRegistros / filasPorPagina);
+    useEffect(() => {
+        obtenerAlumnos();
+    }, []);
+
+    // --- Filtrado y paginación de los datos ---
+    const alumnosFiltrados = alumnos.filter(alumno => (
+        `${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`
+            .toLowerCase()
+            .includes(busqueda.toLowerCase()) ||
+        alumno.boleta.toLowerCase().includes(busqueda.toLowerCase())
+    ) &&
+        (filtroEstatus === "Todos" || alumno.estatus.DESCRIPCION === filtroEstatus) &&
+        (filtroCarrera === "Todos" || alumno.carrera.NOMBRE === "Médico Cirujano y " + filtroCarrera)
+    );
+
+    const totalPaginas = Math.ceil(alumnosFiltrados.length / filasPorPagina);
+    const alumnosMostrados = alumnosFiltrados.slice(
+        (paginaActual - 1) * filasPorPagina,
+        paginaActual * filasPorPagina
+    );
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -153,10 +118,11 @@ export default function ValidarDocumentos() {
                                     onValueChange={setFiltroEstatus}
                                     items={[
                                         { label: "Todos", value: "Todos" },
-                                        { label: "En proceso", value: "En proceso" },
-                                        { label: "Concluido", value: "Concluido" },
+                                        { label: "Baja", value: "Baja" },
                                         { label: "Aspirante", value: "Aspirante" },
                                         { label: "Candidato", value: "Candidato" },
+                                        { label: "En proceso", value: "En proceso" },
+                                        { label: "Concluido", value: "Concluido" },
                                     ]}
                                 />
                             </View>
@@ -179,10 +145,11 @@ export default function ValidarDocumentos() {
                                     <Text
                                         style={[
                                             styles.texto,
+                                            valor === "Baja" && { color: Colores.textoError },
+                                            valor === "Candidato" && { color: Colores.textoAdvertencia },
+                                            valor === "Aspirante" && { color: Colores.textoAdvertencia },
                                             valor === "En proceso" && { color: Colores.textoInfo },
                                             valor === "Concluido" && { color: Colores.textoExito },
-                                            valor === "Candidato" && { color: Colores.textoError },
-                                            valor === "Aspirante" && { color: Colores.textoAdvertencia },
                                         ]}
                                     >
                                         {valor}
@@ -209,10 +176,12 @@ export default function ValidarDocumentos() {
                                 ),
                             },
                         ]}
-                        datos={obtenerDatosFiltrados().map((fila) => ({
+                        datos={alumnosMostrados.map((fila) => ({
                             ...fila,
-                            nombre_completo: `${fila.nombre} ${fila.apellidoPaterno} ${fila.apellidoMaterno}`,
-                            //onPress: () => setAlumnoSeleccionado(fila),
+                            nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                            carrera: fila.carrera.NOMBRE,
+                            estatus: fila.estatus.DESCRIPCION,
+                            // onPress: () => { setAlumnoSeleccionado(fila); },
                         }))}
                     />
                 </ScrollView>
@@ -227,6 +196,7 @@ export default function ValidarDocumentos() {
                     </View>
                 </View>
             </View>
+            <ModalAPI ref={modalAPI} />
         </ScrollView >
     );
 }

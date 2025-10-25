@@ -1,6 +1,7 @@
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
+import Selector from "@/componentes/ui/Selector";
 import { useAuth } from "@/context/AuthProvider";
 import {
     cambiarContraseñaEsquema, modificarPerfilAdminEsquema,
@@ -59,8 +60,7 @@ export default function MiPerfil() {
 
         try {
             const payload = {
-                telcelular: data.telefonoCelular,
-                tellocal: data.telefonoLocal,
+                data,
                 tk: sesion.token
             };
             const response = await postData('users/modificarDatos', payload);
@@ -131,12 +131,25 @@ export default function MiPerfil() {
                                     <Entrada label="CURP" value={datosAdministrativo?.curp || ""} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                                    <Entrada label="Perfil" value={datosAdministrativo?.perfil || ""} editable={false} />
+                                    <Selector
+                                        label="Sexo"
+                                        selectedValue={datosAdministrativo ? (datosAdministrativo.sexo === "F" ? "Femenino" : "Masculino") : ""}
+                                        items={[
+                                            { label: "Masculino", value: "M" },
+                                            { label: "Femenino", value: "F" },
+                                        ]}
+                                        onValueChange={() => { }}
+                                    />
                                 </View>
                             </View>
 
-                            <View style={{ marginBottom: 15, pointerEvents: "none" }}>
-                                <Entrada label="Número de Empleado" value={datosAdministrativo?.numempleado || ""} keyboardType="numeric" editable={false} />
+                            <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                    <Entrada label="Número de Empleado" value={datosAdministrativo?.numempleado || ""} keyboardType="numeric" editable={false} />
+                                </View>
+                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                    <Entrada label="Perfil" value={datosAdministrativo ? (datosAdministrativo.perfil === "1" ? "Administrador de seguimiento" : "Administrador general") : ""} editable={false} />
+                                </View>
                             </View>
 
                             <View style={{ marginBottom: 15, pointerEvents: "none" }}>
@@ -172,18 +185,37 @@ export default function MiPerfil() {
                     {vista === 2 && (
                         <>
                             <Text style={styles.titulo}>Modificar Datos</Text>
+                            <View style={{ marginBottom: 15 }}>
+                                <Controller
+                                    control={controlPerfil}
+                                    name="sexo"
+                                    defaultValue={datosAdministrativo?.sexo || ""}
+                                    render={({ field: { onChange, value } }) => (
+                                        <Selector
+                                            label="Sexo"
+                                            selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
+                                            onValueChange={(val) => onChange(val)}
+                                            items={[
+                                                { label: "Masculino", value: "M" },
+                                                { label: "Femenino", value: "F" },
+                                            ]}
+                                            error={errorsPerfil.sexo?.message}
+                                        />
+                                    )}
+                                />
+                            </View>
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: errorsPerfil.telefonoCelular && !errorsPerfil.telefonoLocal ? 15 : 5 }}>
+                                <View style={{ flex: 1, marginBottom: errorsPerfil.telcelular && !errorsPerfil.tellocal ? 15 : 5 }}>
                                     <Controller
                                         control={controlPerfil}
-                                        name="telefonoCelular"
+                                        name="telcelular"
                                         defaultValue={datosAdministrativo?.telcelular || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Teléfono Celular"
                                                 keyboardType="phone-pad"
                                                 {...field}
-                                                error={errorsPerfil.telefonoCelular?.message}
+                                                error={errorsPerfil.telcelular?.message}
                                             />
                                         )}
                                     />
@@ -191,14 +223,14 @@ export default function MiPerfil() {
                                 <View style={{ flex: 1, marginBottom: 25 }}>
                                     <Controller
                                         control={controlPerfil}
-                                        name="telefonoLocal"
+                                        name="tellocal"
                                         defaultValue={datosAdministrativo?.tellocal}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Teléfono Local"
                                                 keyboardType="phone-pad"
                                                 {...field}
-                                                error={errorsPerfil.telefonoLocal?.message}
+                                                error={errorsPerfil.tellocal?.message}
                                             />
                                         )}
                                     />

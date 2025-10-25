@@ -30,7 +30,7 @@ export default function ExpedienteDigital() {
         verificarToken();
 
         try {
-            const response = await fetchData(`users/expedienteDigital?tk=${sesion.token}`);
+            const response = await fetchData(`users/expedienteDigital?boleta=${sesion.boleta}&tk=${sesion.token}`);
 
             if (response.error === 0) {
                 const docsBackend = response.documents;
@@ -132,8 +132,16 @@ export default function ExpedienteDigital() {
                             />
                         </View>
                         <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-                            <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
+                            <Entrada label="Fecha de envío" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
                         </View>
+                        {adminEncargado && (
+                            <>
+                                <Text style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, marginBottom: 15, textAlign: "right" }}>Nota: Este documento fue rechazado anteriormente.</Text>
+                                <View style={{ pointerEvents: "none", marginBottom: 15 }} >
+                                    <Entrada label="Revisado anteriormente por" value={adminEncargado.nombre + " " + adminEncargado.APELLIDO_PATERNO + " " + adminEncargado.APELLIDO_MATERNO} editable={false} />
+                                </View>
+                            </>
+                        )}
                         <View style={{ pointerEvents: "none" }}>
                             <EntradaMultilinea
                                 label="Observaciones"
@@ -156,7 +164,7 @@ export default function ExpedienteDigital() {
                             />
                         </View>
                         <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-                            <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
+                            <Entrada label="Fecha de envío" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
                         </View>
                         <View style={{ pointerEvents: "none", marginBottom: 15 }} >
                             <Entrada label="Revisado por" value={adminEncargado.nombre + " " + adminEncargado.APELLIDO_PATERNO + " " + adminEncargado.APELLIDO_MATERNO} editable={false} />
@@ -183,7 +191,7 @@ export default function ExpedienteDigital() {
                             />
                         </View>
                         <View style={{ pointerEvents: "none", marginBottom: 15 }} >
-                            <Entrada label="Fecha de modificación" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
+                            <Entrada label="Fecha de envío" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
                         </View>
                         <View style={{ pointerEvents: "none", marginBottom: 15 }} >
                             <Entrada label="Revisado por" value={adminEncargado.nombre + " " + adminEncargado.APELLIDO_PATERNO + " " + adminEncargado.APELLIDO_MATERNO} editable={false} />
@@ -225,6 +233,7 @@ export default function ExpedienteDigital() {
                             .filter((d) => d.tipo === 1)
                             .map((fila) => ({
                                 ...fila,
+                                observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
                                 onPress: () => setDocSeleccionado(fila),
                             }))}
                     />
@@ -252,6 +261,7 @@ export default function ExpedienteDigital() {
                             .filter((d) => d.tipo === 2)
                             .map((fila) => ({
                                 ...fila,
+                                observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
                                 onPress: () => setDocSeleccionado(fila),
                             }))}
                     />

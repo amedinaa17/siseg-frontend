@@ -49,7 +49,7 @@ export default function GestionPersonalAdministrativo() {
                 modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
-            //modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
     };
 
@@ -62,7 +62,7 @@ export default function GestionPersonalAdministrativo() {
         `${personal.persona.nombre} ${personal.persona.APELLIDO_PATERNO} ${personal.persona.APELLIDO_MATERNO}`
             .toLowerCase()
             .includes(busqueda.toLowerCase()) ||
-        personal.boleta.toLowerCase().includes(busqueda.toLowerCase())
+        personal.persona.boleta.toLowerCase().includes(busqueda.toLowerCase())
     ) &&
         (filtroEstatus === "Todos" || personal.estatus.DESCRIPCION === filtroEstatus) &&
         (filtroPerfil === "Todos" || personal.perfil === "Administrador " + filtroPerfil)
@@ -88,6 +88,8 @@ export default function GestionPersonalAdministrativo() {
         try {
             const personalData = {
                 ...data,
+                estatus: data.estatus === "Activo" ? 1 : 0,
+                perfil: data.perfil === "Administrador de seguimiento" ? 1 : 2,
                 tk: sesion.token,
             };
             const response = await postData("users/agregarAdmin", personalData);
@@ -122,6 +124,8 @@ export default function GestionPersonalAdministrativo() {
         try {
             const personalData = {
                 ...data,
+                estatus: data.estatus === "Activo" ? 1 : 0,
+                perfil: data.perfil === "Administrador de seguimiento" ? 1 : 2,
                 tk: sesion.token,
             };
             const response = await postData("users/editarAdmin", personalData);
@@ -129,10 +133,11 @@ export default function GestionPersonalAdministrativo() {
             if (response.error === 0) {
                 resetEditar();
                 setModalEditar(false);
+                setPersonalSeleccionado(null);
                 obtenerPersonal();
                 modalAPI.current?.show(true, "Los datos del personal administrativo se han actualizado correctamente.");
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al actualizar los datos del personala dministrativo. Inténtalo de nuevo más tarde.");
+                modalAPI.current?.show(false, "Hubo un problema al actualizar los datos del personal dministrativo. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
             modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
@@ -140,16 +145,15 @@ export default function GestionPersonalAdministrativo() {
     };
 
     const {
-        control: controlDarBaja,
         handleSubmit: handleSubmitDarBaja,
         formState: { isSubmitting: isSubmittingDarBaja } } = useForm<any>();
 
-    const darBajaPersonal = async (boleta: String) => {
+    const darBajaPersonal = async (numempleado: String) => {
         verificarToken();
 
         try {
             const response = await postData("users/desactivarAdmin", {
-                boleta: boleta,
+                numempleado: numempleado,
                 tk: sesion.token,
             });
             setModalDarBaja(false);
@@ -253,7 +257,7 @@ export default function GestionPersonalAdministrativo() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.apellido_paterno && !errorsEditar.apellido_materno ? 30 : 15 }}>
                             <Controller
                                 control={controlAgregar}
                                 name="apellido_paterno"
@@ -293,7 +297,7 @@ export default function GestionPersonalAdministrativo() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.sexo  && !errorsAgregar.curp ? 15 : 15 }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Controller
                                 control={controlAgregar}
                                 name="sexo"
@@ -334,17 +338,17 @@ export default function GestionPersonalAdministrativo() {
                                     <Selector
                                         label="Estatus"
                                         selectedValue={value}
-                                        onValueChange={(val) => onChange(val)}
+                                        onValueChange={onChange}
                                         items={[
-                                            { label: "ACTIVO", value: "ACTIVO" },
-                                            { label: "INACTIVO", value: "INACTIVO" },
+                                            { label: "Activo", value: "Activo" },
+                                            { label: "Inactivo", value: "Inactivo" },
                                         ]}
                                         error={errorsAgregar.estatus?.message}
                                     />)}
                             />
                         </View>
 
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.perfil ? 15 : 15 }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Controller
                                 control={controlAgregar}
                                 name="perfil"
@@ -519,11 +523,11 @@ export default function GestionPersonalAdministrativo() {
                                 render={({ field: { onChange, value } }) => (
                                     <Selector
                                         label="Estatus"
-                                        selectedValue={estatus || ""}
-                                        onValueChange={(val) => onChange(val)}
+                                        selectedValue={value}
+                                        onValueChange={onChange}
                                         items={[
-                                            { label: "ACTIVO", value: "ACTIVO" },
-                                            { label: "INACTIVO", value: "INACTIVO" },
+                                            { label: "Activo", value: "Activo" },
+                                            { label: "Inactivo", value: "Inactivo" },
                                         ]}
                                         error={errorsEditar.estatus?.message}
                                     />)}
@@ -550,7 +554,7 @@ export default function GestionPersonalAdministrativo() {
                         </View>
                     </View>
 
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.correo && !errorsEditar.correo ? 30 : 15 }}>
+                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.correo && !errorsEditar.telcelular ? 25 : 15 }}>
                         <Controller
                             control={controlEditar}
                             name="correo"
@@ -567,7 +571,7 @@ export default function GestionPersonalAdministrativo() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.telcelular && !errorsEditar.tellocal ? 30 : 15 }}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.telcelular && !errorsEditar.tellocal ? 15 : 15 }}>
                             <Controller
                                 control={controlEditar}
                                 name="telcelular"
@@ -583,7 +587,7 @@ export default function GestionPersonalAdministrativo() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.tellocal ? 30 : 15 }}>
                             <Controller
                                 control={controlEditar}
                                 name="tellocal"
@@ -677,8 +681,8 @@ export default function GestionPersonalAdministrativo() {
                                     onValueChange={setFiltroEstatus}
                                     items={[
                                         { label: "Todos", value: "Todos" },
-                                        { label: "ACTIVO", value: "ACTIVO" },
-                                        { label: "INACTIVO", value: "INACTIVO" },
+                                        { label: "Activo", value: "Activo" },
+                                        { label: "Inactivo", value: "Inactivo" },
                                     ]}
                                 />
                             </View>

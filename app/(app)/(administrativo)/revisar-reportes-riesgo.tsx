@@ -1,4 +1,5 @@
 import Modal from "@/componentes/layout/Modal";
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Boton from "@/componentes/ui/Boton";
 import Checkbox from "@/componentes/ui/Checkbox";
 import Entrada from "@/componentes/ui/Entrada";
@@ -6,91 +7,31 @@ import EntradaMultilinea from "@/componentes/ui/EntradaMultilinea";
 import Paginacion from "@/componentes/ui/Paginacion";
 import Selector from "@/componentes/ui/Selector";
 import Tabla from "@/componentes/ui/Tabla";
+import { useAuth } from "@/context/AuthProvider";
+import { observacionEsquema } from "@/lib/validacion";
+import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
-
-const datosReportes = [
-    {
-        fecha: "10/12/2024",
-        nombre: "Alejandro",
-        apellidoPaterno: "Vega",
-        apellidoMaterno: "Domínguez",
-        carrera: "Médico Cirujano y Homeópata",
-        generacion: "2024",
-        estatus: "Finalizado",
-        boleta: "2022630312",
-        reporte: "Finalizado",
-        sede: "DFIMS000266 UMF 03 LA JOYA GUSTAVO A MADERO",
-        descripcion: "La zona donde realizo el servicio es insegura.",
-        evidencias: [
-            { name: "foto1.jpg", size: "211 KB" },
-            { name: "audio1.mp3", size: "23 MB" },
-            { name: "archivo1.pdf", size: "90 KB" }
-        ],
-        observaciones: [
-            { fecha: "24/12/2024", observacion: "Se aprobó cambio de plaza a zona segura." },
-            { fecha: "20/12/2024", observacion: "Se envió la solicitud de cambio de plaza a secretaría de salud." },
-            { fecha: "14/12/2024", observacion: "Se evaluará la situación Jefe del Departamento de Extensión y Apoyos Educativos." },
-            { fecha: "10/12/2024", observacion: "Reporte enviado, en espera de revisión" }
-        ],
-    },
-    {
-        fecha: "06/03/2025",
-        nombre: "Mariana",
-        apellidoPaterno: "Torres",
-        apellidoMaterno: "López",
-        carrera: "Médico Cirujano y Partero",
-        generacion: "2025",
-        estatus: "En revisión",
-        boleta: "2022630320",
-        reporte: "En revisión",
-        sede: "DFIMS000266 UMF 03 LA JOYA GUSTAVO A MADERO",
-        descripcion: "No me permiten salir a tiempo.",
-        evidencias: [
-            { name: "foto1.jpg", size: "211 KB" },
-            { name: "audio1.mp3", size: "23 MB" },
-            { name: "archivo1.pdf", size: "90 KB" }
-        ],
-        observaciones: [
-            { fecha: "07/03/2025", observacion: "Se contactó a la institución." },
-            { fecha: "06/03/2025", observacion: "Reporte enviado, en espera de revisión" }
-        ],
-    },
-    {
-        fecha: "13/11/2025",
-        nombre: "Andrea",
-        apellidoPaterno: "Salgado",
-        apellidoMaterno: "Ramírez",
-        carrera: "Médico Cirujano y Partero",
-        generacion: "2025",
-        estatus: "Pendiente",
-        boleta: "2022630301",
-        reporte: "Pendiente",
-        sede: "DFIMS000266 UMF 03 LA JOYA GUSTAVO A MADERO",
-        descripcion: "Me siento vigilado por un personal de la institución.",
-        evidencias: [],
-        observaciones: [{ fecha: "13/11/2025", observacion: "Reporte enviado, en espera de revisión" }],
-    },
-];
-
-const defaultValues = {
-    estatus: "Pendiente",
-    observacion: "",
-};
+import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 export default function ReportesRiesgo() {
+    const { sesion, verificarToken } = useAuth();
+
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
 
     // Estados modales
+    const modalAPI = useRef<ModalAPIRef>(null);
     const [modalDetalle, setModalDetalle] = useState(false);
     const [modalObservaciones, setModalObservaciones] = useState(false);
     const [modalAgregarObservacion, setModalAgregarObservacion] = useState(false);
 
+    const [reportes, setReportes] = useState<any[]>([]);
     const [reporteSeleccionado, setReporteSeleccionado] = useState<any | null>(null);
-    const [estatus, setEstatus] = useState<string>("");
+    const [estatus, setEstatus] = useState<number>();
     const [observacionNueva, setObservacionNueva] = useState("");
 
     // --- Estados para búsqueda, filtros y paginación ---
@@ -100,82 +41,84 @@ export default function ReportesRiesgo() {
     const [paginaActual, setPaginaActual] = useState(1);
     const [filasPorPagina, setFilasPorPagina] = useState(5);
 
-    const abrirModalDetalle = (reporte) => {
-        setReporteSeleccionado(reporte);
-        setEstatus(reporte.estatus)
-        setModalDetalle(true);
-    };
+    const obtenerReportes = async () => {
+        verificarToken();
 
-    const cerrarModalDetalle = () => {
-        setReporteSeleccionado(null);
-        setModalDetalle(false);
-    };
+        try {
+            const response = await fetchData(`reportes/obtenerTodosReportes?tk=${sesion.token}`);
 
-    const abrirModalObservaciones = () => {
-        setModalDetalle(false);
-        setModalObservaciones(true);
-    };
-
-    const cerrarModalObservaciones = () => {
-        setModalDetalle(true);
-        setModalObservaciones(false);
-    };
-
-    const abrirModalAgregarObservacion = () => {
-        setModalObservaciones(false);
-        setModalAgregarObservacion(true);
-    };
-
-    const cerrarModalAgregarObservacion = () => {
-        setModalObservaciones(true);
-        setModalAgregarObservacion(false);
-        setObservacionNueva("");
-    };
-
-    const onSubmit = (data) => {
-        console.log(data);
-        setModalDetalle(false);
-    };
-
-    // --- Filtrado y paginación de los datos ---
-    const obtenerDatosFiltrados = () => {
-        let datos = [...datosReportes];
-
-        // Búsqueda por nombre completo o boleta del alumno
-        if (busqueda) {
-            datos = datos.filter(alumno =>
-                `${alumno.nombre} ${alumno.apellidoPaterno} ${alumno.apellidoMaterno}`
-                    .toLowerCase()
-                    .includes(busqueda.toLowerCase()) ||
-                alumno.boleta.includes(busqueda.toLowerCase())
-            );
+            if (response.error === 0) {
+                setReportes(response.fullreportes);
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
+            }
+        } catch (error) {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
-
-        // Filtros por carrera y estatus
-        if (filtroCarrera && filtroCarrera != "Todos") datos = datos.filter(a => a.carrera === "Médico Cirujano y " + filtroCarrera);
-        if (filtroEstatus && filtroEstatus != "Todos") datos = datos.filter(a => a.estatus === filtroEstatus);
-
-        // Paginación
-        const inicio = (paginaActual - 1) * filasPorPagina;
-        const fin = inicio + filasPorPagina;
-
-        return datos.slice(inicio, fin);
     };
 
-    const totalRegistros = (() => {
-        let datos = [...datosReportes];
-        if (busqueda) {
-            datos = datos.filter(alumno =>
-                `${alumno.nombre} ${alumno.apellidoPaterno} ${alumno.apellidoMaterno}`
-                    .toLowerCase()
-                    .includes(busqueda.toLowerCase())
-            );
+    useEffect(() => {
+        obtenerReportes();
+    }, []);
+
+    const reportesFiltrados = reportes
+        .filter(r =>
+            r.descripcion?.toLowerCase().includes(busqueda.toLowerCase())
+            && (filtroEstatus === "Todos" || (r.estatus === 1 && filtroEstatus === "Pendiente")
+                || (r.estatus === 2 && filtroEstatus === "En revisión")
+                || (r.estatus === 3 && filtroEstatus === "Finalizado"))
+        )
+
+    const totalPaginas = Math.ceil(reportesFiltrados.length / filasPorPagina);
+    const reportesMostrados = reportesFiltrados.slice(
+        (paginaActual - 1) * filasPorPagina,
+        paginaActual * filasPorPagina
+    );
+
+    const { handleSubmit: handleSubmitEstatus, formState: { isSubmitting: isSubmittingEstatus } } = useForm<any>();
+
+    const cambiarEstatusReporte = async () => {
+        verificarToken();
+
+        const datos = { idReporte: reporteSeleccionado.id, nuevoEstatus: estatus, tk: sesion.token };
+        try {
+            const response = await postData("reportes/cambiarEstatusReporte", datos);
+            if (response.error === 0) {
+                setModalDetalle(false);
+                setEstatus(undefined);
+                obtenerReportes();
+                modalAPI.current?.show(true, "Se ha actualizado el estatus del reporte correctamente.");
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al cambiar el estatus del reporte. Inténtalo de nuevo más tarde.");
+            }
+        } catch (error) {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
-        if (filtroCarrera && filtroCarrera != "Todos") datos = datos.filter(a => a.carrera === "Médico Cirujano y " + filtroCarrera);
-        if (filtroEstatus && filtroEstatus != "Todos") datos = datos.filter(a => a.estatus === filtroEstatus);
-        return datos.length;
-    })();
-    const totalPaginas = Math.ceil(totalRegistros / filasPorPagina);
+    };
+
+    const { control, handleSubmit: handleSubmitObservacion, reset,
+        formState: { errors, isSubmitting: isSubmittingObservacion } } = useForm({
+            resolver: zodResolver(observacionEsquema),
+        });
+
+    const agregarObservacionReporte = async () => {
+        verificarToken();
+
+        const datos = { idReporte: reporteSeleccionado.id, descripcion: observacionNueva, tk: sesion.token };
+        try {
+            const response = await postData("reportes/agregarObservacionReporte", datos);
+            if (response.error === 0) {
+                setModalAgregarObservacion(false);
+                reset();
+                obtenerReportes();
+                modalAPI.current?.show(true, "Se ha agregado la observación correctamente.");
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al agregar la observación. Inténtalo de nuevo más tarde.");
+            }
+        } catch (error) {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+        }
+    };
 
     // --- Render de modales ---
     const renderModalDetalle = () => {
@@ -183,31 +126,33 @@ export default function ReportesRiesgo() {
         return (
             <Modal
                 visible={modalDetalle} cancelar
-                onClose={() => cerrarModalDetalle()}
+                onClose={() => { setReporteSeleccionado(null); setModalDetalle(false); }}
+                deshabilitado={isSubmittingEstatus} textoAceptar={isSubmittingEstatus ? "Actualizando…" : undefined}
+                onAceptar={reporteSeleccionado.estatus != estatus ? handleSubmitEstatus(cambiarEstatusReporte) : () => { setReporteSeleccionado(null); setModalDetalle(false); }}
                 titulo={"Detalles del Reporte"}
                 maxWidth={700}
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 15, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Fecha:</Text> {reporteSeleccionado.fecha}</Text>
+                    <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 15, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Fecha de envío:</Text> {new Date(reporteSeleccionado.fechaRegistro).toLocaleDateString()}</Text>
                     <View style={{ marginBottom: 15 }}>
                         <View style={{ flexDirection: "row", gap: 16 }}>
                             <Text style={styles.seccionTitulo}>Estatus</Text>
                             <Checkbox
                                 label="Pendiente"
-                                value={estatus === "Pendiente"}
-                                onValueChange={() => setEstatus("Pendiente")}
+                                value={estatus === 1}
+                                onValueChange={() => setEstatus(1)}
                                 labelColor="textoAdvertencia"
                             />
                             <Checkbox
                                 label="En revisión"
-                                value={estatus === "En revisión"}
-                                onValueChange={() => setEstatus("En revisión")}
+                                value={estatus === 2}
+                                onValueChange={() => setEstatus(2)}
                                 labelColor="textoInfo"
                             />
                             <Checkbox
                                 label="Finalizado"
-                                value={estatus === "Finalizado"}
-                                onValueChange={() => setEstatus("Finalizado")}
+                                value={estatus === 3}
+                                onValueChange={() => setEstatus(3)}
                                 labelColor="textoExito"
                             />
                         </View>
@@ -222,7 +167,7 @@ export default function ReportesRiesgo() {
                             />
                         </View>
                         <View style={{ flex: 1, marginBottom: 0 }}>
-                            <Entrada label="Boleta" value={reporteSeleccionado.boleta} editable={false} />
+                            <Entrada label="Boleta" value={reporteSeleccionado.alumnoBoleta} editable={false} />
                         </View>
                     </View>
 
@@ -239,6 +184,22 @@ export default function ReportesRiesgo() {
                         <Entrada label="Sede" value={reporteSeleccionado.sede} editable={false} />
                     </View>
 
+                    {reporteSeleccionado.adminEncargado && (
+                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                {reporteSeleccionado.estatus === 2 ? (
+                                    <Entrada label="Última actualización" value={new Date(reporteSeleccionado.fechaModificacion).toLocaleDateString()} editable={false} />
+                                ) : (
+                                    <Entrada label="Fecha de finalización" value={new Date(reporteSeleccionado.fechaFinalizado).toLocaleDateString()} editable={false} />
+                                )}
+                            </View>
+                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+
+                                <Entrada label="Revisado por" value={reporteSeleccionado.adminEncargado.nombre + " " + reporteSeleccionado.adminEncargado.APELLIDO_PATERNO + " " + reporteSeleccionado.adminEncargado.APELLIDO_MATERNO} editable={false} />
+                            </View>
+                        </View>
+                    )}
+
                     <View style={{ marginBottom: 20 }}>
                         <EntradaMultilinea
                             label="Descripción"
@@ -249,31 +210,37 @@ export default function ReportesRiesgo() {
                         />
                     </View>
                     {reporteSeleccionado.evidencias && reporteSeleccionado.evidencias.length > 0 && (
-                        <View style={{ marginBottom: 20 }}>
+                        <View style={{ marginTop: 15, marginBottom: 20 }}>
                             <Text style={styles.seccionTitulo}>Evidencias</Text>
-                            {reporteSeleccionado.evidencias.map((file, index) => (
-                                <View key={index} style={styles.evidenciaFila}>
+                            {reporteSeleccionado.evidencias.map((evidencia: any, idx: number) => (
+                                <View key={idx} style={styles.evidenciaFila} >
                                     <Ionicons
                                         name={
-                                            file.name.endsWith(".jpg") || file.name.endsWith(".png")
-                                                ? "image-outline"
-                                                : file.name.endsWith(".mp3")
-                                                    ? "musical-notes-outline"
-                                                    : "document-outline"
+                                            evidencia.URL_ARCHIVO.includes(".mp3") ? "musical-notes-outline" : evidencia.URL_ARCHIVO.includes(".pdf") ? "document-outline" : "image-outline"
                                         }
                                         size={18}
                                         color={Colores.textoClaro}
                                         style={{ marginRight: 8 }}
                                     />
-                                    <Text style={styles.evidenciaTexto} numberOfLines={1} ellipsizeMode="middle">{file.name}</Text>
-                                    <Text style={styles.evidenciaPeso}>{file.size}</Text>
+                                    <Pressable onPress={() => Linking.openURL(evidencia.URL_ARCHIVO)}>
+                                        <Text
+                                            style={[
+                                                styles.evidenciaTexto,
+                                                { textDecorationLine: "none" }
+                                            ]}
+                                            numberOfLines={1}
+                                            ellipsizeMode="middle"
+                                        >
+                                            {evidencia.URL_ARCHIVO.split('/').pop()}
+                                        </Text>
+                                    </Pressable>
                                 </View>
                             ))}
                         </View>
                     )}
 
                     <View style={{ alignItems: "flex-start" }}>
-                        <Boton title="Ver observaciones" onPress={() => abrirModalObservaciones()} />
+                        <Boton title="Ver observaciones" onPress={() => { setModalDetalle(false); setModalObservaciones(true); }} />
                     </View>
                 </ScrollView>
             </Modal>
@@ -285,23 +252,24 @@ export default function ReportesRiesgo() {
         return (
             <Modal
                 visible={modalObservaciones}
-                onClose={() => cerrarModalObservaciones()}
+                onClose={() => { setModalDetalle(true); setModalObservaciones(false); reset(); }}
                 titulo={"Observaciones"}
                 maxWidth={700}
             >
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 5, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Fecha:</Text> {reporteSeleccionado.fecha}</Text>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
+                    <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 5, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Fecha de envío:</Text> {new Date(reporteSeleccionado.fechaRegistro).toLocaleDateString()}</Text>
                     <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{reporteSeleccionado.nombre} {reporteSeleccionado.apellidoPaterno} {reporteSeleccionado.apellidoMaterno}</Text>
                     <View>
                         <Text style={{ marginBottom: 20, fontWeight: "600", fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>Estatus:
                             <Text
                                 style={[
-                                    reporteSeleccionado.estatus === "Finalizado" && { color: Colores.textoExito },
-                                    reporteSeleccionado.estatus === "En revisión" && { color: Colores.textoInfo },
-                                    reporteSeleccionado.estatus === "Pendiente" && { color: Colores.textoAdvertencia },
+                                    styles.texto,
+                                    reporteSeleccionado.estatus === 2 && { color: Colores.textoInfo },
+                                    reporteSeleccionado.estatus === 1 && { color: Colores.textoAdvertencia },
+                                    reporteSeleccionado.estatus === 3 && { color: Colores.textoExito },
                                 ]}
                             >
-                                {" " + reporteSeleccionado.estatus}
+                                {" " + (reporteSeleccionado.estatus === 1 ? "Pendiente" : reporteSeleccionado.estatus === 2 ? "En revisión" : "Finalizado")}
                             </Text>
                         </Text>
                     </View>
@@ -309,21 +277,28 @@ export default function ReportesRiesgo() {
                     {reporteSeleccionado.observaciones && reporteSeleccionado.observaciones.length > 0 && (
                         <View>
                             <Text style={styles.seccionTitulo}>Observaciones</Text>
-                            <Tabla
-                                columnas={[
-                                    { key: "fecha", titulo: "Fecha" },
-                                    { key: "observacion", titulo: "Observación", multilinea: true },
-                                ]}
-                                datos={reporteSeleccionado.observaciones}
-                            />
+                            <ScrollView horizontal={esPantallaPequeña}>
+                                <Tabla
+                                    columnas={[
+                                        { key: "fecha", titulo: "Fecha", ancho: 105 },
+                                        { key: "admin", titulo: "Revisado por", ancho: 250, multilinea: true },
+                                        { key: "descripcion", titulo: "Observación", ...(esPantallaPequeña && { ancho: 350 }), multilinea: true },
+                                    ]}
+                                    datos={reporteSeleccionado.observaciones.map((observacion: any) => ({
+                                        fecha: new Date(observacion.FECHA_DATETIME).toLocaleDateString(),
+                                        admin: observacion.AUTOR_ADMIN.nombre + " " + observacion.AUTOR_ADMIN.APELLIDO_PATERNO + " " + observacion.AUTOR_ADMIN.APELLIDO_MATERNO,
+                                        descripcion: observacion.DESCRIPCION,
+                                    }))}
+                                />
+                            </ScrollView>
                         </View>
                     )}
-                    {reporteSeleccionado.estatus != "Finalizado" && (
+                    {reporteSeleccionado.estatus != 3 && (
                         <View style={{ alignItems: "flex-start", marginTop: 20 }}>
-                            <Boton title="Agregar Observación" onPress={() => abrirModalAgregarObservacion()} />
+                            <Boton title="Agregar Observación" onPress={() => { setModalObservaciones(false); setModalAgregarObservacion(true); }} />
                         </View>
                     )}
-                </ScrollView>
+                </KeyboardAvoidingView>
             </Modal>
         );
     };
@@ -333,33 +308,46 @@ export default function ReportesRiesgo() {
         return (
             <Modal
                 visible={modalAgregarObservacion}
-                onClose={() => cerrarModalAgregarObservacion()}
-                titulo={"Observaciones"}
-                textoAceptar="Agregar observación" cancelar
+                onClose={() => { setModalObservaciones(true); setModalAgregarObservacion(false); setObservacionNueva(""); reset(); }}
+                titulo={"Observaciones"} cancelar
+                deshabilitado={isSubmittingObservacion} textoAceptar={isSubmittingObservacion ? "Agregando…" : "Agregar observación"}
+                onAceptar={handleSubmitObservacion(agregarObservacionReporte)}
                 maxWidth={700}
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 5, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Fecha:</Text> {reporteSeleccionado.fecha}</Text>
+                    <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 5, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Fecha de envío:</Text> {new Date(reporteSeleccionado.fechaRegistro).toLocaleDateString()}</Text>
                     <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{reporteSeleccionado.nombre} {reporteSeleccionado.apellidoPaterno} {reporteSeleccionado.apellidoMaterno}</Text>
                     <View>
                         <Text style={{ marginBottom: 20, fontWeight: "600", fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>Estatus:
                             <Text
                                 style={[
-                                    reporteSeleccionado.estatus === "Finalizado" && { color: Colores.textoExito },
-                                    reporteSeleccionado.estatus === "En revisión" && { color: Colores.textoInfo },
-                                    reporteSeleccionado.estatus === "Pendiente" && { color: Colores.textoAdvertencia },
+                                    styles.texto,
+                                    reporteSeleccionado.estatus === 2 && { color: Colores.textoInfo },
+                                    reporteSeleccionado.estatus === 1 && { color: Colores.textoAdvertencia },
+                                    reporteSeleccionado.estatus === 3 && { color: Colores.textoExito },
                                 ]}
                             >
-                                {" " + reporteSeleccionado.estatus}
+                                {" " + (reporteSeleccionado.estatus === 1 ? "Pendiente" : reporteSeleccionado.estatus === 2 ? "En revisión" : "Finalizado")}
                             </Text>
                         </Text>
                     </View>
                     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
                         <View style={{ marginTop: 5, marginBottom: 20 }}>
-                            <EntradaMultilinea
-                                label="Observación"
-                                value={observacionNueva}
-                                onChangeText={setObservacionNueva}
+                            <Controller
+                                control={control}
+                                name="observacion"
+                                defaultValue=""
+                                render={({ field: { onChange, value } }) => (
+                                    <EntradaMultilinea
+                                        label="Observación"
+                                        value={value}
+                                        onChangeText={(text) => {
+                                            onChange(text);
+                                            setObservacionNueva(text);
+                                        }}
+                                        error={errors.observacion?.message}
+                                    />
+                                )}
                             />
                         </View>
                     </KeyboardAvoidingView>
@@ -434,7 +422,7 @@ export default function ReportesRiesgo() {
                     <Tabla
                         columnas={[
                             { key: "fecha", titulo: "Fecha", ancho: 120 },
-                            { key: "boleta", titulo: "Boleta", ancho: 150 },
+                            { key: "alumnoBoleta", titulo: "Boleta", ancho: 150 },
                             { key: "nombre_completo", titulo: "Alumno", ...(esPantallaPequeña && { ancho: 250 }) },
                             { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
                             { key: "generacion", titulo: "Generación", ancho: 150 },
@@ -446,21 +434,23 @@ export default function ReportesRiesgo() {
                                     <Text
                                         style={[
                                             styles.texto,
-                                            valor === "En revisión" && { color: Colores.textoInfo },
-                                            valor === "Finalizado" && { color: Colores.textoExito },
-                                            valor === "Pendiente" && { color: Colores.textoAdvertencia },
+                                            valor === 2 && { color: Colores.textoInfo },
+                                            valor === 1 && { color: Colores.textoAdvertencia },
+                                            valor === 3 && { color: Colores.textoExito },
                                         ]}
                                     >
-                                        {valor}
+                                        {valor === 1 ? "Pendiente" : valor === 2 ? "En revisión" : "Finalizado"}
                                     </Text>
                                 ),
                             },
                         ]}
-                        datos={obtenerDatosFiltrados().map((fila) => ({
-                            ...fila,
-                            nombre_completo: `${fila.nombre} ${fila.apellidoPaterno} ${fila.apellidoMaterno}`,
-                            onPress: () => abrirModalDetalle(fila),
-                        }))}
+                        datos={reportesMostrados.map((fila) => {
+                            return {
+                                ...fila,
+                                fecha: new Date(fila.fechaRegistro).toLocaleDateString(),
+                                onPress: () => { setReporteSeleccionado(fila); setEstatus(fila.estatus); setModalDetalle(true); },
+                            };
+                        })}
                     />
                 </ScrollView>
 
@@ -475,6 +465,7 @@ export default function ReportesRiesgo() {
             {renderModalDetalle()}
             {renderModalObservaciones()}
             {renderModalAgregarObservacion()}
+            <ModalAPI ref={modalAPI} />
         </ScrollView>
     );
 }

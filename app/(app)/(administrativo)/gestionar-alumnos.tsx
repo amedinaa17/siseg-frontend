@@ -154,7 +154,6 @@ export default function GestionAlumnos() {
     };
 
     const {
-        control: controlDarBaja,
         handleSubmit: handleSubmitDarBaja,
         formState: { isSubmitting: isSubmittingDarBaja } } = useForm<any>();
 

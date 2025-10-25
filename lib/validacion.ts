@@ -181,7 +181,11 @@ export type ModificarPerfilFormulario = z.infer<typeof modificarPerfilEsquema>;
 
 // Esquema para modificar datos del perfil de personal administrativo
 export const modificarPerfilAdminEsquema = z.object({
-  telefonoCelular: z
+  sexo: z
+    .string()
+    .nonempty("El sexo es obligatorio"),
+
+  telcelular: z
     .string()
     .nonempty("El teléfono celular es obligatorio")
     .refine((val) => /^\d+$/.test(val), {
@@ -191,7 +195,7 @@ export const modificarPerfilAdminEsquema = z.object({
       message: "El número de celular debe contener exactamente 10 dígitos",
     }),
 
-  telefonoLocal: z
+  tellocal: z
     .string()
     .optional()
     .refine((val) => !val || /^\d+$/.test(val), {
@@ -368,3 +372,10 @@ export const reporteEsquema = z.object({
 });
 
 export type ReporteFormulario = z.infer<typeof reporteEsquema>;
+
+// Esquema para observaciones
+export const observacionEsquema = z.object({
+  observacion: z.string().min(1, "La observación no puede estar vacía.")
+});
+
+export type ObservacionFormulario = z.infer<typeof observacionEsquema>;
