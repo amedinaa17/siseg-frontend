@@ -41,7 +41,7 @@ const ModalAPI = forwardRef<ModalAPIRef>((_, ref) => {
                     color={estatus ? Colores.textoExito : Colores.textoError}
                 />
                 <Text style={styles.titulo}>
-                    {estatus ? "¡Todo Listo!" : "¡Algo Salió Mal!"}
+                    {estatus ? "¡Todo listo!" : "¡Algo salió mal!"}
                 </Text>
                 <Text style={styles.mensaje}>
                     {mensajePartes.map((parte, index) => {

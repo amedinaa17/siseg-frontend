@@ -1,46 +1,94 @@
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Entrada from "@/componentes/ui/Entrada";
+import { useAuth } from "@/context/AuthProvider";
+import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function PlazaAsignada() {
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 600;
 
+    const modalAPI = useRef<ModalAPIRef>(null);
+    const { sesion } = useAuth();
+
+    const [datosAlumno, setDatosAlumno] = useState<any>(null);
+    const [cargando, setCargando] = useState(false);
+
+    useEffect(() => {
+        const obtenerDatos = async () => {
+            if (!sesion?.token) return;
+
+            try {
+                setCargando(true);
+                const response = await fetchData(`users/obtenerPlazaAsignada?tk=${encodeURIComponent(sesion.token)}`);
+                console.log("[obtenerPlazaAsignada] respuesta:", response);
+
+                if (response?.error === 0) {
+                    if (response?.plaza) {
+                        setDatosAlumno(response.plaza);
+                    } else {
+                        modalAPI.current?.show(false, "No tienes plaza asignada todavía.");
+                        setDatosAlumno(null);
+                    }
+                } else {
+                    modalAPI.current?.show(false, response?.message ?? "No se pudo obtener tu plaza.");
+                    setDatosAlumno(null);
+                }
+            } catch (error) {
+                console.error(error);
+                modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            } finally {
+                setCargando(false);
+            }
+        };
+
+        obtenerDatos();
+    }, [sesion]);
+
+
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View
-                style={[
-                    styles.contenedorFormulario,
-                    esPantallaPequeña && { maxWidth: "95%" },
-                ]}
-            >
-                <Text style={styles.titulo}>
-                    Plaza asignada
-                </Text>
+            <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                <Text style={styles.titulo}>Plaza asignada</Text>
 
-                <View style={{ marginBottom: 15, pointerEvents: "none" }} >
-                    <Entrada label="Programa" value="DFIMS000266 UMF 3 LA JOYA GUSTAVO A. MADERO" editable={false} />
+                <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                    <View style={{ flex: 1, pointerEvents: "none" }}>
+                        <Entrada label="Programa" value={datosAlumno?.PROGRAMA ?? ""} editable={false} />
+                    </View>
+
+                    <View style={{ flex: 1, pointerEvents: "none" }}>
+                        <Entrada label="Promoción" value={datosAlumno?.promocion ?? ""} editable={false} />
+                    </View>
                 </View>
 
-                <View style={{ marginBottom: 15, pointerEvents: "none" }} >
-                    <Entrada label="Sede" value="IMSS NORTE, CDMX" editable={false} />
+                <View style={{ marginBottom: 15, pointerEvents: "none" }}>
+                    <Entrada label="Sede" value={datosAlumno?.sede ?? ""} editable={false} />
                 </View>
 
                 <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                     <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                        <Entrada label="Tarjeta" value="1" editable={false} />
+                        <Entrada label="Tarjeta" value={datosAlumno?.tarjetaDisponible ?? ""} editable={false} />
                     </View>
                     <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                        <Entrada label="Tipo de beca" value="A" editable={false} />
+                        <Entrada label="Tipo de beca" value={datosAlumno?.tipoBeca ?? ""} editable={false} />
                     </View>
                 </View>
 
-                <View style={{ marginBottom: 15, pointerEvents: "none" }} >
-                    <Entrada label="Ubicación" value="Ote 91, La Joya, Gustavo A. Madero, 07890 Ciudad de México, CDMX" editable={false} />
+                <View style={{ marginBottom: 15, pointerEvents: "none" }}>
+                    <Entrada label="Ubicación" value={datosAlumno?.ubicacion ?? ""} editable={false} />
                 </View>
 
+                {cargando && (
+                    <Text style={{ textAlign: "center", marginTop: 8 }}>
+                        Cargando información...
+                    </Text>
+                )}
             </View>
+
+            {/* Monta el modal para poder usar modalAPI.current?.show(...) */}
+            <ModalAPI ref={modalAPI} />
         </ScrollView>
     );
 }
