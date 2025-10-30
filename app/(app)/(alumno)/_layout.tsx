@@ -28,7 +28,7 @@ export default function AlumnoLayout() {
         <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
         <Drawer.Screen name="plaza-asignada" options={{ title: "Plaza Asignada" }} />
         <Drawer.Screen name="reportes-riesgo" options={{ title: "Situación de Riesgo" }} />
-        <Drawer.Screen name="Encuesta" options={{ title: "Encuesta de Satisfacción" }} />
+        <Drawer.Screen name="encuesta-satisfaccion" options={{ title: "Encuesta de Satisfacción" }} />
         <Drawer.Screen name="mi-perfil" options={{ title: "Mi Perfil" }} />
       </Drawer>
     );
@@ -134,7 +134,7 @@ function AlumnoDrawerContent(props) {
           </TouchableOpacity>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/encuesta-satisfaccion")}
           >
             <Text style={drawerStyles.submenuText}>Encuesta de Satisfacción</Text>
           </TouchableOpacity>

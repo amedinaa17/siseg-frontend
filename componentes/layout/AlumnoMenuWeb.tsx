@@ -265,7 +265,7 @@ export default function AlumnoMenuWeb() {
                     </Pressable>
                   </Link>
 
-                  <Link href="/" asChild>
+                  <Link href="/encuesta-satisfaccion" asChild>
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("encuesta-satisfaccion")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
