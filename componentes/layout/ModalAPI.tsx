@@ -5,7 +5,7 @@ import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export interface ModalAPIRef {
-    show: (estatus: boolean, mensaje: string) => void;
+    show: (estatus: boolean, mensaje: string, aceptar?: () => void) => void;
     close: () => void;
 }
 
@@ -14,11 +14,13 @@ const ModalAPI = forwardRef<ModalAPIRef>((_, ref) => {
     const [estatus, setEstatus] = useState(true);
     const [mensaje, setMensaje] = useState("");
     const [modalKey, setModalKey] = useState(0);
+    const [onAceptar, setOnAceptar] = useState<(() => void) | undefined>(undefined);
 
     useImperativeHandle(ref, () => ({
-        show(estatus: boolean, mensaje: string) {
+        show(estatus: boolean, mensaje: string, aceptar?: () => void) {
             setEstatus(estatus);
             setMensaje(mensaje);
+            setOnAceptar(() => aceptar);
 
             setVisible(false);
             setModalKey((k) => k + 1);
@@ -33,7 +35,10 @@ const ModalAPI = forwardRef<ModalAPIRef>((_, ref) => {
     const mensajePartes = mensaje.split(correoRegex);
 
     return (
-        <Modal key={modalKey} visible={visible} titulo="" cerrar={false} onClose={() => setVisible(false)}>
+        <Modal key={modalKey} visible={visible} titulo=""
+            cerrar={false} onClose={() => !onAceptar && setVisible(false)}
+            onAceptar={onAceptar}
+        >
             <View style={{ alignItems: "center" }}>
                 <Ionicons
                     name={estatus ? "checkmark-circle-outline" : "close-circle-outline"}

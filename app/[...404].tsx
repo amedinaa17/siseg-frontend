@@ -21,11 +21,11 @@ const NotFound = () => {
         <View style={styles.contenido}>
           <Ionicons
             name="sad-outline"
-            size={100}
+            size={65}
             color={Colores.textoClaro}
           />
-          <Text style={styles.title}>¡Oops! Error 404</Text>
-          <Text style={styles.message}>Lo sentimos, la página que estás buscando no existe.</Text>
+          <Text style={styles.titulo}>¡Oops! Error 404</Text>
+          <Text style={styles.mensaje}>Lo sentimos, la página que estás buscando no existe.</Text>
           <Boton title="Volver al inicio" onPress={handleRedirect} />
         </View>
         <PiePagina />
@@ -51,22 +51,17 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40,
   },
-  image: {
-    width: 150,
-    height: 150,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: Fuentes.display,
+  titulo: {
+    fontSize: 22,
     fontWeight: "bold",
     color: Colores.primario,
-    marginBottom: 20,
+    marginBottom: 15,
   },
-  message: {
-    fontSize: 18,
+  mensaje: {
+    fontSize: Fuentes.cuerpo,
     color: Colores.textoClaro,
     textAlign: "center",
-    marginBottom: 40,
+    marginBottom: 15,
   },
 });
 

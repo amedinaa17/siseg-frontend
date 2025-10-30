@@ -61,12 +61,12 @@ export default function MiPerfil() {
             const datosActualizar = {
                 calle: datos.calle,
                 colonia: datos.colonia,
-                delegacion: datos.municipio,
+                delegacion: datos.delegacion,
                 estado: datos.estado,
-                cp: datos.codigoPostal,
+                cp: datos.cp,
                 sexo: datos.sexo,
-                telcelular: datos.telefonoCelular,
-                tellocal: datos.telefonoLocal,
+                telcelular: datos.telcelular,
+                tellocal: datos.tellocal,
                 tk: sesion?.token
             };
             const response = await postData('users/modificarDatos', datosActualizar);
@@ -104,7 +104,7 @@ export default function MiPerfil() {
                 setVista(1);
                 modalAPI.current?.show(true, "Tu contraseña se ha cambiado correctamente.");
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al actualizar tu contraseña. Inténtalo de nuevo más tarde..");
+                modalAPI.current?.show(false, "Hubo un problema al actualizar tu contraseña. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
             modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
@@ -248,7 +248,7 @@ export default function MiPerfil() {
                                         )}
                                     />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.colonia && !errorsPerfil.municipio ? 30 : 15 }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.colonia && !errorsPerfil.delegacion ? 30 : 15 }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="colonia"
@@ -266,21 +266,21 @@ export default function MiPerfil() {
                             <View
                                 style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}
                             >
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.municipio && !errorsPerfil.estado ? 30 : 15 }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.delegacion && !errorsPerfil.estado ? 30 : 15 }}>
                                     <Controller
                                         control={controlPerfil}
-                                        name="municipio"
+                                        name="delegacion"
                                         defaultValue={datosAlumno?.delegacion || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Delegación / Municipio"
                                                 {...field}
-                                                error={errorsPerfil.municipio?.message}
+                                                error={errorsPerfil.delegacion?.message}
                                             />
                                         )}
                                     />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.estado && !errorsPerfil.codigoPostal ? 30 : 15 }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.estado && !errorsPerfil.cp ? 30 : 15 }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="estado"
@@ -298,22 +298,22 @@ export default function MiPerfil() {
                             <View
                                 style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}
                             >
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.codigoPostal ? 30 : 15 }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.cp ? 30 : 15 }}>
                                     <Controller
                                         control={controlPerfil}
-                                        name="codigoPostal"
+                                        name="cp"
                                         defaultValue={datosAlumno?.cp || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Código Postal"
                                                 keyboardType="numeric"
                                                 {...field}
-                                                error={errorsPerfil.codigoPostal?.message}
+                                                error={errorsPerfil.cp?.message}
                                             />
                                         )}
                                     />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && !errorsPerfil.telefonoCelular ? 15 : 20 }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && !errorsPerfil.telcelular ? 15 : 20 }}>
                                     <Controller
                                         control={controlPerfil}
                                         name="sexo"
@@ -334,17 +334,17 @@ export default function MiPerfil() {
                                 </View>
                             </View>
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.telefonoCelular && !errorsPerfil.telefonoLocal ? 30 : 15  }}>
+                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.telcelular && !errorsPerfil.tellocal ? 30 : 15  }}>
                                     <Controller
                                         control={controlPerfil}
-                                        name="telefonoCelular"
+                                        name="telcelular"
                                         defaultValue={datosAlumno?.telcelular || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Teléfono Celular"
                                                 keyboardType="phone-pad"
                                                 {...field}
-                                                error={errorsPerfil.telefonoCelular?.message}
+                                                error={errorsPerfil.telcelular?.message}
                                             />
                                         )}
                                     />
@@ -352,14 +352,14 @@ export default function MiPerfil() {
                                 <View style={{ flex: 1, marginBottom: 30 }}>
                                     <Controller
                                         control={controlPerfil}
-                                        name="telefonoLocal"
+                                        name="tellocal"
                                         defaultValue={datosAlumno?.tellocal || ""}
                                         render={({ field }) => (
                                             <Entrada
                                                 label="Teléfono Local"
                                                 keyboardType="phone-pad"
                                                 {...field}
-                                                error={errorsPerfil.telefonoLocal?.message}
+                                                error={errorsPerfil.tellocal?.message}
                                             />
                                         )}
                                     />

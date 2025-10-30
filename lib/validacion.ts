@@ -56,9 +56,9 @@ export const registroEsquema = z.object({
     .nonempty("La colonia es obligatoria")
     .min(3, "Debe tener al menos 3 caracteres"),
 
-  municipio: z
+  delegacion: z
     .string()
-    .nonempty("El municipio es obligatorio")
+    .nonempty("La delegación / municipio es obligatorio")
     .min(3, "Debe tener al menos 3 caracteres"),
 
   estado: z
@@ -66,7 +66,7 @@ export const registroEsquema = z.object({
     .nonempty("El estado es obligatorio")
     .min(3, "Debe tener al menos 3 caracteres"),
 
-  codigoPostal: z
+  cp: z
     .string()
     .nonempty("El código postal es obligatorio")
     .refine((val) => /^\d+$/.test(val), {
@@ -80,7 +80,7 @@ export const registroEsquema = z.object({
     .string()
     .nonempty("El sexo es obligatorio"),
 
-  telefonoCelular: z
+  telcelular: z
     .string()
     .nonempty("El teléfono celular es obligatorio")
     .refine((val) => /^\d+$/.test(val), {
@@ -90,7 +90,7 @@ export const registroEsquema = z.object({
       message: "El número de celular debe contener exactamente 10 dígitos",
     }),
 
-  telefonoLocal: z
+  tellocal: z
     .string()
     .optional()
     .refine((val) => !val || /^\d+$/.test(val), {
@@ -132,9 +132,9 @@ export const modificarPerfilEsquema = z.object({
     .nonempty("La colonia es obligatoria")
     .min(3, "Debe tener al menos 3 caracteres"),
 
-  municipio: z
+  delegacion: z
     .string()
-    .nonempty("El municipio es obligatorio")
+    .nonempty("La delegación / municipio es obligatorio")
     .min(3, "Debe tener al menos 3 caracteres"),
 
   estado: z
@@ -142,7 +142,7 @@ export const modificarPerfilEsquema = z.object({
     .nonempty("El estado es obligatorio")
     .min(3, "Debe tener al menos 3 caracteres"),
 
-  codigoPostal: z
+  cp: z
     .string()
     .nonempty("El código postal es obligatorio")
     .refine((val) => /^\d+$/.test(val), {
@@ -156,7 +156,7 @@ export const modificarPerfilEsquema = z.object({
     .string()
     .nonempty("El sexo es obligatorio"),
 
-  telefonoCelular: z
+  telcelular: z
     .string()
     .nonempty("El teléfono celular es obligatorio")
     .refine((val) => /^\d+$/.test(val), {
@@ -166,7 +166,7 @@ export const modificarPerfilEsquema = z.object({
       message: "El número de celular debe contener exactamente 10 dígitos",
     }),
 
-  telefonoLocal: z
+  tellocal: z
     .string()
     .optional()
     .refine((val) => !val || /^\d+$/.test(val), {
