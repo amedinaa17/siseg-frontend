@@ -7,12 +7,14 @@ import { correoEsquema, type CorreoFormulario } from "@/lib/validacion";
 import { postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ResetPassword() {
+  const router = useRouter();
+
   const modalAPI = useRef<ModalAPIRef>(null);
   const [error, setError] = useState<string>("");
 
@@ -32,7 +34,8 @@ export default function ResetPassword() {
       const response = await postData('users/restablecerPasswordEmail', { email: correo });
 
       if (response.error === 0) {
-        modalAPI.current?.show(true, `Para continuar, hemos enviado un correo electrónico a ${correo}. Revisa tu bandeja de entrada y sigue las instrucciones.`);
+        modalAPI.current?.show(true, `Para continuar, hemos enviado un correo electrónico a ${correo}. Revisa tu bandeja de entrada y sigue las instrucciones.`,
+          () => { router.replace("/"); });
         reset();
       } else {
         setError("No existe una cuenta registrada con este correo electrónico.");

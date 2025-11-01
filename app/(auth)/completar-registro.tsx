@@ -57,9 +57,11 @@ export default function CompletarRegistro() {
               setError("Parece que el enlace ha caducado. Registra tu correo electrónico institucional nuevamente para recibir otro.");
             else if(response.message.includes("inválido"))
               setError("Parece que el enlace no es válido. Verifica que el enlace sea el correcto o registra tu correo electrónico institucional nuevamente para recibir otro.");
+            else
+              setError("Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
           }
         } catch (error) {
-          setError("Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
+          setError("Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
       } else {
         setError("Parece que el enlace no contiene un token válido. Verifica que el enlace sea el correcto o registra tu correo electrónico institucional nuevamente para recibir otro.");
@@ -100,7 +102,7 @@ export default function CompletarRegistro() {
             <Ionicons name="sad-outline" size={65} color={Colores.textoClaro} />
             <Text style={styles.error}>¡Oops! Algo salió mal</Text>
             <Text style={styles.mensaje}>{error}</Text>
-            <Boton title="Volver al inicio" onPress={() => router.replace("/")} />
+            <Boton title="Volver a intentarlo" onPress={() => router.replace("/registrar-cuenta")} />
           </View>
         ) : (
           <>

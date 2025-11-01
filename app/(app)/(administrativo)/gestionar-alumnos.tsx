@@ -359,7 +359,7 @@ export default function GestionAlumnos() {
                 titulo="Agregar Alumno" maxWidth={700} cancelar deshabilitado={isSubmittingAgregar}
                 textoAceptar={isSubmittingAgregar ? "Agregando…" : "Agregar alumno"} onAceptar={handleSubmitAgregar(onSubmitAgregar)}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
-                    <View style={{ marginTop: 5 }}>
+                    <View style={{ marginTop: 5, marginBottom: 15 }}>
                         <Controller
                             control={controlAgregar}
                             name="nombre"
@@ -370,7 +370,7 @@ export default function GestionAlumnos() {
                         />
                     </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row" }]}>
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                         <View style={{ flex: 1 }}>
                             <Controller
                                 control={controlAgregar}
@@ -381,7 +381,7 @@ export default function GestionAlumnos() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1 }}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.apellido_materno && !errorsAgregar.apellido_paterno ? 30 : 15 }}>
                             <Controller
                                 control={controlAgregar}
                                 name="apellido_materno"
@@ -392,7 +392,7 @@ export default function GestionAlumnos() {
                             />
                         </View>
                     </View>
-                    <View style={{ flex: 1 }}>
+                    <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlAgregar}
                             name="curp"
@@ -664,7 +664,7 @@ export default function GestionAlumnos() {
                                         keyboardType="email-address"
                                         {...field}
                                         error={errorsEditar.correo?.message}
-                                        style={{ flex: 1 }}
+                                        editable={false}
                                     />
                                 )}
                             />
