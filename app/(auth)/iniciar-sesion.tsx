@@ -103,7 +103,7 @@ export default function IniciarSesion() {
             <View style={styles.separador} />
 
             <View style={styles.iniciarSesionTexto}>
-              <Text>¿Aún no tienes una cuenta?</Text>
+              <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>¿Aún no tienes una cuenta?</Text>
               <Link href="/(auth)/registrar-cuenta" style={styles.iniciarSesionLink}>
                 Regístrate aquí
               </Link>
@@ -187,8 +187,6 @@ const styles = StyleSheet.create({
         gap: 50,
       },
     }),
-    fontSize: Fuentes.cuerpo,
-    color: Colores.textoSecundario,
   },
   iniciarSesionLink: {
     color: Colores.textoInfo,

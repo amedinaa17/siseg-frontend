@@ -86,7 +86,7 @@ export default function Register() {
           <View style={styles.separador} />
 
           <View style={styles.registroTexto}>
-            <Text>¿Ya tienes una cuenta?</Text>
+            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>¿Ya tienes una cuenta?</Text>
             <Link href="/(auth)/iniciar-sesion" style={styles.registroLink}>
               Inicia sesión aquí
             </Link>

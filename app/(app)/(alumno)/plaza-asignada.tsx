@@ -23,7 +23,6 @@ export default function PlazaAsignada() {
             try {
                 setCargando(true);
                 const response = await fetchData(`users/obtenerPlazaAsignada?tk=${encodeURIComponent(sesion.token)}`);
-                console.log("[obtenerPlazaAsignada] respuesta:", response);
 
                 if (response?.error === 0) {
                     if (response?.plaza) {
