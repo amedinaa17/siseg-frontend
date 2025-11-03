@@ -379,3 +379,49 @@ export const observacionEsquema = z.object({
 });
 
 export type ObservacionFormulario = z.infer<typeof observacionEsquema>;
+
+export const CARRERAS_PLAZA = [
+  "Médico Cirujano y Homeópata",
+  "Médico Cirujano y Partero",
+] as const;
+
+export const plazaEsquema = z.object({
+  carrera: z.enum(CARRERAS_PLAZA, {
+    required_error: "Selecciona una carrera",
+    invalid_type_error: "Selecciona una carrera válida",
+  }),
+
+  promocion: z
+    .string()
+    .nonempty("La promoción es obligatoria"),
+
+  programa: z
+    .string()
+    .nonempty("El programa es obligatorio")
+    .min(3, "El programa debe tener al menos 3 caracteres"),
+
+  sede: z
+    .string()
+    .nonempty("La sede es obligatoria")
+    .min(3, "La sede debe tener al menos 3 caracteres"),
+
+  estatus: z.union([z.literal(0), z.literal(1)]),  
+
+  beca: z
+    .string()
+    .nonempty("El tipo de beca es obligatorio"),
+
+  tarjeta: z
+    .union([z.string(), z.number()])
+    .transform((v) => (v === "" ? null : Number(v)))
+    .refine((v) => v === null || (Number.isInteger(v) && v >= 0), {
+      message: "La tarjeta debe ser un número entero positivo",
+    }),
+
+  ubicacion: z
+    .string()
+    .nonempty("La ubicación es obligatoria")
+    .min(3, "La ubicación debe tener al menos 3 caracteres"),
+});
+
+export type PlazaFormulario = z.infer<typeof plazaEsquema>;

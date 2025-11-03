@@ -24,7 +24,7 @@ export default function AdministrativoLayout() {
         <Drawer.Screen name="index" options={{ title: "Inicio" }} />
         <Drawer.Screen name="validar-documentos" options={{ title: "Validar Documentos" }} />
         <Drawer.Screen name="validar-documentos/[boleta]" options={{ title: "Validar Documentos" }} />
-        <Drawer.Screen name="lista-asistencia" options={{ title: "Lista de Asistencia al Curso de Inducción" }} />
+        <Drawer.Screen name="lista-asistencia" options={{ title: "Asistencia al Curso de Inducción" }} />
         <Drawer.Screen name="gestionar-alumnos" options={{ title: "Gestionar Alumnos" }} />
         <Drawer.Screen name="gestionar-personal" options={{ title: "Personal Administrativo" }} />
         <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
@@ -82,9 +82,9 @@ function AdministrativoDrawerContent(props) {
           </TouchableOpacity>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/lista-asistencia")}
           >
-            <Text style={drawerStyles.submenuText}>Lista de Asistencia al Curso de Inducción</Text>
+            <Text style={drawerStyles.submenuText}>Asistencia al Curso de Inducción</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
@@ -112,13 +112,13 @@ function AdministrativoDrawerContent(props) {
         <View style={drawerStyles.submenuContenedor}>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/catalogo-plazas")}
           >
             <Text style={drawerStyles.submenuText}>Catálogo de Plazas</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/asignar-plaza")}
           >
             <Text style={drawerStyles.submenuText}>Asignar Plaza</Text>
           </TouchableOpacity>

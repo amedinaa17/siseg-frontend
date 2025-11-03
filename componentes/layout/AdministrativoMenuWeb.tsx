@@ -110,7 +110,7 @@ export default function AdministrativoMenuWeb() {
                         Validar Documentos</Text>
                     </Pressable>
                   </Link>
-                  <Link href="/" asChild>
+                  <Link href="/lista-asistencia" asChild>
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("lista-asistencia")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
@@ -120,7 +120,7 @@ export default function AdministrativoMenuWeb() {
                         styles.submenuItem,
                         menuItemHoverSubItem === "lista-asistencia" && styles.submenuItemHover
                       ]}>
-                        Lista de Asistencia al Curso de Inducción
+                        Asistencia al Curso de Inducción
                       </Text>
                     </Pressable>
                   </Link>
@@ -180,7 +180,7 @@ export default function AdministrativoMenuWeb() {
 
               {mostrarSubmenuPlazas && (
                 <View style={menuHamburguesa ? styles.submenuHamburguesa : styles.submenu}>
-                  <Link href="/" asChild>
+                  <Link href="/catalogo-plazas" asChild>
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("catalogo-plazas")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
@@ -192,7 +192,7 @@ export default function AdministrativoMenuWeb() {
                       ]}>Cátalogo de Plazas</Text>
                     </Pressable>
                   </Link>
-                  <Link href="/" asChild>
+                  <Link href="/asignar-plaza" asChild>
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("asignar-plaza")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
