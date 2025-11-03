@@ -86,7 +86,7 @@ export default function ResetPassword() {
           <View style={styles.separador} />
 
           <View style={styles.restrablecerTexto}>
-            <Text>¿Ya recordaste tu contraseña?</Text>
+            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>¿Ya recordaste tu contraseña?</Text>
             <Link href="/(auth)/iniciar-sesion" style={styles.restablecerLink}>
               Inicia sesión aquí
             </Link>

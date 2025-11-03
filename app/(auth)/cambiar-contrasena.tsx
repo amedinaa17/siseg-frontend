@@ -1,16 +1,23 @@
 import Encabezado from "@/componentes/layout/Encabezado";
+import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
+import { useAuth } from "@/context/AuthProvider";
 import { CambiarContraseñaFormulario, cambiarContraseñaEsquema } from "@/lib/validacion";
+import { postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import { useRouter } from "expo-router";
+import React, { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
-
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function CambiarContraseña() {
+  const router = useRouter();
+  const { sesion, verificarToken, cerrarSesion } = useAuth();
+  const modalAPI = useRef<ModalAPIRef>(null);
+
   const {
     control,
     handleSubmit,
@@ -20,8 +27,32 @@ export default function CambiarContraseña() {
     defaultValues: { contraseña: "", confirmarContraseña: "" },
   });
 
-  const onSubmit = async ({ contraseña }: CambiarContraseñaFormulario) => {
-    Alert.alert("Contraseña actualizada", "Tu contraseña ha sido cambiada con éxito.");
+  const onSubmit = async (contraseña: CambiarContraseñaFormulario) => {
+    verificarToken();
+
+    try {
+      const datos = {
+        password: contraseña.contraseña,
+        tk: sesion.token
+      };
+      const response = await postData("users/restablecerPassword", datos);
+
+      if (response.error === 0) {
+        modalAPI.current?.show(true, "Tu contraseña se ha actualizado correctamente.",
+          () => { router.replace("/"); });
+          sesion.estatus = 1;
+      } else {
+        modalAPI.current?.show(false, "Hubo un problema al cambiar tu contraseña. Inténtalo de nuevo más tarde.",
+          () => { cerrarSesion(); });
+      }
+    } catch (error) {
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.",
+        () => { cerrarSesion(); });
+    }
+  };
+
+  const handleLogout = async () => {
+    await cerrarSesion();
   };
 
   return (
@@ -62,13 +93,20 @@ export default function CambiarContraseña() {
               )}
             />
           </View>
-
-          <Boton
-            title={isSubmitting ? "Guardando…" : "Guardar contraseña"}
-            onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-          />
+          <View style={{ flexDirection: "row", gap: 12 }}>
+            <View style={{ flex: 1 }}>
+              <Boton title="Regresar" onPress={handleLogout} disabled={isSubmitting} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Boton
+                title={isSubmitting ? "Guardando…" : "Guardar contraseña"}
+                onPress={handleSubmit(onSubmit)}
+                disabled={isSubmitting}
+              />
+            </View>
+          </View>
         </View>
+        <ModalAPI ref={modalAPI} />
         <PiePagina />
       </ScrollView>
     </KeyboardAvoidingView>

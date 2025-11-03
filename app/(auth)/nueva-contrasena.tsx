@@ -46,11 +46,11 @@ export default function NuevaContraseña() {
 
   const onSubmit = async (contraseña: CambiarContraseñaFormulario) => {
     try {
-      const nuevaContraseña = {
-        password: contraseña,
+      const datos = {
+        password: contraseña.contraseña,
         tk: token
       };
-      const response = await postData("users/restablecerPassword", nuevaContraseña);
+      const response = await postData("users/restablecerPassword", datos);
 
       if (response.error === 0) {
         modalAPI.current?.show(true, "Tu contraseña se ha actualizado correctamente.",
@@ -61,10 +61,12 @@ export default function NuevaContraseña() {
         else if (response.message.includes("inválido"))
           setError("Parece que el enlace no es válido. Verifica que el enlace sea el correcto o solicita nuevamente el restablecimiento de tu contraseña.");
         else
-          modalAPI.current?.show(false, "Hubo un problema al cambiar tu contraseña. Inténtalo de nuevo más tarde.");
+          modalAPI.current?.show(false, "Hubo un problema al cambiar tu contraseña. Inténtalo de nuevo más tarde.",
+            () => { router.replace("/"); });
       }
     } catch (error) {
-      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.",
+        () => { router.replace("/"); });
     }
   };
 

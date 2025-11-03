@@ -36,12 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setErrorMessage("");
     try { 
       const usuario = await login(boleta, contraseña);
-      setSesion({
-        token: usuario.token,
-        boleta: usuario.boleta,
-        rol: usuario.rol,
-        nombre: usuario.nombre,
-      });
+      setSesion(usuario);
       if (usuario.rol === "ALUMNO")
         router.replace("/(app)/(alumno)/");
       else if (usuario.rol === "P_ADMIN")

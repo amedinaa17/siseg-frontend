@@ -740,14 +740,16 @@ export default function GestionAlumnos() {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
                 <Text style={styles.titulo}>Gestionar Alumnos</Text>
-                <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
-                    <View>
-                        <Boton title="Agregar alumno" onPress={() => { setModalAgregar(true) }} />
+                {sesion?.perfil === 2 && (
+                    <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
+                        <View>
+                            <Boton title="Agregar alumno" onPress={() => { setModalAgregar(true) }} />
+                        </View>
+                        <View>
+                            <Boton title="Cargar alumnos" onPress={() => setModalCargar(true)} />
+                        </View>
                     </View>
-                    <View>
-                        <Boton title="Cargar alumnos" onPress={() => setModalCargar(true)} />
-                    </View>
-                </View>
+                )}
 
                 <View style={styles.controlesSuperiores}>
                     <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
@@ -834,26 +836,30 @@ export default function GestionAlumnos() {
                                     </Text>
                                 ),
                             },
-                            {
-                                key: "acciones",
-                                titulo: "Acciones",
-                                ancho: 110,
-                                render: (_, fila) => (
-                                    <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
-                                        <Boton
-                                            onPress={() => { setAlumnoSeleccionado(fila); setModalEditar(true); }}
-                                            icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                            color={Colores.textoInfo}
-                                        />
-                                        <Boton
-                                            onPress={() => { setModalDarBaja(fila) }}
-                                            icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                            color={Colores.textoError}
-                                            disabled={fila.estatus === "Baja" ? true : false}
-                                        />
-                                    </View>
-                                ),
-                            },
+                            ...(sesion?.perfil === 2
+                                ? [
+                                    {
+                                        key: "acciones",
+                                        titulo: "Acciones",
+                                        ancho: 110,
+                                        render: (_, fila) => (
+                                            <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                                                <Boton
+                                                    onPress={() => { setAlumnoSeleccionado(fila); setModalEditar(true); }}
+                                                    icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                    color={Colores.textoInfo}
+                                                />
+                                                <Boton
+                                                    onPress={() => { setModalDarBaja(fila) }}
+                                                    icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                    color={Colores.textoError}
+                                                    disabled={fila.estatus === "Baja" ? true : false}
+                                                />
+                                            </View>
+                                        ),
+                                    },
+                                ]
+                                : []),
                         ]}
                         datos={alumnosMostrados.map((fila) => ({
                             ...fila,

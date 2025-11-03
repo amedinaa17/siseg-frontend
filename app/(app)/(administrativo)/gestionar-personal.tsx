@@ -628,11 +628,13 @@ export default function GestionPersonalAdministrativo() {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
                 <Text style={styles.titulo}>Gestionar Personal Administrativo</Text>
-                <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
-                    <View>
-                        <Boton title="Agregar personal" onPress={() => { setModalAgregar(true) }} />
+                {sesion?.perfil === 2 && (
+                    <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
+                        <View>
+                            <Boton title="Agregar personal" onPress={() => { setModalAgregar(true) }} />
+                        </View>
                     </View>
-                </View>
+                )}
 
                 <View style={styles.controlesSuperiores}>
                     <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
@@ -696,27 +698,44 @@ export default function GestionPersonalAdministrativo() {
                             { key: "boleta", titulo: "No. Empleado", ancho: 150 },
                             { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
                             { key: "perfil", titulo: "Perfil", ...(esPantallaPequeña && { ancho: 250 }) },
-                            { key: "estatus", titulo: "Estatus", ...(esPantallaPequeña && { ancho: 150 }) },
                             {
-                                key: "acciones",
-                                titulo: "Acciones",
-                                ancho: 110,
-                                render: (_, fila) => (
-                                    <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
-                                        <Boton
-                                            onPress={() => { setPersonalSeleccionado(fila); setModalEditar(true); }}
-                                            icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                            color={Colores.textoInfo}
-                                        />
-                                        <Boton
-                                            onPress={() => { setModalDarBaja(fila) }}
-                                            icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                            color={Colores.textoError}
-                                            disabled={fila.estatus === "Baja" ? true : false}
-                                        />
-                                    </View>
-                                ),
+                                key: "estatus", titulo: "Estatus",
+                                render: (valor) => (
+                                    <Text
+                                        style={[
+                                            styles.texto,
+                                            valor === "Inactivo" && { color: Colores.textoError },
+                                            valor === "Activo" && { color: Colores.textoInfo },
+                                        ]}
+                                    >
+                                        {valor}
+                                    </Text>
+                                ), ...(esPantallaPequeña && { ancho: 150 })
                             },
+                            ...(sesion?.perfil === 2
+                                ? [
+                                    {
+                                        key: "acciones",
+                                        titulo: "Acciones",
+                                        ancho: 110,
+                                        render: (_, fila) => (
+                                            <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                                                <Boton
+                                                    onPress={() => { setPersonalSeleccionado(fila); setModalEditar(true); }}
+                                                    icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                    color={Colores.textoInfo}
+                                                />
+                                                <Boton
+                                                    onPress={() => { setModalDarBaja(fila) }}
+                                                    icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                    color={Colores.textoError}
+                                                    disabled={fila.estatus === "Baja" ? true : false}
+                                                />
+                                            </View>
+                                        ),
+                                    },
+                                ]
+                                : []),
                         ]}
                         datos={personalMostrados.map((fila) => ({
                             ...fila,

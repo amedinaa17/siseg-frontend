@@ -27,6 +27,8 @@ function AuthGate() {
       router.replace("/[...404]");
     } else if (!sesion && !enGrupoAuth) {
       router.replace("/(auth)/iniciar-sesion");
+    } else if (sesion?.estatus === 0) {
+        router.replace("/(auth)/cambiar-contrasena");
     } else if (sesion?.rol === "ALUMNO") {
       if (!enGrupoApp || enSubgrupo !== "(alumno)") {
         router.replace("/(app)/(alumno)");
