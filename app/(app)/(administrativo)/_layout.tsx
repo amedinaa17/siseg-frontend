@@ -124,7 +124,7 @@ function AdministrativoDrawerContent(props) {
           </TouchableOpacity>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/mapa-plazas")}
           >
             <Text style={drawerStyles.submenuText}>Mapa de Plazas</Text>
           </TouchableOpacity>

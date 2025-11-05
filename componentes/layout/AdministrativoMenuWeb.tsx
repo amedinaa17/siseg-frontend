@@ -204,7 +204,7 @@ export default function AdministrativoMenuWeb() {
                       ]}>Asignar Plaza</Text>
                     </Pressable>
                   </Link>
-                  <Link href="/" asChild>
+                  <Link href="/mapa-plazas" asChild>
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("mapa-plazas")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}

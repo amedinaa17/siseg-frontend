@@ -1,3 +1,4 @@
+import ChatbotWidget from "@/componentes/chat/ChatbotWidget";
 import AlumnoMenuWeb from '@/componentes/layout/AlumnoMenuWeb';
 import { useAuth } from "@/context/AuthProvider";
 import { Colores, Fuentes } from '@/temas/colores';
@@ -12,25 +13,29 @@ export default function AlumnoLayout() {
 
   if (esMovil) {
     return (
-      <Drawer
-        screenOptions={{
-          headerStyle: { backgroundColor: Colores.fondoInstitucional },
-          headerTintColor: Colores.onPrimario,
-          drawerActiveTintColor: Colores.primario,
-          drawerStyle: { backgroundColor: Colores.fondo },
-        }}
-        drawerContent={(props) => <AlumnoDrawerContent {...props} />}
-      >
-        <Drawer.Screen name="index" options={{ title: "Inicio" }} />
-        <Drawer.Screen name="acuse-solicitud" options={{ title: "Acuse de Solicitud" }} />
-        <Drawer.Screen name="expediente-digital" options={{ title: "Ver Expediente" }} />
-        <Drawer.Screen name="curso-induccion" options={{ title: "Curso de Inducción" }} />
-        <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
-        <Drawer.Screen name="plaza-asignada" options={{ title: "Plaza Asignada" }} />
-        <Drawer.Screen name="reportes-riesgo" options={{ title: "Situación de Riesgo" }} />
-        <Drawer.Screen name="encuesta-satisfaccion" options={{ title: "Encuesta de Satisfacción" }} />
-        <Drawer.Screen name="mi-perfil" options={{ title: "Mi Perfil" }} />
-      </Drawer>
+      <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
+        <Drawer
+          screenOptions={{
+            headerStyle: { backgroundColor: Colores.fondoInstitucional },
+            headerTintColor: Colores.onPrimario,
+            drawerActiveTintColor: Colores.primario,
+            drawerStyle: { backgroundColor: Colores.fondo },
+          }}
+          drawerContent={(props) => <AlumnoDrawerContent {...props} />}
+        >
+          <Drawer.Screen name="index" options={{ title: "Inicio" }} />
+          <Drawer.Screen name="acuse-solicitud" options={{ title: "Acuse de Solicitud" }} />
+          <Drawer.Screen name="expediente-digital" options={{ title: "Ver Expediente" }} />
+          <Drawer.Screen name="curso-induccion" options={{ title: "Curso de Inducción" }} />
+          <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
+          <Drawer.Screen name="plaza-asignada" options={{ title: "Plaza Asignada" }} />
+          <Drawer.Screen name="reportes-riesgo" options={{ title: "Situación de Riesgo" }} />
+          <Drawer.Screen name="encuesta-satisfaccion" options={{ title: "Encuesta de Satisfacción" }} />
+          <Drawer.Screen name="mi-perfil" options={{ title: "Mi Perfil" }} />
+        </Drawer>
+
+        <ChatbotWidget endpoint="chatbot/chatbotQuery" title="Asistente SISEG" />
+      </View>
     );
   }
 
@@ -38,6 +43,8 @@ export default function AlumnoLayout() {
     <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
       <AlumnoMenuWeb />
       <Slot />
+
+      <ChatbotWidget endpoint="chatbot/chatbotQuery" title="Asistente SISEG" />
     </View>
   );
 }
@@ -156,6 +163,7 @@ function AlumnoDrawerContent(props) {
     </DrawerContentScrollView>
   );
 }
+
 const drawerStyles = StyleSheet.create({
   seccionEncabezado: {
     flexDirection: "row",
