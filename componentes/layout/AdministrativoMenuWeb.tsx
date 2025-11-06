@@ -254,7 +254,7 @@ export default function AdministrativoMenuWeb() {
                       </Text>
                     </Pressable>
                   </Link>
-                  <Link href="/" asChild>
+                  <Link href="/reportes-encuestas" asChild>
                     <Pressable
                       onHoverIn={() => setmenuItemHoverSubItem("reportes-encuestas")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
