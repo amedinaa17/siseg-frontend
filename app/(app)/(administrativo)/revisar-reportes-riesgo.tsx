@@ -162,7 +162,7 @@ export default function ReportesRiesgo() {
                         <View style={{ flex: 1, marginBottom: 0 }}>
                             <Entrada
                                 label="Alumno"
-                                value={`${reporteSeleccionado.nombre} ${reporteSeleccionado.apellidoPaterno} ${reporteSeleccionado.apellidoMaterno}`}
+                                value={`${reporteSeleccionado.alumnoNombre}`}
                                 editable={false}
                             />
                         </View>
@@ -173,16 +173,16 @@ export default function ReportesRiesgo() {
 
                     <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                         <View style={{ flex: 1, marginBottom: 0 }}>
-                            <Entrada label="Carrera" value={reporteSeleccionado.carrera} editable={false} />
+                            <Entrada label="Carrera" value={reporteSeleccionado.alumnoCarrera} editable={false} />
                         </View>
                         <View style={{ flex: 1, marginBottom: 0 }}>
-                            <Entrada label="Generación" value={reporteSeleccionado.generacion} editable={false} />
+                            <Entrada label="Generación" value={reporteSeleccionado.alumnoGeneracion} editable={false} />
                         </View>
                     </View>
 
-                    <View style={{ marginBottom: 15 }}>
-                        <Entrada label="Sede" value={reporteSeleccionado.sede} editable={false} />
-                    </View>
+                    {/* <View style={{ marginBottom: 15 }}>
+                        <Entrada label="Sede" value={reporteSeleccionado.alumnoSede} editable={false} />
+                    </View> */}
 
                     {reporteSeleccionado.adminEncargado && (
                         <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
@@ -258,7 +258,7 @@ export default function ReportesRiesgo() {
             >
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
                     <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 5, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Fecha de envío:</Text> {new Date(reporteSeleccionado.fechaRegistro).toLocaleDateString()}</Text>
-                    <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{reporteSeleccionado.nombre} {reporteSeleccionado.apellidoPaterno} {reporteSeleccionado.apellidoMaterno}</Text>
+                    <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{reporteSeleccionado.alumnoNombre}</Text>
                     <View>
                         <Text style={{ marginBottom: 20, fontWeight: "600", fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>Estatus:
                             <Text
@@ -316,7 +316,7 @@ export default function ReportesRiesgo() {
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 5, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Fecha de envío:</Text> {new Date(reporteSeleccionado.fechaRegistro).toLocaleDateString()}</Text>
-                    <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{reporteSeleccionado.nombre} {reporteSeleccionado.apellidoPaterno} {reporteSeleccionado.apellidoMaterno}</Text>
+                    <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{reporteSeleccionado.alumnoNombre}</Text>
                     <View>
                         <Text style={{ marginBottom: 20, fontWeight: "600", fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>Estatus:
                             <Text
@@ -423,9 +423,9 @@ export default function ReportesRiesgo() {
                         columnas={[
                             { key: "fecha", titulo: "Fecha", ancho: 120 },
                             { key: "alumnoBoleta", titulo: "Boleta", ancho: 150 },
-                            { key: "nombre_completo", titulo: "Alumno", ...(esPantallaPequeña && { ancho: 250 }) },
-                            { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
-                            { key: "generacion", titulo: "Generación", ancho: 150 },
+                            { key: "alumnoNombre", titulo: "Alumno", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "alumnoCarrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "alumnoGeneracion", titulo: "Generación", ancho: 150 },
                             {
                                 key: "estatus",
                                 titulo: "Estatus",

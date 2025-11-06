@@ -10,13 +10,13 @@ import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    useWindowDimensions,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
 
 import NativeMap from "@/componentes/mapa/NativeMap";
@@ -51,7 +51,7 @@ type AlumnoMin = {
   nombre?: string;
   apellido_paterno?: string;
   apellido_materno?: string;
-  sede?: string | number | null; 
+  sede?: string | number | null;
   carrera?: number | string | { ID?: number; NOMBRE?: string } | null;
   [k: string]: any;
 };
@@ -327,7 +327,7 @@ export default function MapaPlazas() {
           boleta
         )}`
       );
-console.log(resp.data)
+      console.log(resp.data)
       if (resp?.error === 0 && resp?.data) {
         setAlumnoDetalles(resp.data as DetallesAlumno);
         setModalAlumnoVisible(true);
@@ -370,31 +370,23 @@ console.log(resp.data)
         <Text style={styles.titulo}>Mapa de plazas</Text>
 
         <View style={styles.filtros}>
-          <View style={esPequeña ? { width: "100%", marginBottom: 12 } : { width: "34%" }}>
+          <View style={esPequeña ? { width: "100%", marginBottom: 15 } : { width: "34%" }}>
             <Entrada
-              label="Buscar (sede/ubicación/programa)"
+              label="Buscar"
               value={busquedaTexto}
               onChangeText={setBusquedaTexto}
             />
           </View>
 
-          <View style={esPequeña ? { width: "100%", marginBottom: 12 } : { width: "30%" }}>
+          <View style={esPequeña ? { width: "100%", marginBottom: 15 } : { width: "30%" }}>
             {Platform.OS === "web" ? (
               <View>
-                <Text style={{ marginBottom: 6, color: Colores.textoClaro }}>Programa</Text>
-                <select
-                  value={filtroPrograma}
-                  onChange={(e) => setFiltroPrograma(e.target.value)}
-                  style={styles.selectWeb}
-                >
-                  {[{ label: "Todos los programas", value: "" }, ...programas.map((p) => ({ label: p, value: p }))].map(
-                    (o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    )
-                  )}
-                </select>
+                <Selector
+                  label="Programa"
+                  items={[{ label: "Todos los programas", value: "" }, ...programas.map((p) => ({ label: p, value: p }))]}
+                  selectedValue={filtroPrograma}
+                  onValueChange={(v) => setFiltroPrograma(String(v))}
+                />
               </View>
             ) : (
               <Selector
@@ -406,26 +398,20 @@ console.log(resp.data)
             )}
           </View>
 
-          <View style={esPequeña ? { width: "100%", marginBottom: 12 } : { width: "30%" }}>
+          <View style={esPequeña ? { width: "100%", marginBottom: 15 } : { width: "30%" }}>
             {Platform.OS === "web" ? (
               <View>
-                <Text style={{ marginBottom: 6, color: Colores.textoClaro }}>Carrera</Text>
-                <select
-                  value={filtroCarrera}
-                  onChange={(e) => setFiltroCarrera(e.target.value)}
-                  style={styles.selectWeb}
-                >
-                  {[{ label: "Todos", value: "Todos" }, ...carreras.map((c) => ({ label: c, value: c }))].map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+                <Selector
+                  label="Carrera"
+                  items={[{ label: "Todos", value: "Todos" }, ...carreras.map((c) => ({ label: c, value: c }))]}
+                  selectedValue={filtroCarrera}
+                  onValueChange={(v) => setFiltroCarrera(String(v))}
+                />
               </View>
             ) : (
               <Selector
                 label="Carrera"
-                items={[{ label: "Todos", value: "Todos" }, ...carreras.map((c) => ({ label: c, value: c }))]}
+                items={[{ label: "Todos", value: "" }, ...carreras.map((c) => ({ label: c, value: c }))]}
                 selectedValue={filtroCarrera}
                 onValueChange={(v) => setFiltroCarrera(String(v))}
               />
@@ -433,28 +419,16 @@ console.log(resp.data)
           </View>
         </View>
 
-        <View style={[styles.fila, { marginTop: 6, marginBottom: 14 }]}>
+        <View style={[styles.fila, { marginVertical: 15 }]}>
           <View style={esPequeña ? { width: "100%" } : { width: "60%" }}>
             {Platform.OS === "web" ? (
               <View>
-                <Text style={{ marginBottom: 6, color: Colores.textoClaro }}>Ir a sede</Text>
-                <select
-                  value={sedeJump}
-                  onChange={(e) => setSedeJump(e.target.value)}
-                  disabled={disableIrASede}
-                  style={{
-                    ...styles.selectWeb,
-                    ...(disableIrASede ? { background: "#f3f4f6" } : {}),
-                  }}
-                >
-                  {[{ label: "Ir a sede…", value: "" }, ...sedesDisponibles.map((s) => ({ label: s, value: s }))].map(
-                    (o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    )
-                  )}
-                </select>
+                <Selector
+                  label="Ir a sede"
+                  items={[{ label: "Ir a sede…", value: "" }, ...sedesDisponibles.map((s) => ({ label: s, value: s }))]}
+                  selectedValue={sedeJump}
+                  onValueChange={(v) => setSedeJump(String(v))}
+                />
               </View>
             ) : (
               <Selector
@@ -467,7 +441,7 @@ console.log(resp.data)
           </View>
 
           <View style={{ flex: 1, alignItems: esPequeña ? "stretch" : "flex-end", justifyContent: "flex-end" }}>
-            <Boton onPress={recargar} texto={loading ? "Cargando..." : "Recargar"} />
+            <Boton onPress={recargar} title={loading ? "Cargando..." : "Recargar"} />
           </View>
         </View>
 
@@ -498,7 +472,7 @@ console.log(resp.data)
         cancelar
       >
         {Platform.OS === "web" ? (
-          <View style={{ paddingTop: 8 }}> 
+          <View style={{ paddingTop: 8 }}>
             <View style={[styles.row, styles.headerRow]}>
               <View style={[styles.cell, { flex: 2 }]}><Text style={styles.headerText}>Alumno</Text></View>
               <View style={[styles.cell, { flex: 2 }]}><Text style={styles.headerText}>Carrera</Text></View>
@@ -582,8 +556,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colores.fondo,
     ...Platform.select({
       ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
-      android:{ shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
-      web:   { boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
+      android: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
+      web: { boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
     }),
     elevation: 2,
     marginVertical: 30,

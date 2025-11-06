@@ -25,7 +25,7 @@ export default function NuevaContraseña() {
     const obtenerToken = async () => {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("tk");
-      setToken({ "tk": token })
+      setToken(token)
 
       if (!token) {
         setError("Parece que el enlace no contiene un token válido. Verifica que el enlace sea el correcto o solicita restablecer tu contraseña nuevamente.");
@@ -45,6 +45,7 @@ export default function NuevaContraseña() {
   });
 
   const onSubmit = async (contraseña: CambiarContraseñaFormulario) => {
+    console.log(token)
     try {
       const datos = {
         password: contraseña.contraseña,

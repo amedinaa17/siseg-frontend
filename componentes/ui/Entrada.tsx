@@ -1,16 +1,7 @@
 import { Colores, Fuentes } from '@/temas/colores';
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import {
-  Animated,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  View,
-} from "react-native";
+import { Animated, Platform, Pressable, StyleSheet, Text, TextInput, TextInputProps, View, } from "react-native";
 
 type Propiedades = TextInputProps & {
   label: string;
@@ -25,7 +16,6 @@ export default function Entrada({
   onBlur,
   style,
   secureTextEntry,
-  editable = true,
   ...props
 }: Propiedades) {
   const [focused, setFocused] = React.useState(false);
@@ -43,43 +33,15 @@ export default function Entrada({
   const estiloEtiqueta = {
     position: "absolute" as const,
     left: 12,
-    top: anim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [14, -8],
-    }),
-    fontSize: anim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [16, 12],
-    }),
-    color: error
-      ? Colores.textoError
-      : focused
-      ? Colores.textoInfo
-      : Colores.textoClaro,
+    top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
+    fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
+    color: error ? Colores.textoError : focused ? Colores.textoInfo : Colores.textoClaro,
     backgroundColor: Colores.fondo,
     paddingHorizontal: 4,
   };
 
-  if (!editable) {
-    return (
-      <View style={{ marginBottom: 8 }}>
-        <View style={styles.contenedorReadonly}>
-          <Text style={styles.labelReadonly}>{label}</Text>
-          <Text
-            style={styles.textReadonly}
-            numberOfLines={0}
-            selectable={true}
-          >
-            {value ?? ""}
-          </Text>
-        </View>
-        {error && <Text style={styles.errorTexto}>{error}</Text>}
-      </View>
-    );
-  }
-
   return (
-    <View style={{ marginBottom: 8 }}>
+    <View>
       <View
         style={[
           styles.contenedor,
@@ -87,13 +49,12 @@ export default function Entrada({
             borderColor: error
               ? Colores.textoError
               : focused
-              ? Colores.textoInfo
-              : Colores.borde,
+                ? Colores.textoInfo
+                : Colores.borde,
           },
         ]}
       >
         <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
-
         <TextInput
           {...props}
           value={value}
@@ -109,11 +70,10 @@ export default function Entrada({
           style={[
             styles.entrada,
             style,
-            Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : null,
+            Platform.OS === "web"
+              ? ({ outlineStyle: "none" } as any)
+              : null,
           ]}
-          underlineColorAndroid="transparent"
-          textAlignVertical="center"
-          multiline={false}
         />
 
         {secureTextEntry && (
@@ -130,7 +90,9 @@ export default function Entrada({
         )}
       </View>
 
-      {error && <Text style={styles.errorTexto}>{error}</Text>}
+      {error && (
+        <Text style={styles.errorTexto}>{error}</Text>
+      )}
     </View>
   );
 }
@@ -150,9 +112,9 @@ const styles = StyleSheet.create({
     height: 48,
     fontSize: 15,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingBottom: 6,
     color: Colores.textoPrincipal,
-    lineHeight: 20, 
   },
   icono: {
     position: "absolute",
@@ -163,24 +125,5 @@ const styles = StyleSheet.create({
     color: Colores.textoError,
     marginTop: 5,
     fontSize: Fuentes.caption,
-  },
-
-  contenedorReadonly: {
-    borderWidth: 1,
-    borderRadius: 8,
-    borderColor: Colores.borde,
-    backgroundColor: "#fff",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  labelReadonly: {
-    fontSize: 12,
-    color: Colores.textoClaro,
-    marginBottom: 4,
-  },
-  textReadonly: {
-    fontSize: 15,
-    color: Colores.textoPrincipal,
-    lineHeight: 20,
   },
 });

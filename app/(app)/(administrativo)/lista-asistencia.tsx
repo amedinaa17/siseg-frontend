@@ -23,7 +23,7 @@ export default function CursoInduccion() {
         if (!permission?.granted) {
             const res = await requestPermission();
             if (!res.granted) {
-                modalAPI.current?.show(false, "Permiso de cámara denegado.");
+                modalAPI.current?.show(false, "El acceso a la cámara ha sido denegado. Para continuar, otorga el permiso necesario.");
                 return;
             }
         }
@@ -51,7 +51,7 @@ export default function CursoInduccion() {
             if (response.error === 0) {
                 modalAPI.current?.show(true, `${response.message || "Registro de QR exitoso."}\n\nBoleta registrada: ${boleta}`);
             } else {
-                modalAPI.current?.show(false, response.message || "Hubo un problema al registrar el QR. Inténtalo de nuevo más tarde.");
+                modalAPI.current?.show(false, response.message || "Hubo un problema al registrar la asistencia del alumno. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
             modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
@@ -66,7 +66,7 @@ export default function CursoInduccion() {
 
             const boleta = getBoletaFromQR(data);
             if (!boleta) {
-                modalAPI.current?.show(false, "El QR no contiene una boleta válida.");
+                modalAPI.current?.show(false, "El código QR no contiene una boleta válida.");
                 setTimeout(() => setBloquearLectura(false), 800);
                 return;
             }
@@ -87,8 +87,9 @@ export default function CursoInduccion() {
             >
                 <Text style={styles.titulo}>Asistencia al curso de inducción por QR</Text>
                 <Text style={styles.subtitulo}>
-                    Escanea el código QR del alumno para registrar su asistencia al curso de inducción. (Nota: autoriza el uso de la cámara)
+                    Escanea el código QR del alumno para registrar su asistencia al curso de inducción.
                 </Text>
+                <Text style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, marginBottom: 20, textAlign: "center"}}>Nota: Habilita el acceso a la cámara de tu dispositivo.</Text>
 
                 <View style={styles.marcoEscaneo}>
                     {escaneando ? (
@@ -146,14 +147,14 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         color: Colores.textoPrincipal,
         textAlign: "center",
-        marginBottom: 8,
+        marginBottom: 10,
     },
     subtitulo: {
         fontSize: Fuentes.cuerpo,
         color: Colores.textoSecundario,
         textAlign: "center",
-        marginBottom: 22,
         paddingHorizontal: 12,
+        marginBottom: 8,
     },
     marcoEscaneo: {
         alignSelf: "center",

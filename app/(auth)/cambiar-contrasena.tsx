@@ -4,6 +4,7 @@ import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import { useAuth } from "@/context/AuthProvider";
+import { login } from "@/lib/auth/authServicio";
 import { CambiarContraseñaFormulario, cambiarContraseñaEsquema } from "@/lib/validacion";
 import { postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
@@ -38,9 +39,10 @@ export default function CambiarContraseña() {
       const response = await postData("users/restablecerPassword", datos);
 
       if (response.error === 0) {
+        await login(sesion.boleta, contraseña.contraseña);
+        verificarToken();
         modalAPI.current?.show(true, "Tu contraseña se ha actualizado correctamente.",
           () => { router.replace("/"); });
-          sesion.estatus = 1;
       } else {
         modalAPI.current?.show(false, "Hubo un problema al cambiar tu contraseña. Inténtalo de nuevo más tarde.",
           () => { cerrarSesion(); });

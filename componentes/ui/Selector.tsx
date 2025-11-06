@@ -1,6 +1,6 @@
 import { Colores, Fuentes } from '@/temas/colores';
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, Modal, Pressable, StyleSheet, Text, View, } from "react-native";
+import { Animated, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 type Item = { label: string; value: string };
 
@@ -13,7 +13,7 @@ type Propiedades = {
 };
 
 export default function Selector({
-  label, 
+  label,
   selectedValue,
   onValueChange,
   items,
@@ -74,19 +74,25 @@ export default function Selector({
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
-            {items.map((item) => (
-              <Pressable
-                key={item.value}
-                onPress={() => {
-                  onValueChange(item.value);
-                  setModalVisible(false);
-                  setFocused(true);
-                }}
-                style={styles.opcion}
-              >
-                <Text style={styles.textoOpcion}>{item.label}</Text>
-              </Pressable>
-            ))}
+            {/* Agregado ScrollView para habilitar el desplazamiento */}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={{ maxHeight: 300 }} // Limita la altura del contenido
+            >
+              {items.map((item) => (
+                <Pressable
+                  key={item.value}
+                  onPress={() => {
+                    onValueChange(item.value);
+                    setModalVisible(false);
+                    setFocused(true);
+                  }}
+                  style={styles.opcion}
+                >
+                  <Text style={styles.textoOpcion}>{item.label}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
 
             <Pressable
               onPress={() => setModalVisible(false)}
@@ -133,7 +139,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colores.fondo,
     borderRadius: 12,
     width: "80%",
-    maxWidth: 400,
+    maxWidth: 500,
     paddingVertical: 10,
     elevation: 4,
   },

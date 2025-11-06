@@ -53,7 +53,7 @@ export default function Tabla({ columnas, datos }: Props) {
             ]}
           >
             {columnas.map((col) => {
-              const isMultiline = col.multilinea !== false; 
+              const isMultiline = col.multilinea; 
               return (
                 <View
                   key={col.key}

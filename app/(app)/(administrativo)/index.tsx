@@ -60,21 +60,21 @@ export default function InicioPersonalAdministrativo() {
           <Text style={styles.nombrePersonalAdministrativo}>{sesion?.nombre || "Personal Administrativo"}</Text>
           <Text style={styles.idPersonalAdministrativo}>{sesion?.boleta || ""}</Text>
 
-          <View style={styles.tarjetaContenedor}>
-            <Link href="/(app)/(administrativo)/gestionar-alumnos">
-              <View style={styles.tarjeta}>
+          <View style={[styles.tarjetaContenedor, { flexDirection: esMovil ? "column" : "row" }]}>
+            <Link href="/(app)/(administrativo)/gestionar-alumnos" style={ esMovil && { minWidth: "100%", marginBottom: 15}}>
+              <View style={[styles.tarjeta, esMovil && { width: "100%"}]}>
                 <Text style={styles.tarjetaTitulo}>Alumnos registrados</Text>
                 <Text style={styles.tarjetaValor}>{kpis.alumnosRegistrados}</Text>
               </View>
             </Link>
-            <Link href="/(app)/(administrativo)/gestionar-alumnos">
-              <View style={styles.tarjeta}>
+            <Link href="/(app)/(administrativo)/gestionar-alumnos" style={ esMovil && { minWidth: "100%", marginBottom: 15}}>
+              <View style={[styles.tarjeta, esMovil && { width: "100%"}]}>
                 <Text style={styles.tarjetaTitulo}>Alumnos realizando su servicio social</Text>
                 <Text style={styles.tarjetaValor}>{kpis.alumnosRealizandoSS}</Text>
               </View>
             </Link>
             <Link href="/(app)/(administrativo)/revisar-reportes-riesgo">
-              <View style={styles.tarjeta}>
+              <View style={[styles.tarjeta, esMovil && { width: "100%"}]}>
                 <Text style={styles.tarjetaTitulo}>Reportes de incidencia nuevos</Text>
                 <Text style={styles.tarjetaValor}>{kpis.reportesdeIncidencias}</Text>
               </View>
@@ -160,11 +160,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tarjetaContenedor: {
-    flexDirection: "row",
     justifyContent: "space-around",
     flexWrap: "wrap",
     marginVertical: 20,
-    width:"100%"
+    width: "100%"
   },
   tarjeta: {
     flex: 1,

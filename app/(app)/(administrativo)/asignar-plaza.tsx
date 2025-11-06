@@ -55,7 +55,7 @@ export default function AsignarPlaza() {
     const plazasDisponibles = useMemo(() => {
         return plazas.filter((p) => {
             const id = getPlazaId(p);
-            if (!id || usedPlazaIds.has(id)) return false; 
+            if (!id || usedPlazaIds.has(id)) return false;
             if (programaSeleccionado) return getPlazaPrograma(p) === programaSeleccionado;
             return true;
         });
@@ -170,7 +170,7 @@ export default function AsignarPlaza() {
                 setModalEditar(false);
                 setProgramaSeleccionado("");
                 setPlazaSeleccionadaId("");
-                setPlazaSeleccionadaLabel(""); 
+                setPlazaSeleccionadaLabel("");
                 await obtenerAlumnos();
             } else {
                 modalAPI.current?.show(false, resp.message || "No se pudo asignar la plaza.");
@@ -208,12 +208,12 @@ export default function AsignarPlaza() {
             <Modal
                 visible={modalEditar}
                 onClose={() => setModalEditar(false)}
-                titulo={`Asignar plaza a ${alumnoSeleccionado.nombre} ${alumnoSeleccionado.apellido_materno} ${alumnoSeleccionado.apellido_paterno}`}
+                titulo={`Asignar plaza`}
                 maxWidth={700}
                 cancelar
-                textoAceptar="Asignar"
+                textoAceptar={isSubmittingAsignar ? "Asignando…" : "Asignar"}
                 onAceptar={asignarPlaza}
-                deshabilitarAceptar={isSubmittingAsignar || (!plazaSeleccionadaId && !plazaSeleccionadaLabel)}
+                deshabilitado={isSubmittingAsignar || (!plazaSeleccionadaId && !plazaSeleccionadaLabel)}
             >
                 <KeyboardAvoidingView
                     style={{ flex: 1 }}
@@ -221,38 +221,29 @@ export default function AsignarPlaza() {
                     keyboardVerticalOffset={80}
                 >
                     <ModalBody>
-                        <View style={{ marginBottom: 10, pointerEvents: "none" }}>
+                        <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{alumnoSeleccionado.nombre} {alumnoSeleccionado.apellido_materno} {alumnoSeleccionado.apellido_paterno}</Text>
+                        <View style={{ marginTop: 5, marginBottom: 15, pointerEvents: "none" }}>
                             <Entrada label="Boleta" value={`${alumnoSeleccionado.boleta}`} editable={false} />
                         </View>
 
                         {Platform.OS === "web" ? (
-                            <View style={{ marginTop: 5, marginBottom: 12 }}>
-                                <Text style={{ marginBottom: 6, color: Colores.textoClaro }}>Programa</Text>
-                                <select
-                                    value={programaSeleccionado}
-                                    onChange={(e) => {
-                                        setProgramaSeleccionado(e.target.value);
+                            <View style={{ marginBottom: 15 }}>
+                                <Selector
+                                    label="Programa"
+                                    items={programasOpts}
+                                    selectedValue={programaSeleccionado}
+                                    onValueChange={(v) => {
+                                        setProgramaSeleccionado(v as string);
                                         setPlazaSeleccionadaId("");
                                         setPlazaSeleccionadaLabel("");
                                     }}
-                                    style={{
-                                        width: "100%",
-                                        padding: 10,
-                                        borderRadius: 8,
-                                        border: `1px solid ${Colores.borde}`,
-                                    }}
-                                >
-                                    <option value="" disabled>Selecciona un programa…</option>
-                                    {programasOpts.map((opt) => (
-                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                    ))}
-                                </select>
+                                />
                             </View>
                         ) : (
-                            <View style={{ marginTop: 5, marginBottom: 12 }}>
+                            <View style={{ marginBottom: 15 }}>
                                 <Selector
                                     label="Programa"
-                                    items={[{ label: "Selecciona un programa…", value: "" }, ...programasOpts]}
+                                    items={programasOpts}
                                     selectedValue={programaSeleccionado}
                                     onValueChange={(v) => {
                                         setProgramaSeleccionado(v as string);
@@ -264,31 +255,23 @@ export default function AsignarPlaza() {
                         )}
 
                         {Platform.OS === "web" ? (
-                            <View style={{ marginTop: 5, marginBottom: 12 }}>
-                                <Text style={{ marginBottom: 6, color: Colores.textoClaro }}>Plaza</Text>
-                                <select
-                                    value={plazaSeleccionadaId}
-                                    onChange={(e) => setPlazaSeleccionadaId(e.target.value)}
-                                    disabled={!programaSeleccionado}
-                                    style={{
-                                        width: "100%",
-                                        padding: 10,
-                                        borderRadius: 8,
-                                        border: `1px solid ${Colores.borde}`,
-                                        ...(programaSeleccionado ? {} : { backgroundColor: "#f3f4f6" }),
-                                    }}
-                                >
-                                    <option value="" disabled>Selecciona una plaza…</option>
-                                    {plazaOptions.map((opt) => (
-                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                    ))}
-                                </select>
-                            </View>
-                        ) : (
-                            <View style={{ marginTop: 5, marginBottom: 12, ...(programaSeleccionado ? {} : { opacity: 0.5, pointerEvents: "none" as const }) }}>
+                            <View style={{ marginBottom: 15 }}>
                                 <Selector
                                     label="Plaza"
-                                    items={[{ label: "Selecciona una plaza…", value: "" }, ...plazaOptions.map(o => ({ label: o.label, value: o.label }))]}
+                                    items={plazaOptions.map(o => ({ label: o.label, value: o.label }))}
+                                    selectedValue={plazaSeleccionadaLabel}
+                                    onValueChange={(lbl) => {
+                                        const label = String(lbl || "");
+                                        setPlazaSeleccionadaLabel(label);
+                                        setPlazaSeleccionadaId(label ? (labelToId.get(label) || "") : "");
+                                    }}
+                                />
+                            </View>
+                        ) : (
+                            <View style={{ marginBottom: 15 }}>
+                                <Selector
+                                    label="Plaza"
+                                    items={plazaOptions.map(o => ({ label: o.label, value: o.label }))}
                                     selectedValue={plazaSeleccionadaLabel}
                                     onValueChange={(lbl) => {
                                         const label = String(lbl || "");
@@ -299,29 +282,12 @@ export default function AsignarPlaza() {
                             </View>
                         )}
 
-                        <View style={{ marginTop: 2, marginBottom: 10 }}>
-                            <Text style={{ marginBottom: 6, color: Colores.textoClaro }}>Sede seleccionada</Text>
-                            <View
-                                style={{
-                                    borderWidth: 1,
-                                    borderColor: Colores.borde,
-                                    borderRadius: 8,
-                                    padding: 12,
-                                    backgroundColor: Colores.fondo,
-                                }}
-                            >
-                                <Text
-                                    style={[
-                                        { fontSize: Fuentes.cuerpoPrincipal, color: Colores.textoPrincipal },
-                                        Platform.OS === "web"
-                                            ? ({ whiteSpace: "pre-wrap", wordBreak: "break-word" } as any)
-                                            : {},
-                                    ]}
-                                    numberOfLines={0}
-                                >
-                                    {sedeSel || "—"}
-                                </Text>
-                            </View>
+                        <View style={{ marginBottom: 15 }}>
+                            <Entrada
+                                label="Sede seleccionada"
+                                value={sedeSel}
+                                editable={false}
+                            />
                         </View>
 
                         <View style={{ marginTop: 2, marginBottom: 10, pointerEvents: "none" }}>
@@ -381,9 +347,9 @@ export default function AsignarPlaza() {
                     <Tabla
                         columnas={[
                             { key: "boleta", titulo: "Boleta", ancho: 130 },
-                            { key: "nombre_completo", titulo: "Nombre", ancho: esPantallaPequeña ? 250 : 400 },
-                            { key: "carrera", titulo: "Carrera", ancho: esPantallaPequeña ? 200 : 230 },
-                            { key: "sedeNombre", titulo: "Sede", ...(esPantallaPequeña && { ancho: 200 }) },
+                            { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "sedeNombre", titulo: "Sede", ...(esPantallaPequeña && { ancho: 250 }) },
                             {
                                 key: "estatusAsignacion",
                                 titulo: "Estatus",

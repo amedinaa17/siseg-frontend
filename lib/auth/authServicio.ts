@@ -26,10 +26,8 @@ export const verificarJWT = async () => {
                 perfil: tokenDecodificado.perfil || 0,
             };
         } else if (tokenDecodificado.exp > currentTime) {
-            console.log("refrescando token")
             // Token válido pero por expirar
-            const nuevoToken = await refreshToken(token);
-            return await verificarJWTConNuevoToken(nuevoToken);
+            return await refreshToken(token);
         }
         else {
             // Si el token ha expirado, lanzamos un error
@@ -42,25 +40,22 @@ export const verificarJWT = async () => {
     }
 };
 
-async function verificarJWTConNuevoToken(token: string) {
-    const tokenDecodificado: any = jwtDecode(token);
-    return {
-        token,
-        boleta: tokenDecodificado.id,
-        rol: tokenDecodificado.rol,
-        nombre: tokenDecodificado.username,
-        estatus: 1,
-        perfil: 1,
-    };
-}
-
 // Función para renovar el token
 export const refreshToken = async (tk: string) => {
     try {
         const response = await fetchData(`users/refreshToken?tk=${tk}`);
         if (response.error === 0 && response.token) {
             await storage.setItem("token", response.token);
-            return response.token;
+            
+            const tokenDecodificado: any = jwtDecode(response.token);
+            return {
+                token: response.token,
+                boleta: tokenDecodificado.id,
+                rol: tokenDecodificado.rol,
+                nombre: tokenDecodificado.username,
+                estatus: tokenDecodificado.estatus,
+                perfil: tokenDecodificado.perfil || 0,
+            };
         } else {
             await storage.removeItem("token");
             throw new Error("La sesión no es válida o ha expirado. Inicia sesión de nuevo para continuar.");
@@ -83,8 +78,8 @@ export const login = async (boleta: string, password: string) => {
                 boleta: tokenDecodificado.id,
                 rol: tokenDecodificado.rol,
                 nombre: tokenDecodificado.username,
-                estatus: 1,
-                perfil: 1,
+                estatus: tokenDecodificado.estatus,
+                perfil: tokenDecodificado.perfil || 0,
             };
         } else {
             throw new Error(data.error);
