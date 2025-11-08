@@ -1,11 +1,13 @@
 import { Colores, Fuentes } from '@/temas/colores';
 import { Link } from 'expo-router';
 import React from "react";
-import { Image, Platform, StyleSheet, Text, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Encabezado() {
   const esMovil = Platform.OS === "ios" || Platform.OS === "android";
+  const { width } = useWindowDimensions();
+  const esPantallaPequeña = width < 600;
 
   return (
     <SafeAreaView edges={["top"]} style={styles.seguro}>
@@ -16,14 +18,12 @@ export default function Encabezado() {
             style={styles.logo}
           />
         </Link>
-        <Text style={styles.textoEnLinea}>
-          <Text style={styles.titulo}>SISEG </Text>
-          {!esMovil && (
-            <Text style={styles.subtitulo}>
-              Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
-            </Text>
-          )}
-        </Text>
+        <Text style={styles.titulo}>SISEG </Text>
+        {!esMovil && !esPantallaPequeña && (
+          <Text style={styles.subtitulo}>
+            Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
+          </Text>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -45,11 +45,6 @@ const styles = StyleSheet.create({
     height: 60,
     marginLeft: "5%",
   },
-  textoEnLinea: {
-    flex: 1,
-    flexWrap: "wrap",
-    color: Colores.onPrimario,
-  },
   titulo: {
     fontSize: Fuentes.subtitulo,
     fontWeight: "700",
@@ -58,6 +53,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   subtitulo: {
-    fontSize: Fuentes.cuerpo
+    fontSize: Fuentes.cuerpo,
+    color: Colores.onPrimario,
   },
 });

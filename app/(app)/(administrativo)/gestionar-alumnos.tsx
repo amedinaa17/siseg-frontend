@@ -39,6 +39,11 @@ export default function GestionAlumnos() {
     const [paginaActual, setPaginaActual] = useState(1);
     const [filasPorPagina, setFilasPorPagina] = useState(5);
 
+    // --- Estados para detalle de carga de alumnos masiva ---
+    const [detalleVisible, setDetalleVisible] = useState(false);
+    const [detalleTotales, setDetalleTotales] = useState({ total: 0, exitos: 0, errores: 0 });
+    const [detalleFilas, setDetalleFilas] = useState<Array<{ boleta: string; error?: string }>>([]);
+
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
 
@@ -197,29 +202,39 @@ export default function GestionAlumnos() {
                 setArchivoSeleccionado(null);
                 obtenerAlumnos();
 
-                const totalErrores = response.errores.length;
-                const totalCorrectos = response.totalAlumnos - totalErrores - 1;
-                const resumen =
-                    `${totalCorrectos} alumno(s) se han registrado correctamente.\n` +
-                    `${totalErrores} errores encontrados.\n\nDetalles:\n` +
-                    (totalErrores > 0
-                        ? response.errores
-                            .map((e, i) => {
-                                const match = e.error.match(/(\d+)$/);
-                                const boleta = match ? match[1] : "Desconocido";
+                // Construir totales
+                const total = Number(response.totalAlumnos ?? 0);
+                const erroresArr = Array.isArray(response.errores) ? response.errores : [];
+                const errores = erroresArr.length;
+                const exitos = Math.max(total - errores - 1, 0);
 
-                                const mensaje = e.error.includes("ya está registrada")
-                                    ? "Boleta duplicada"
-                                    : e.error.includes("inválida")
-                                        ? "Matrícula inválida"
-                                        : e.error;
+                // Construir filas
+                const filas = erroresArr.map((e: any) => {
+                    const match = typeof e.error === "string" ? e.error.match(/(\d+)$/) : null;
+                    const boleta = match ? match[1] : (e.boleta || "Desconocido");
 
-                                return `${i + 1}. [${boleta}] ${mensaje}.`;
-                            })
-                            .join('\n')
-                        : ""
-                    );
-                modalAPI.current?.show(true, resumen);
+                    const error =
+                        typeof e.error === "string"
+                            ? e.error.includes("ya está registrada")
+                                ? "Boleta duplicada"
+                                : e.error.includes("inválida")
+                                    ? "Boleta inválida"
+                                    : e.error
+                            : "Error desconocido";
+
+                    return { boleta, error };
+                });
+
+                setDetalleTotales({ total, exitos, errores });
+                setDetalleFilas(filas);
+
+                const resumen = `${exitos} alumno(s) registrados correctamente · ${errores} errores.`;
+                modalAPI.current?.show(
+                    true,
+                    resumen,
+                    undefined,
+                    () => { modalAPI.current?.close(); setDetalleVisible(true) }
+                );
             } else {
                 modalAPI.current?.show(false, "Hubo un problema al subir el archivo. Verifica el formato e inténtalo de nuevo.");
             }
@@ -736,6 +751,37 @@ export default function GestionAlumnos() {
         );
     };
 
+    const renderModalDetallesCargarAlumnos = () => {
+        return (
+            <Modal
+                visible={detalleVisible} maxWidth={520}
+                titulo="Detalle de la carga"
+                onClose={() => setDetalleVisible(false)}
+                onAceptar={() => setDetalleVisible(false)}
+            >
+                <View style={{ marginBottom: 12 }}>
+                    <View style={{ marginBottom: 6, flexDirection:"row", justifyContent: "space-between" }}>
+                        <Text>Alumnos procesados: <Text style={{ fontWeight: "700" }}>{detalleTotales.total}</Text></Text>
+                        <Text>Alumnos registrados: <Text style={{ fontWeight: "700", color: Colores.textoExito }}>{detalleTotales.exitos}</Text></Text>
+                        <Text>Errores: <Text style={{ fontWeight: "700", color: Colores.textoError }}>{detalleTotales.errores}</Text></Text>
+                    </View>
+                </View>
+
+                <Tabla
+                    columnas={[
+                        { key: "boleta", titulo: "Boleta", ancho: 150 },
+                        
+                        { key: "error", titulo: "Error" },
+                    ]}
+                    datos={detalleFilas.map((f) => ({
+                        ...f,
+                    }))}
+                />
+            </Modal>
+        );
+    };
+
+
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
@@ -887,6 +933,7 @@ export default function GestionAlumnos() {
             {renderModalEditar()}
             {renderModalDarBaja()}
             {renderModalCargarAlumnos()}
+            {renderModalDetallesCargarAlumnos()}
             <ModalAPI ref={modalAPI} />
         </ScrollView >
     );

@@ -14,8 +14,9 @@ import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, Vi
 export default function IniciarSesion() {
   const { iniciarSesion, errorMessage } = useAuth();
 
+  const esMovil = Platform.OS === "ios" || Platform.OS === "android";
   const { width } = useWindowDimensions();
-  const esPantallaPequeña = width < 768;
+  const esPantallaPequeña = width < 850;
 
   const {
     control,
@@ -35,20 +36,22 @@ export default function IniciarSesion() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={[styles.contenedorPrincipal, esPantallaPequeña ? { flexDirection: 'column', marginVertical: 35 } : { flexDirection: 'row' }]}>
-          {!esPantallaPequeña && (
+          {!esMovil && (
             <>
-              <View style={[styles.textoContainer, { width: esPantallaPequeña ? '90%' : '30%', }]}>
+              <View style={[styles.textoContainer, { width: esPantallaPequeña ? '70%' : '30%' }]}>
                 <Image
                   source={require('@/activos/imagenes/siseg.png')}
-                  style={{ width: 160, height: 160, marginBottom: 10 }}
+                  style={{ width: esPantallaPequeña ? 70 : 150, height: esPantallaPequeña ? 70 : 150, marginBottom: 10 }}
                 />
 
-                <Text style={styles.bienvenidaSubtitulo}>
+                <Text style={[styles.bienvenidaSubtitulo, esPantallaPequeña ? { fontSize: Fuentes.cuerpo, marginBottom: 35 } : { fontSize: Fuentes.subtitulo }]}>
                   Sistema de Seguimiento del Servicio Social para la ENMyH
                 </Text>
-                <Text style={styles.bienvenidaDescripcion}>
-                  <Text style={{ color: Colores.primario, fontWeight: '600' }}>SISEG</Text> es una herramienta informática diseñada para dar seguimiento al servicio social de la <Text style={{ fontWeight: '600' }}>Escuela Nacional de Medicina y Homeopatía</Text>.
-                </Text>
+                {!esPantallaPequeña && (
+                  <Text style={styles.bienvenidaDescripcion}>
+                    <Text style={{ color: Colores.primario, fontWeight: '600' }}>SISEG</Text> es una herramienta informática diseñada para dar seguimiento al servicio social de la <Text style={{ fontWeight: '600' }}>Escuela Nacional de Medicina y Homeopatía</Text>.
+                  </Text>
+                )}
               </View>
             </>
           )}
@@ -128,7 +131,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   bienvenidaSubtitulo: {
-    fontSize: Fuentes.subtitulo,
     fontWeight: '600',
     color: Colores.textoPrincipal,
     textAlign: 'center',

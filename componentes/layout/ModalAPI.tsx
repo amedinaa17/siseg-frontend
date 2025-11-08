@@ -2,10 +2,10 @@ import Modal from "@/componentes/layout/Modal";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from '@expo/vector-icons';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export interface ModalAPIRef {
-    show: (estatus: boolean, mensaje: string, aceptar?: () => void) => void;
+    show: (estatus: boolean, mensaje: string, aceptar?: () => void, verDetalles?: () => void) => void;
     close: () => void;
 }
 
@@ -15,12 +15,14 @@ const ModalAPI = forwardRef<ModalAPIRef>((_, ref) => {
     const [mensaje, setMensaje] = useState("");
     const [modalKey, setModalKey] = useState(0);
     const [onAceptar, setOnAceptar] = useState<(() => void) | undefined>(undefined);
+    const [onDetalles, setOnDetalles] = useState<(() => void) | undefined>(undefined);
 
     useImperativeHandle(ref, () => ({
-        show(estatus: boolean, mensaje: string, aceptar?: () => void) {
+        show(estatus: boolean, mensaje: string, aceptar?: () => void, verDetalles?: () => void) {
             setEstatus(estatus);
             setMensaje(mensaje);
             setOnAceptar(() => aceptar);
+            setOnDetalles(() => verDetalles);
 
             setVisible(false);
             setModalKey((k) => k + 1);
@@ -50,17 +52,22 @@ const ModalAPI = forwardRef<ModalAPIRef>((_, ref) => {
                 </Text>
                 <Text style={styles.mensaje}>
                     {mensajePartes.map((parte, index) => {
-
                         if (correoRegex.test(parte)) {
                             return (
-                                <Text style={{ color: estatus ? Colores.textoInfo : Colores.textoError }}>
+                                <Text key={`p-${index}`} style={{ color: estatus ? Colores.textoInfo : Colores.textoError }}>
                                     {parte}
                                 </Text>
                             );
                         }
-                        return parte;
+                        return <Text key={`t-${index}`}>{parte}</Text>;
                     })}
                 </Text>
+
+                {onDetalles && (
+                    <Pressable onPress={onDetalles} style={styles.linkWrap}>
+                        <Text style={styles.link}>Ver detalles</Text>
+                    </Pressable>
+                )}
             </View>
         </Modal>
     );
@@ -68,10 +75,21 @@ const ModalAPI = forwardRef<ModalAPIRef>((_, ref) => {
 
 const styles = StyleSheet.create({
     titulo: {
-        fontSize: Fuentes.cuerpo, color: Colores.textoClaro, marginBottom: 8
+        fontSize: Fuentes.cuerpo,
+        color: Colores.textoClaro,
+        marginBottom: 8
     },
     mensaje: {
-        fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 8, textAlign: "center"
+        fontSize: Fuentes.cuerpo,
+        color: Colores.textoPrincipal,
+        marginBottom: 12,
+        textAlign: "center"
+    },
+    linkWrap: { paddingVertical: 3 },
+    link: {
+        color: Colores.textoInfo,
+        fontWeight: "700",
+        textDecorationLine: "underline"
     }
 });
 
