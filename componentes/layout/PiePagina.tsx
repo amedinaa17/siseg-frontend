@@ -1,6 +1,6 @@
 import { Colores } from '@/temas/colores';
 import React, { useState } from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, Platform, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import ModalAvisoPrivacidad from './AvisoPrivacidad';
 
@@ -10,12 +10,16 @@ export default function PiePagina() {
 
   return (
     <SafeAreaView edges={["bottom"]} style={styles.seguro}>
-      <View style={styles.piePagina}>
-        <Text style={styles.piePaginaTexto}>Desarrollado por la Escuela Superior de Cómputo.</Text>
+      <ImageBackground
+        source={require('@/activos/imagenes/pattern-gris.png')}
+        style={styles.piePagina}
+        imageStyle={{ resizeMode: 'repeat' }}
+      >
+        <Text style={{ color: Colores.onPrimario }}>Desarrollado por la Escuela Superior de Cómputo.</Text>
         <TouchableOpacity onPress={() => setVisibleAviso(true)}>
-          <Text style={styles.avisoPrivacidad}> Aviso de Privacidad.</Text>
+          <Text style={{ color: Colores.onPrimario }}> Aviso de Privacidad.</Text>
         </TouchableOpacity>
-      </View>
+      </ImageBackground>
       <ModalAvisoPrivacidad
         visible={visibleAviso}
         onClose={() => setVisibleAviso(false)}
@@ -30,9 +34,11 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   piePagina: {
-    backgroundColor: Colores.fondoInstitucional,
     paddingVertical: 10,
     alignItems: 'center',
+    justifyContent: "space-evenly",
+    width: '100%',
+    height: "auto",
     ...Platform.select({
       ios: {
         flexDirection: 'column',
@@ -46,11 +52,7 @@ const styles = StyleSheet.create({
       },
       web: {
         flexDirection: 'row',
-        gap: 50,
       },
     }),
-    justifyContent: 'center',
   },
-  piePaginaTexto: { color: Colores.onPrimario },
-  avisoPrivacidad: { color: Colores.onPrimario },
 });

@@ -12,11 +12,14 @@ export default function Encabezado() {
   return (
     <SafeAreaView edges={["top"]} style={styles.seguro}>
       <View style={styles.encabezado}>
-        <Link href="/(auth)/iniciar-sesion">
-          <Image
-            source={require('@/activos/imagenes/enmyh.png')}
-            style={styles.logo}
-          />
+        <Link href="/(auth)/iniciar-sesion" style={{ marginLeft: "8%" }}>
+          <View style={{ width: 80, height: 80, position: 'relative' }}>
+            <Image
+              source={require('@/activos/imagenes/enmyh.png')}
+              style={[styles.logo, { marginTop: esMovil ? 0 : 12 }]}
+            />
+            <View style={[styles.logoTail, { marginTop: esMovil ? 80 : 91.5 }]} />
+          </View>
         </Link>
         <Text style={styles.titulo}>SISEG </Text>
         {!esMovil && !esPantallaPequeña && (
@@ -31,25 +34,38 @@ export default function Encabezado() {
 
 const styles = StyleSheet.create({
   seguro: {
-    backgroundColor: Colores.fondoInstitucional,
+    backgroundColor: "rgba(51, 51, 51, 0.5)",
     width: "100%",
   },
   encabezado: {
     backgroundColor: Colores.fondoInstitucional,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
+    height: 60,
   },
   logo: {
-    width: 60,
-    height: 60,
-    marginLeft: "5%",
+    width: 80,
+    height: 80,
+    position: 'absolute',
+    backgroundColor: "rgba(51, 51, 51, 0.5)",
+  },
+  logoTail: {
+    position: 'absolute',
+    width: 80,
+    left: 0,
+    height: 0,
+    borderLeftWidth: 40,
+    borderRightWidth: 40,
+    borderTopWidth: 9,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: "rgba(51, 51, 51, 0.5)",
   },
   titulo: {
     fontSize: Fuentes.subtitulo,
     fontWeight: "700",
     color: Colores.onPrimario,
-    marginLeft: 12,
+    marginLeft: 30,
     marginRight: 12,
   },
   subtitulo: {

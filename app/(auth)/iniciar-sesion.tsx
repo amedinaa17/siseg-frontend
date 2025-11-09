@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
   contenedorFormulario: {
     maxWidth: 500,
     padding: 24,
+    marginVertical: 50,
     borderWidth: 1,
     borderRadius: 12,
     borderColor: Colores.borde,
