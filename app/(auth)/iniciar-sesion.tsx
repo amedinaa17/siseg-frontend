@@ -34,6 +34,8 @@ export default function IniciarSesion() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        {/* <GobMxHeader />
+        <IPNHeader /> */}
         <Encabezado />
         <View style={[styles.contenedorPrincipal, esPantallaPequeña ? { flexDirection: 'column', marginVertical: 35 } : { flexDirection: 'row' }]}>
           {!esMovil && (
@@ -44,7 +46,7 @@ export default function IniciarSesion() {
                   style={{ width: esPantallaPequeña ? 70 : 150, height: esPantallaPequeña ? 70 : 150, marginBottom: 10 }}
                 />
 
-                <Text style={[styles.bienvenidaSubtitulo, esPantallaPequeña ? { fontSize: Fuentes.cuerpo, marginBottom: 35 } : { fontSize: Fuentes.subtitulo }]}>
+                <Text style={[styles.bienvenidaSubtitulo, { fontSize: esPantallaPequeña ? Fuentes.cuerpo : Fuentes.subtitulo }]}>
                   Sistema de Seguimiento del Servicio Social para la ENMyH
                 </Text>
                 {!esPantallaPequeña && (
@@ -114,6 +116,8 @@ export default function IniciarSesion() {
           </View>
         </View>
         <PiePagina />
+        {/* <IPNFooter />
+        <GobMxFooter /> */}
       </ScrollView>
     </KeyboardAvoidingView >
   );
