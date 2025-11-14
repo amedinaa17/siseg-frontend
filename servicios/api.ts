@@ -1,6 +1,7 @@
 import axios from "axios";
+import Constants from 'expo-constants';
 
-const API_URL = "https://sisegplataform.online/api";
+const API_URL = Constants.expoConfig?.extra?.API_URL;
 
 // GET
 export const fetchData = async (endpoint: string) => {

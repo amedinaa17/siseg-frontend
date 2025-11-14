@@ -14,6 +14,7 @@ export default function EntradaMultilinea({
   onFocus,
   onBlur,
   style,
+  editable = true,
   ...props
 }: Propiedades) {
   const [focused, setFocused] = useState(false);
@@ -32,7 +33,7 @@ export default function EntradaMultilinea({
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-    color: error ? Colores.textoError : focused ? Colores.textoInfo : Colores.textoClaro,
+    color: error ? Colores.textoError : focused && editable ? Colores.textoInfo : Colores.textoClaro,
     backgroundColor: Colores.fondo,
     paddingHorizontal: 4,
   };
@@ -45,15 +46,16 @@ export default function EntradaMultilinea({
           {
             borderColor: error
               ? Colores.textoError
-              : focused
-              ? Colores.textoInfo
-              : Colores.borde,
+              : focused && editable
+                ? Colores.textoInfo
+                : Colores.borde,
           },
         ]}
       >
         <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
         <TextInput
           {...props}
+          editable={editable}
           value={value}
           onFocus={(e) => {
             setFocused(true);
@@ -66,7 +68,9 @@ export default function EntradaMultilinea({
           style={[
             styles.entrada,
             style,
-            Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : null,
+            Platform.OS === "web"
+              ? ({ outlineStyle: "none" } as any)
+              : null,
           ]}
           multiline={true}
           textAlignVertical="top"

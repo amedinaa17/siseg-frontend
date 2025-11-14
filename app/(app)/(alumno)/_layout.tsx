@@ -27,7 +27,7 @@ export default function AlumnoLayout() {
           <Drawer.Screen name="acuse-solicitud" options={{ title: "Acuse de Solicitud" }} />
           <Drawer.Screen name="expediente-digital" options={{ title: "Ver Expediente" }} />
           <Drawer.Screen name="curso-induccion" options={{ title: "Curso de Inducción" }} />
-          <Drawer.Screen name="catalogo-plazas" options={{ title: "Catálogo de Plazas" }} />
+          <Drawer.Screen name="plazas" options={{ title: "Plazas" }} />
           <Drawer.Screen name="plaza-asignada" options={{ title: "Plaza Asignada" }} />
           <Drawer.Screen name="reportes-riesgo" options={{ title: "Situación de Riesgo" }} />
           <Drawer.Screen name="encuesta-satisfaccion" options={{ title: "Encuesta de Satisfacción" }} />
@@ -110,9 +110,9 @@ function AlumnoDrawerContent(props) {
         <View style={drawerStyles.submenuContenedor}>
           <TouchableOpacity
             style={drawerStyles.submenuItem}
-            onPress={() => router.push("/(app)/(alumno)/catalogo-plazas")}
+            onPress={() => router.push("/(app)/(alumno)/plazas")}
           >
-            <Text style={drawerStyles.submenuText}>Catálogo de Plazas</Text>
+            <Text style={drawerStyles.submenuText}>Plazas</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={drawerStyles.submenuItem}

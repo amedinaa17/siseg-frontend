@@ -23,7 +23,7 @@ export default function CompletarRegistro() {
   const modalAPI = useRef<ModalAPIRef>(null);
 
   const { width } = useWindowDimensions();
-  const esPantallaPequeña = width < 600;
+  const esPantallaPequeña = width < 790;
 
   const [alumno, setAlumno] = useState<any>(null);
   const [step, setStep] = useState(1);
@@ -55,7 +55,7 @@ export default function CompletarRegistro() {
           } else {
             if (response.message.includes("expirado"))
               setError("Parece que el enlace ha caducado. Registra tu correo electrónico institucional nuevamente para recibir otro.");
-            else if(response.message.includes("inválido"))
+            else if (response.message.includes("inválido"))
               setError("Parece que el enlace no es válido. Verifica que el enlace sea el correcto o registra tu correo electrónico institucional nuevamente para recibir otro.");
             else
               setError("Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
@@ -93,6 +93,12 @@ export default function CompletarRegistro() {
     }
   };
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+    }
+  }, [errors]);
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -108,24 +114,24 @@ export default function CompletarRegistro() {
           <>
             <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
               <Text style={styles.titulo}>
-                {step === 1 ? "Validar Datos" : "Completar Registro"}
+                {step === 1 ? "Validar datos" : "Completar registro"}
               </Text>
 
               {step === 1 && (
                 <>
-                  <View style={{ marginBottom: 15, pointerEvents: "none" }} >
+                  <View style={{ marginBottom: 15 }} >
                     <Entrada label="Nombre" value={alumno?.nombre || ""} editable={false} />
                   </View>
 
                   <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
                       <Entrada
                         label="Apellido Paterno"
                         value={alumno?.apellido_paterno || ""}
                         editable={false}
                       />
                     </View>
-                    <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
                       <Entrada
                         label="Apellido Materno"
                         value={alumno?.apellido_materno || ""}
@@ -134,7 +140,7 @@ export default function CompletarRegistro() {
                     </View>
                   </View>
 
-                  <View style={{ marginBottom: 15, pointerEvents: "none" }} >
+                  <View style={{ marginBottom: 15 }} >
                     <Entrada
                       label="CURP"
                       value={alumno?.curp || ""}
@@ -143,14 +149,14 @@ export default function CompletarRegistro() {
                   </View>
 
                   <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
                       <Entrada
                         label="Boleta"
                         value={alumno?.boleta || ""}
                         editable={false}
                       />
                     </View>
-                    <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
                       <Entrada
                         label="Carrera"
                         value={alumno?.carrera || ""}
@@ -160,14 +166,14 @@ export default function CompletarRegistro() {
                   </View>
 
                   <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
                       <Entrada
                         label="Generación"
                         value={alumno?.generacion || ""}
                         editable={false}
                       />
                     </View>
-                    <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
                       <Entrada
                         label="Promedio"
                         value={alumno?.promedio || ""}
@@ -176,7 +182,7 @@ export default function CompletarRegistro() {
                     </View>
                   </View>
 
-                  <View style={{ marginBottom: 25, pointerEvents: "none" }} >
+                  <View style={{ marginBottom: 25 }} >
                     <Entrada
                       label="Correo Electrónico Institucional"
                       value={alumno?.correo || ""}
@@ -348,7 +354,7 @@ export default function CompletarRegistro() {
                     </View>
                     <View style={{ flex: 1 }}>
                       <Boton
-                        title={isSubmitting ? "Guardando…" : "Guardar Datos"}
+                        title={isSubmitting ? "Guardando…" : "Guardar datos"}
                         onPress={handleSubmit(onSubmit)}
                         disabled={isSubmitting}
                       />

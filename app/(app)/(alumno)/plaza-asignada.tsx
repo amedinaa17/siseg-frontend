@@ -8,7 +8,7 @@ import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } fro
 
 export default function PlazaAsignada() {
     const { width } = useWindowDimensions();
-    const esPantallaPequeña = width < 600;
+    const esPantallaPequeña = width < 790;
 
     const modalAPI = useRef<ModalAPIRef>(null);
     const { sesion } = useAuth();
@@ -53,29 +53,29 @@ export default function PlazaAsignada() {
                 <Text style={styles.titulo}>Plaza asignada</Text>
 
                 <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                    <View style={{ flex: 1, pointerEvents: "none" }}>
+                    <View style={{ flex: 1 }}>
                         <Entrada label="Programa" value={datosAlumno?.PROGRAMA ?? ""} editable={false} />
                     </View>
 
-                    <View style={{ flex: 1, pointerEvents: "none" }}>
+                    <View style={{ flex: 1 }}>
                         <Entrada label="Promoción" value={datosAlumno?.promocion ?? ""} editable={false} />
                     </View>
                 </View>
 
-                <View style={{ marginBottom: 15, pointerEvents: "none" }}>
+                <View style={{ marginBottom: 15 }}>
                     <Entrada label="Sede" value={datosAlumno?.sede ?? ""} editable={false} />
                 </View>
 
                 <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                    <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                    <View style={{ flex: 1, marginBottom: 0 }}>
                         <Entrada label="Tarjeta" value={datosAlumno?.tarjetaDisponible ?? ""} editable={false} />
                     </View>
-                    <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
-                        <Entrada label="Tipo de beca" value={datosAlumno?.tipoBeca ?? ""} editable={false} />
+                    <View style={{ flex: 1, marginBottom: 0 }}>
+                        <Entrada label="Tipo de Beca" value={datosAlumno?.tipoBeca ?? ""} editable={false} />
                     </View>
                 </View>
 
-                <View style={{ marginBottom: 15, pointerEvents: "none" }}>
+                <View style={{ marginBottom: 15 }}>
                     <Entrada label="Ubicación" value={datosAlumno?.ubicacion ?? ""} editable={false} />
                 </View>
 

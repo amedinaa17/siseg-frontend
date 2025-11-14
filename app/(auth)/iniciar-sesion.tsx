@@ -59,7 +59,7 @@ export default function IniciarSesion() {
           )}
 
           <View style={[styles.contenedorFormulario, { width: esPantallaPequeña ? '90%' : '70%' }]}>
-            <Text style={styles.titulo}>Inicio de sesión</Text>
+            <Text style={styles.titulo}>Iniciar sesión</Text>
             <View style={{ marginBottom: 15 }}>
               <Controller
                 control={control}

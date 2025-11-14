@@ -71,6 +71,12 @@ export default function NuevaContraseña() {
     }
   };
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+    }
+  }, [errors]);
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -85,7 +91,7 @@ export default function NuevaContraseña() {
         ) : (
           <>
             <View style={styles.contenedorFormulario}>
-              <Text style={styles.titulo}>Restablecer Contraseña</Text>
+              <Text style={styles.titulo}>Restablecer contraseña</Text>
 
               <View style={{ marginBottom: 15 }}>
                 <Controller

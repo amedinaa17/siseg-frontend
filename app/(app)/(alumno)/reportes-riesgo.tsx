@@ -186,6 +186,12 @@ export default function ReportesRiesgo() {
         }
     };
 
+    useEffect(() => {
+        if (Object.keys(errors).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errors]);
+
     const handleCancelar = () => {
         reset();
         setErrorEvidenciaNueva("");
@@ -296,25 +302,25 @@ export default function ReportesRiesgo() {
                         </Text>
                     </Text>
                 </View>
-                <View style={{ pointerEvents: "none", marginBottom: 15 }} >
+                <View style={{ marginBottom: 15 }} >
                     <Entrada label="Fecha de envío" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
                 </View>
                 {estatus != 1 && (
                     <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                        <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 0 }}>
                             {estatus === 2 ? (
                                 <Entrada label="Última actualización" value={new Date(fechaModificacion).toLocaleDateString()} editable={false} />
                             ) : (
                                 <Entrada label="Fecha de finalización" value={new Date(fechaFinalizado).toLocaleDateString()} editable={false} />
                             )}
                         </View>
-                        <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 0 }}>
 
                             <Entrada label="Revisado por" value={adminEncargado} editable={false} />
                         </View>
                     </View>
                 )}
-                <View style={{ pointerEvents: "none" }}>
+                <View style={{}}>
                     <EntradaMultilinea
                         label="Descripción"
                         value={descripcion}
@@ -381,7 +387,7 @@ export default function ReportesRiesgo() {
                     esPantallaPequeña && { maxWidth: "95%" },
                 ]}
             >
-                <Text style={styles.titulo}>Reportes de Situación de Riesgo</Text>
+                <Text style={styles.titulo}>Reportes de situación de riesgo</Text>
 
                 <View style={{ marginBottom: 15, alignItems: "flex-start" }}>
                     <Boton title="Agregar reporte" onPress={() => setModalAgregar(true)} />
@@ -466,7 +472,7 @@ export default function ReportesRiesgo() {
                         })}
                     />
                 </ScrollView>
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
                     <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
                         <Paginacion
                             paginaActual={paginaActual}
@@ -474,6 +480,16 @@ export default function ReportesRiesgo() {
                             setPaginaActual={setPaginaActual}
                         />
                     </View>
+
+                    <Text
+                        style={{
+                            color: Colores.textoClaro,
+                            fontSize: Fuentes.caption,
+                            marginTop: 15,
+                        }}
+                    >
+                        {`Mostrando ${reportesMostrados.length} de ${reportesFiltrados.length} resultados`}
+                    </Text>
                 </View>
             </View>
             {renderModalAgregar()}

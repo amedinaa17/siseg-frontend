@@ -32,15 +32,13 @@ const CARRERA_ID_BY_NOMBRE: Record<string, number> = {
 
 export default function CatalogoPlazas() {
   const { width } = useWindowDimensions();
-  const esPantallaPequeña = width < 600;
+  const esPantallaPequeña = width < 790;
   const { sesion } = useAuth();
 
   const [alumno, setAlumno] = useState<any>(null);
   const [plazas, setPlazas] = useState<Plaza[]>([]);
-  const [cargandoAlumno, setCargandoAlumno] = useState(false);
-  const [cargandoPlazas, setCargandoPlazas] = useState(false);
   const modalAPI = useRef<ModalAPIRef>(null);
-  const [busqueda, setBusqueda] = useState(""); // por Sede
+  const [busqueda, setBusqueda] = useState("");
   const [paginaActual, setPaginaActual] = useState(1);
   const [filasPorPagina, setFilasPorPagina] = useState(10);
 
@@ -48,17 +46,13 @@ export default function CatalogoPlazas() {
     const cargarAlumno = async () => {
       if (!sesion?.token) return;
       try {
-        setCargandoAlumno(true);
-        const res = await fetchData(
-          `users/obtenerTodosDatosAlumno?tk=${encodeURIComponent(sesion.token)}`
-        );
-        if (res?.error === 0) setAlumno(res.data);
-        else modalAPI.current?.show(false, res?.message || "Error al obtener los datos del alumno.");
+        const res = await fetchData(`users/obtenerTodosDatosAlumno?tk=${encodeURIComponent(sesion.token)}`);
+        if (res?.error === 0)
+          setAlumno(res.data);
+        else
+          modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
       } catch (e) {
-        console.error("[Alumno] Error de red", e);
-        modalAPI.current?.show(false, "Error al conectar con el servidor al obtener los datos del alumno.");
-      } finally {
-        setCargandoAlumno(false);
+        modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
       }
     };
     cargarAlumno();
@@ -68,7 +62,6 @@ export default function CatalogoPlazas() {
     const cargarPlazas = async () => {
       if (!sesion?.token) return;
       try {
-        setCargandoPlazas(true);
         const res = await fetchData(
           `plaza/obtenerPlazas?tk=${encodeURIComponent(sesion.token)}`
         );
@@ -77,8 +70,6 @@ export default function CatalogoPlazas() {
       } catch (e) {
         console.error("[Plazas] Error de red", e);
         modalAPI.current?.show(false, "Error al conectar con el servidor al obtener las plazas.");
-      } finally {
-        setCargandoPlazas(false);
       }
     };
     cargarPlazas();
@@ -123,7 +114,6 @@ export default function CatalogoPlazas() {
     setPaginaActual(1);
   }, [busqueda, alumnoCarreraId, filasPorPagina]);
 
-  const cargando = cargandoAlumno || cargandoPlazas;
   const promoTexto = plazasFiltradas[0]?.promocion;
 
   return (
@@ -136,8 +126,8 @@ export default function CatalogoPlazas() {
       >
         <Text style={styles.titulo}>Plazas</Text>
         <Text style={styles.subtitulo}>Promoción {promoTexto}</Text>
-        <Text style={styles.preTitulo}>{alumno?.carrera ?? ""}</Text>
-        <Text style={styles.subtituloRojo}>
+        <Text style={styles.carrera}>{alumno?.carrera ?? ""}</Text>
+        <Text style={styles.aviso}>
           “SUJETAS A CAMBIO SIN PREVIO AVISO DE LAS AUTORIDADES”
         </Text>
 
@@ -154,8 +144,8 @@ export default function CatalogoPlazas() {
                   filasPorPagina === 10
                     ? { minWidth: 42.8 }
                     : filasPorPagina === 15
-                    ? { minWidth: 48.8 }
-                    : { minWidth: 52.8 },
+                      ? { minWidth: 48.8 }
+                      : { minWidth: 52.8 },
                 ],
               ]}
             >
@@ -178,7 +168,7 @@ export default function CatalogoPlazas() {
 
           <View style={{ width: esPantallaPequeña ? "100%" : "40%" }}>
             <Entrada
-              label="Buscar (sede)"
+              label="Buscar"
               value={busqueda}
               onChangeText={(text) => {
                 setBusqueda(text);
@@ -195,45 +185,33 @@ export default function CatalogoPlazas() {
               {
                 key: "Programa",
                 titulo: "Programa",
-                ancho: esPantallaPequeña ? 120 : 160,
                 multilinea: true,
+                ancho: 170
               },
               {
                 key: "Sede",
                 titulo: "Sede",
-                ancho: esPantallaPequeña ? 220 : undefined, 
                 multilinea: true,
+                ...(esPantallaPequeña && { ancho: 350 })
               },
               {
                 key: "Beca",
                 titulo: "Beca",
-                ancho: esPantallaPequeña ? 80 : 100,
+                ancho: 100
               },
               {
                 key: "Tarjeta",
                 titulo: "Tarjeta",
-                ancho: esPantallaPequeña ? 90 : 110,
+                ancho: 100
               },
             ]}
             datos={filasMostradas}
-            cargando={cargando}
           />
         </ScrollView>
 
         {/* Paginación */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            marginTop: 15,
-            gap: 8,
-            overflow: "visible",
-            minHeight: 44,
-          }}
-        >
-          <View style={{ minWidth: 170 }}>
+        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+          <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
             <Paginacion
               paginaActual={paginaActual}
               totalPaginas={totalPaginas}
@@ -245,8 +223,7 @@ export default function CatalogoPlazas() {
             style={{
               color: Colores.textoClaro,
               fontSize: Fuentes.caption,
-              textAlign: esPantallaPequeña ? "center" : "right",
-              width: esPantallaPequeña ? "100%" : "auto",
+              marginTop: 15,
             }}
           >
             {`Mostrando ${filasMostradas.length} de ${filasTabla.length} resultados`}
@@ -284,7 +261,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  preTitulo: {
+  carrera: {
     fontSize: Fuentes.titulo,
     fontWeight: "700",
     color: Colores.textoPrincipal,
@@ -297,8 +274,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
-  subtituloRojo: {
-    fontSize: Fuentes.subtitulo,
+  aviso: {
+    fontSize: Fuentes.cuerpo,
     color: Colores.textoError,
     textAlign: "center",
     marginBottom: 20,

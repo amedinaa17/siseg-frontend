@@ -10,7 +10,7 @@ import { postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -57,12 +57,18 @@ export default function CambiarContraseña() {
     await cerrarSesion();
   };
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+    }
+  }, [errors]);
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>
-          <Text style={styles.titulo}>Cambiar Contraseña</Text>
+          <Text style={styles.titulo}>Cambiar contraseña</Text>
 
           <View style={{ marginBottom: 15 }}>
             <Controller

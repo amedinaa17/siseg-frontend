@@ -51,7 +51,7 @@ export default function Register() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>
-          <Text style={styles.titulo}>Registro</Text>
+          <Text style={styles.titulo}>Registrar cuenta</Text>
 
           <View style={{ marginBottom: error == '' || !error.includes("Error") ? 25 : 10 }}>
             <Controller

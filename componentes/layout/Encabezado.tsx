@@ -15,7 +15,7 @@ export default function Encabezado() {
         <Link href="/(auth)/iniciar-sesion" style={{ marginLeft: "8%" }}>
           <View style={{ width: 80, height: 80, position: 'relative' }}>
             <Image
-              source={require('@/activos/imagenes/siseg.png')}
+              source={require('@/activos/imagenes/enmyh.png')}
               style={[styles.logo, { marginTop: esMovil ? 0 : 12 }]}
             />
             <View style={[styles.logoTail, { marginTop: esMovil ? 80 : 91.5 }]} />

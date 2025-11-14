@@ -5,10 +5,7 @@ export const correoEsquema = z.object({
   correo: z
     .string()
     .nonempty("El correo electrónico institucional es obligatorio")
-    .endsWith(
-      "@alumno.ipn.mx",
-      "El correo electrónico debe ser institucional (@alumno.ipn.mx)"
-    ),
+    .endsWith(".ipn.mx", "El correo electrónico debe ser institucional (.ipn.mx)"),
 });
 
 export type CorreoFormulario = z.infer<typeof correoEsquema>;
@@ -334,7 +331,7 @@ export const personalEsquema = z.object({
     .string()
     .nonempty("El correo es obligatorio")
     .email("Formato de correo inválido")
-    .endsWith("@alumno.ipn.mx", "Debe ser un correo institucional (@alumno.ipn.mx)"),
+    .endsWith(".ipn.mx", "El correo electrónico debe ser institucional (.ipn.mx)"),
 
   telcelular: z
     .string()
@@ -386,9 +383,8 @@ export const CARRERAS_PLAZA = [
 ] as const;
 
 export const plazaEsquema = z.object({
-  carrera: z.enum(CARRERAS_PLAZA, {
-    required_error: "Selecciona una carrera",
-    invalid_type_error: "Selecciona una carrera válida",
+  carrera: z.enum(CARRERAS_PLAZA).refine((val) => CARRERAS_PLAZA.includes(val), {
+    message: "Selecciona una carrera válida",
   }),
 
   promocion: z
@@ -405,7 +401,7 @@ export const plazaEsquema = z.object({
     .nonempty("La sede es obligatoria")
     .min(3, "La sede debe tener al menos 3 caracteres"),
 
-  estatus: z.union([z.literal(0), z.literal(1)]),  
+  estatus: z.union([z.literal(0), z.literal(1)]),
 
   beca: z
     .string()

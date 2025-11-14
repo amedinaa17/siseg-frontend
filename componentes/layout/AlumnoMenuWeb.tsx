@@ -24,7 +24,7 @@ export default function AlumnoMenuWeb() {
     if (pathname === "/") return "inicio";
     if (["/expediente-digital", "/acuse-solicitud"].includes(pathname)) return "expediente";
     if (pathname === "/curso-induccion") return "curso";
-    if (["/catalogo-plazas", "/plaza-asignada"].includes(pathname)) return "plazas";
+    if (["/plazas", "/plaza-asignada"].includes(pathname)) return "plazas";
     if (["/reportes-riesgo", "/encuesta-satisfaccion"].includes(pathname)) return "reportes";
     if (pathname === "/mi-perfil") return "perfil";
     return null;
@@ -186,20 +186,20 @@ export default function AlumnoMenuWeb() {
 
               {mostrarSubmenuPlazas && (
                 <View style={menuHamburguesa ? styles.submenuHamburguesa : styles.submenu}>
-                  <Link href="/(app)/(alumno)/catalogo-plazas" asChild>
+                  <Link href="/(app)/(alumno)/plazas" asChild>
                     <Pressable
-                      onHoverIn={() => setmenuItemHoverSubItem("catalogo-plazas")}
+                      onHoverIn={() => setmenuItemHoverSubItem("plazas")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
                       onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text
                         style={[
                           styles.submenuitem,
-                          menuItemHoverSubItem === "catalogo-plazas" &&
+                          menuItemHoverSubItem === "plazas" &&
                             styles.submenuItemHover,
                         ]}
                       >
-                        Cátalogo de Plazas
+                        Plazas
                       </Text>
                     </Pressable>
                   </Link>

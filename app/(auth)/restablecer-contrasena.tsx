@@ -51,7 +51,7 @@ export default function ResetPassword() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>
-          <Text style={styles.titulo}>Restablecer Contraseña</Text>
+          <Text style={styles.titulo}>Restablecer contraseña</Text>
 
           <View style={{ marginBottom: error.includes("@") || error === "" ? 25 : 10 }}>
             <Controller

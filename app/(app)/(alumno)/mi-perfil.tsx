@@ -22,7 +22,7 @@ export default function MiPerfil() {
     const [vista, setVista] = useState<1 | 2 | 3>(1);
 
     const { width } = useWindowDimensions();
-    const esPantallaPequeña = width < 600;
+    const esPantallaPequeña = width < 790;
 
     useEffect(() => {
         const obtenerDatos = async () => {
@@ -111,6 +111,18 @@ export default function MiPerfil() {
         }
     };
 
+    useEffect(() => {
+        if (Object.keys(errorsPerfil).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errorsPerfil]);
+
+    useEffect(() => {
+        if (Object.keys(errorsContraseña).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errorsContraseña]);
+
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -123,49 +135,49 @@ export default function MiPerfil() {
                 >
                     {vista === 1 && (
                         <>
-                            <Text style={styles.titulo}>Mi Perfil</Text>
+                            <Text style={styles.titulo}>Perfil</Text>
 
-                            <View style={{ marginBottom: 15, pointerEvents: "none" }} >
+                            <View style={{ marginBottom: 15 }} >
                                 <Entrada label="Nombre" value={datosAlumno?.nombre || ""} editable={false} />
                             </View>
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Apellido Paterno" value={datosAlumno?.apellido_paterno || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Apellido Materno" value={datosAlumno?.apellido_materno || ""} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="CURP" value={datosAlumno?.curp || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="RFC" value={datosAlumno?.rfc || ""} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Boleta" value={datosAlumno?.boleta || ""} keyboardType="numeric" editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Carrera" value={datosAlumno?.carrera || ""} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Generación" value={datosAlumno?.generacion || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Promedio" value={datosAlumno?.promedio || ""} keyboardType="decimal-pad" editable={false} />
                                 </View>
                             </View>
 
-                            <View style={{ marginBottom: 15, pointerEvents: "none" }}>
+                            <View style={{ marginBottom: 15 }}>
                                 <Entrada
                                     label="Correo Electrónico Institucional"
                                     value={datosAlumno?.correo || ""}
@@ -175,28 +187,28 @@ export default function MiPerfil() {
                             </View>
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Calle y Número" value={datosAlumno?.calle_y_numero || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Colonia" value={datosAlumno?.colonia || ""} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Delegación / Municipio" value={datosAlumno?.delegacion || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Estado de Procedencia" value={datosAlumno?.estado || ""} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Código Postal" value={datosAlumno?.cp || ""} keyboardType="numeric" editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Selector
                                         label="Sexo"
                                         selectedValue={datosAlumno ? (datosAlumno.sexo === "F" ? "Femenino" : "Masculino") : ""}
@@ -210,10 +222,10 @@ export default function MiPerfil() {
                             </View>
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular || ""} keyboardType="phone-pad" editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 25, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 25 }}>
                                     <Entrada label="Teléfono Local" value={datosAlumno?.tellocal || ""} keyboardType="phone-pad" editable={false} />
                                 </View>
                             </View>
@@ -231,7 +243,7 @@ export default function MiPerfil() {
                     )}
                     {vista === 2 && (
                         <>
-                            <Text style={styles.titulo}>Modificar Datos</Text>
+                            <Text style={styles.titulo}>Modificar datos</Text>
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                                 <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.calle && !errorsPerfil.colonia ? 30 : 15 }}>
@@ -372,7 +384,7 @@ export default function MiPerfil() {
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Boton
-                                        title={enviandoPerfil ? "Guardando…" : "Guardar Cambios"}
+                                        title={enviandoPerfil ? "Guardando…" : "Guardar cambios"}
                                         onPress={handlePerfil(onSubmitPerfil)}
                                         disabled={enviandoPerfil}
                                     />
@@ -383,7 +395,7 @@ export default function MiPerfil() {
 
                     {vista === 3 && (
                         <>
-                            <Text style={styles.titulo}>Cambiar Contraseña</Text>
+                            <Text style={styles.titulo}>Cambiar contraseña</Text>
 
                             <View style={{ marginBottom: 15 }}>
                                 <Controller
@@ -394,7 +406,6 @@ export default function MiPerfil() {
                                         <Entrada
                                             label="Nueva Contraseña"
                                             secureTextEntry
-                                            defaultValue=""
                                             value={value}
                                             onChangeText={onChange}
                                             error={errorsContraseña.contraseña?.message}
@@ -412,7 +423,6 @@ export default function MiPerfil() {
                                         <Entrada
                                             label="Confirmar Contraseña"
                                             secureTextEntry
-                                            defaultValue=""
                                             value={value}
                                             onChangeText={onChange}
                                             error={errorsContraseña.confirmarContraseña?.message}

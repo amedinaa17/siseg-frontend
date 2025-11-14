@@ -20,7 +20,7 @@ import { WebView } from "react-native-webview";
 
 export default function AcuseSolicitud() {
   const { width } = useWindowDimensions();
-  const esPantallaPequeña = width < 600;
+  const esPantallaPequeña = width < 790;
   const webViewRef = useRef<any>(null);
   const { sesion } = useAuth();
   const modalAPI = useRef<ModalAPIRef>(null);
@@ -38,7 +38,7 @@ export default function AcuseSolicitud() {
           setDatosAlumno(response.data);
         } else {
           console.error(response.message);
-          modalAPI.current?.show(false, "No se pudieron obtener los datos del alumno.");
+          modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
         }
       } catch (error) {
         modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
@@ -51,117 +51,117 @@ export default function AcuseSolicitud() {
 
   const generarHTML = useCallback(
     (includePrintButton: boolean) => `
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Servicio Social: Solicitud de Registro al Servicio Social</title>
-<style type="text/css">
-  .titulo { text-align: justify; margin: 0 auto; font-family: Calibri; font-size: 20px; }
-  .contenido { text-align: justify; margin: 0 auto; font-family: Calibri; font-size: 15px; }
-  .texto { text-align: justify; margin: 0 auto; font-family: Calibri; font-size: 20px; line-height: 30px; }
-  .fin { text-align: center; margin: 0 auto; font-family: Arial, Helvetica, sans-serif; font-size: 10px; }
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Servicio Social: Solicitud de Registro al Servicio Social</title>
+    <style type="text/css">
+      .titulo { text-align: justify; margin: 0 auto; font-family: Calibri; font-size: 20px; }
+      .contenido { text-align: justify; margin: 0 auto; font-family: Calibri; font-size: 15px; }
+      .texto { text-align: justify; margin: 0 auto; font-family: Calibri; font-size: 20px; line-height: 30px; }
+      .fin { text-align: center; margin: 0 auto; font-family: Arial, Helvetica, sans-serif; font-size: 10px; }
 
-  .nover {
-    background-color: #333; 
-    color: #fff; 
-    font-family: Calibri, sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    margin: 16px auto;
-    display: block;
-  }
-  .nover:hover { background-color: #555; transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0,0,0,0.3); }
-  .nover:active { transform: translateY(1px); box-shadow: 0 3px 5px rgba(0,0,0,0.2); }
+      .nover {
+        background-color: #333; 
+        color: #fff; 
+        font-family: Calibri, sans-serif;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        margin: 16px auto;
+        display: block;
+      }
+      .nover:hover { background-color: #555; transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0,0,0,0.3); }
+      .nover:active { transform: translateY(1px); box-shadow: 0 3px 5px rgba(0,0,0,0.2); }
 
-  @media print { .nover { display: none; } }
-</style>
-</head>
+      @media print { .nover { display: none; } }
+    </style>
+    </head>
 
-<body>
-  <div align="center">
-    <img src="http://148.204.10.106/ServicioSocial/cabezacarta.png" width="871">
-  </div>
+    <body>
+      <div align="center">
+        <img src="http://148.204.10.106/ServicioSocial/cabezacarta.png" width="871">
+      </div>
 
-  <table width="681" border="0" cellspacing="0" cellpadding="0" align="center">
-    <tbody>
-      <tr>
-        <td width="681" class="titulo" background="http://148.204.10.106/ServicioSocial/LugarFoto.png">
-          <div align="center">
-            <p><strong><u>SOLICITUD DE REGISTRO <br> SERVICIO SOCIAL</u></strong></p>
-            <p><strong>PROMOCIÓN: AGOSTO 2025 – JULIO 2026</strong></p>
-            <strong>MÉDICO CIRUJANO Y HOMEÓPATA</strong>
-          </div>
-        </td>
-      </tr>
+      <table width="681" border="0" cellspacing="0" cellpadding="0" align="center">
+        <tbody>
+          <tr>
+            <td width="681" class="titulo" background="http://148.204.10.106/ServicioSocial/LugarFoto.png">
+              <div align="center">
+                <p><strong><u>SOLICITUD DE REGISTRO <br> SERVICIO SOCIAL</u></strong></p>
+                <p><strong>PROMOCIÓN: AGOSTO 2025 – JULIO 2026</strong></p>
+                <strong>MÉDICO CIRUJANO Y HOMEÓPATA</strong>
+              </div>
+            </td>
+          </tr>
 
-      <tr>
-        <td>
-          <table width="709" border="1" align="center" cellpadding="0" cellspacing="0" class="contenido">
-            <tbody>
-              <tr>
-                <td colspan="2">Nombre:
-                  ${datosAlumno?.nombre ?? ""} ${datosAlumno?.apellido_paterno ?? ""} ${datosAlumno?.apellido_materno ?? ""}</td>
-              </tr>
-              <tr>
-                <td>No. boleta: ${datosAlumno?.boleta ?? ""}</td>
-                <td>CURP: ${datosAlumno?.curp ?? ""}</td>
-              </tr>
-              <tr><td colspan="2">Domicilio: ${datosAlumno?.calle_y_numero ?? ""}</td></tr>
-              <tr>
-                <td colspan="2">
-                  Colonia: ${datosAlumno?.colonia ?? ""}
-                  <br>Delegación/Municipio: ${datosAlumno?.delegacion ?? ""}
-                  <br>Estado: ${datosAlumno?.estado ?? ""}
-                  <br>Código postal: ${datosAlumno?.cp ?? ""}
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  Teléfono local: ${datosAlumno?.tellocal ?? ""}
-                  <br>Celular: ${datosAlumno?.telcelular ?? ""} </td>
-                <td>
-                  Correo electrónico: <br>${datosAlumno?.correo ?? ""}  </td>
-              </tr>
-            </tbody>
-          </table>
-        </td>
-      </tr>
+          <tr>
+            <td>
+              <table width="709" border="1" align="center" cellpadding="0" cellspacing="0" class="contenido">
+                <tbody>
+                  <tr>
+                    <td colspan="2">Nombre:
+                      ${datosAlumno?.nombre ?? ""} ${datosAlumno?.apellido_paterno ?? ""} ${datosAlumno?.apellido_materno ?? ""}</td>
+                  </tr>
+                  <tr>
+                    <td>No. boleta: ${datosAlumno?.boleta ?? ""}</td>
+                    <td>CURP: ${datosAlumno?.curp ?? ""}</td>
+                  </tr>
+                  <tr><td colspan="2">Domicilio: ${datosAlumno?.calle_y_numero ?? ""}</td></tr>
+                  <tr>
+                    <td colspan="2">
+                      Colonia: ${datosAlumno?.colonia ?? ""}
+                      <br>Delegación/Municipio: ${datosAlumno?.delegacion ?? ""}
+                      <br>Estado: ${datosAlumno?.estado ?? ""}
+                      <br>Código postal: ${datosAlumno?.cp ?? ""}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Teléfono local: ${datosAlumno?.tellocal ?? ""}
+                      <br>Celular: ${datosAlumno?.telcelular ?? ""} </td>
+                    <td>
+                      Correo electrónico: <br>${datosAlumno?.correo ?? ""}  </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
 
-      <tr align="center">
-        <td class="texto" align="center">
-          <p align="justify">Con la firma de este registro <strong>me comprometo</strong> a sujetarme a los lineamientos
-            del Servicio Social de la NORMA OFICIAL 034 Y DEL REGLAMENTO DE SERVICIO SOCIAL DE ÁREA DE LA SALUD,
-            cumplirlo en forma y en el período manifestado, así como observar una conducta ejemplar durante la
-            permanencia en el lugar asignado y procurar acrecentar el prestigio del
-            <strong>INSTITUTO POLITÉCNICO NACIONAL</strong>.</p>
-          <p align="center">
-            <strong>DE CONFORMIDAD</strong><br><br>
-            <strong>_______________________________</strong>
-            <br>${datosAlumno?.nombre ?? ""} ${datosAlumno?.apellido_paterno ?? ""} ${datosAlumno?.apellido_materno ?? ""}
-          </p>
-        </td>
-      </tr>
+          <tr align="center">
+            <td class="texto" align="center">
+              <p align="justify">Con la firma de este registro <strong>me comprometo</strong> a sujetarme a los lineamientos
+                del Servicio Social de la NORMA OFICIAL 034 Y DEL REGLAMENTO DE SERVICIO SOCIAL DE ÁREA DE LA SALUD,
+                cumplirlo en forma y en el período manifestado, así como observar una conducta ejemplar durante la
+                permanencia en el lugar asignado y procurar acrecentar el prestigio del
+                <strong>INSTITUTO POLITÉCNICO NACIONAL</strong>.</p>
+              <p align="center">
+                <strong>DE CONFORMIDAD</strong><br><br>
+                <strong>_______________________________</strong>
+                <br>${datosAlumno?.nombre ?? ""} ${datosAlumno?.apellido_paterno ?? ""} ${datosAlumno?.apellido_materno ?? ""}
+              </p>
+            </td>
+          </tr>
 
-      <tr class="fin">
-        <td><p align="center"><img src="http://148.204.10.106/ServicioSocial/piecarta.png" width="871"></p></td>
-      </tr>
-    </tbody>
-  </table>
+          <tr class="fin">
+            <td><p align="center"><img src="http://148.204.10.106/ServicioSocial/piecarta.png" width="871"></p></td>
+          </tr>
+        </tbody>
+      </table>
 
-  ${includePrintButton
+      ${includePrintButton
         ? `<div align="center">
-          <input type="button" name="imprimir" value="Imprimir" class="nover" onclick="window.print();">
-        </div>`
+              <input type="button" name="imprimir" value="Imprimir" class="nover" onclick="window.print();">
+            </div>`
         : ``
       }
-</body>
-</html>`,
+    </body>
+    </html>`,
     [datosAlumno]
   );
 
@@ -190,11 +190,11 @@ export default function AcuseSolicitud() {
       if (puedeCompartir) {
         await Sharing.shareAsync(nuevoNombre, { mimeType: "application/pdf" });
       } else {
-        modalAPI.current?.show(true, `Archivo PDF guardado en:\n${nuevoNombre}`);
+        modalAPI.current?.show(true, `Archivo PDF descargado en:\n${nuevoNombre}`);
       }
     } catch (e: any) {
       console.error(e);
-      modalAPI.current?.show(false, "No se pudo generar o compartir el PDF.");
+      modalAPI.current?.show(false, "Hubo un problema al generar el PDF. Inténtalo de nuevo más tarde.");
     } finally {
       setCargando(false);
     }
@@ -212,9 +212,12 @@ export default function AcuseSolicitud() {
           Acuse de solicitud de registro al servicio social
         </Text>
 
-        <Text style={styles.texto}>
-          Confirma la información del documento antes de imprimir o descargar.
+        <Text style={styles.subtitulo}>
+          Descarga e imprime tu Acuse de Solicitud de Registro al Servicio Social. Deberás pegar en el lado superior izquierdo una fotografía tamaño infantil actual a color y firmarlo.
         </Text>
+
+        <Text style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>Importante: Verifica que tu información sea correcta antes de imprimir o descargar el acuse.</Text>
+
 
         {Platform.OS !== "web" && (
           <View style={{ alignItems: "center", marginTop: 12 }}>
@@ -286,11 +289,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  texto: {
+  subtitulo: {
     fontSize: Fuentes.cuerpo,
-    textAlign: "justify",
-    paddingHorizontal: 15,
-    paddingVertical: 8,
+    color: Colores.textoSecundario,
+    textAlign: "center",
+    paddingHorizontal: 12,
+    marginBottom: 8,
   },
   botonPrimario: {
     backgroundColor: "#333",

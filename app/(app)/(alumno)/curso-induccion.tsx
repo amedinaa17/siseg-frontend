@@ -10,7 +10,7 @@ import { Image, Platform, ScrollView, StyleSheet, Text, View, useWindowDimension
 
 export default function CursoInduccion() {
   const { width } = useWindowDimensions();
-  const esPantallaPequeña = width < 600;
+  const esPantallaPequeña = width < 790;
   const { sesion } = useAuth();
 
   const [codigoQR, setCodigoQR] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export default function CursoInduccion() {
         if (match && match[1]) {
           setCodigoQR(match[1]);
         } else {
-          modalRef.current?.show(false, "No se encontró el código QR en la respuesta.");
+          modalRef.current?.show(false, "Hubo un problema al obtener tu código QR del servidor. Inténtalo de nuevo más tarde.");
         }
       } catch (error) {
         console.error("Error en la solicitud:", error);
@@ -86,11 +86,11 @@ export default function CursoInduccion() {
       >
         <Text style={styles.titulo}>Curso de inducción</Text>
 
-        <Text style={styles.texto}>
+        <Text style={styles.subtitulo}>
           Este código QR es único y personal para cada alumno. Se utilizará para registrar su asistencia al curso de inducción del servicio social.
         </Text>
 
-        <Text style={styles.textoRojo}>
+        <Text style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>
           Importante: Presenta este código en el momento de ingresar al curso. No debe ser compartido ni reutilizado.
         </Text>
 
@@ -137,18 +137,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  texto: {
+  subtitulo: {
     fontSize: Fuentes.cuerpo,
-    textAlign: "justify",
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-  },
-  textoRojo: {
-    fontSize: Fuentes.cuerpo,
-    color: "red",
-    textAlign: "justify",
-    paddingHorizontal: 15,
-    paddingVertical: 8,
+    color: Colores.textoSecundario,
+    textAlign: "center",
+    paddingHorizontal: 12,
+    marginBottom: 8,
   },
   logo: {
     alignSelf: "center",

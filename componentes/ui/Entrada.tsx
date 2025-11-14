@@ -15,6 +15,7 @@ export default function Entrada({
   onFocus,
   onBlur,
   style,
+  editable = true,
   secureTextEntry,
   ...props
 }: Propiedades) {
@@ -35,7 +36,7 @@ export default function Entrada({
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-    color: error ? Colores.textoError : focused ? Colores.textoInfo : Colores.textoClaro,
+    color: error ? Colores.textoError : focused && editable ? Colores.textoInfo : Colores.textoClaro,
     backgroundColor: Colores.fondo,
     paddingHorizontal: 4,
   };
@@ -48,7 +49,7 @@ export default function Entrada({
           {
             borderColor: error
               ? Colores.textoError
-              : focused
+              : focused && editable
                 ? Colores.textoInfo
                 : Colores.borde,
           },
@@ -57,6 +58,7 @@ export default function Entrada({
         <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
         <TextInput
           {...props}
+          editable={editable}
           value={value}
           secureTextEntry={secureTextEntry && !mostrarContraseña}
           onFocus={(e) => {
@@ -74,6 +76,7 @@ export default function Entrada({
               ? ({ outlineStyle: "none" } as any)
               : null,
           ]}
+          multiline={true}
         />
 
         {secureTextEntry && (
@@ -106,13 +109,14 @@ const styles = StyleSheet.create({
     position: "relative",
     flexDirection: "row",
     alignItems: "center",
+    paddingTop: 10,
   },
   entrada: {
     flex: 1,
-    height: 48,
+    height: 38,
     fontSize: 15,
     paddingHorizontal: 12,
-    paddingTop: 10,
+    paddingTop: 5,
     paddingBottom: 6,
     color: Colores.textoPrincipal,
   },
