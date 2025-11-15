@@ -1,8 +1,14 @@
 {
   "responseOverrides": {
     "404": {
-      "rewrite": "/+not-found", 
+      "rewrite": "/+not-found",
       "statusCode": 404
     }
-  }
+  },
+  "routes": [
+    {
+      "route": "/+not-found",
+      "statusCode": 404
+    }
+  ]
 }
