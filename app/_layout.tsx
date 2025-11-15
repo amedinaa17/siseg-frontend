@@ -18,27 +18,63 @@ function AuthGate() {
 
     if (typeof document !== "undefined") document.title = "SISEG";
 
-    const enGrupoAuth = segmentos[0] === "(auth)";
-    const enGrupoApp = segmentos[0] === "(app)";
-    const enSubgrupo = segmentos[1];
+    const grupo = segmentos[0];
+    const subgrupo = segmentos[1];
 
-    // Redirigir según la sesión y rol del usuario
-    if (segmentos[0] == "+not-found") {
+    const enGrupoAuth = grupo === "(auth)";
+    const enGrupoApp = grupo === "(app)";
+
+    console.log(segmentos);
+
+    // 404
+    if (grupo === "+not-found") {
       router.replace("/+not-found");
-    } else if (!sesion && !enGrupoAuth) {
-      router.replace("/(auth)/iniciar-sesion");
-    } else if (sesion?.estatus === 0) {
-        router.replace("/(auth)/cambiar-contrasena");
-    } else if (sesion?.rol === "ALUMNO") {
-      if (!enGrupoApp || enSubgrupo !== "(alumno)") {
-        router.replace("/(app)/(alumno)");
+      return;
+    }
+
+    // Si NO hay sesión
+    if (!sesion) {
+      if (!enGrupoAuth) {
+        router.replace("/(auth)/iniciar-sesion");
       }
-    } else if (sesion?.rol === "P_ADMIN") {
-      if (!enGrupoApp || enSubgrupo !== "(administrativo)") {
+      return;
+    }
+
+    // Si HAY sesión
+    if (enGrupoAuth) {
+      // Cambiar contraseña en primer inicio de sesión
+      if (sesion.estatus === 0) {
+        router.replace("/(auth)/cambiar-contrasena");
+        return;
+      }
+
+      // Redirigir según rol
+      if (sesion.rol === "ALUMNO") {
+        router.replace("/(app)/(alumno)");
+        return;
+      }
+      if (sesion.rol === "P_ADMIN") {
         router.replace("/(app)/(administrativo)");
+        return;
       }
     }
-  }, [segmentos, montado]);
+
+    // Si HAY sesión y está en (app)
+    if (sesion.rol === "ALUMNO") {
+      if (!enGrupoApp || subgrupo !== "(alumno)") {
+        router.replace("/(app)/(alumno)");
+      }
+      return;
+    }
+
+    if (sesion.rol === "P_ADMIN") {
+      if (!enGrupoApp || subgrupo !== "(administrativo)") {
+        router.replace("/(app)/(administrativo)");
+      }
+      return;
+    }
+
+  }, [segmentos, montado, sesion, cargando, router]);
 
   useEffect(() => {
     verificarToken();

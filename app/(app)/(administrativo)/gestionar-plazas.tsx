@@ -4,10 +4,9 @@ import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Paginacion from "@/componentes/ui/Paginacion";
 import Selector from "@/componentes/ui/Selector";
-import SelectorArchivo from "@/componentes/ui/SelectorArchivo";
 import Tabla from "@/componentes/ui/Tabla";
 import { useAuth } from "@/context/AuthProvider";
-import { CARRERAS_PLAZA, plazaEsquema, type PlazaFormulario } from "@/lib/validacion";
+import { plazaEsquema, type PlazaFormulario } from "@/lib/validacion";
 import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
@@ -60,25 +59,13 @@ export default function GestionPlazas() {
         obtenerPlazas();
     }, []);
 
-    const carreraLabel = (c: any) => {
-        if (typeof c === "number") return c === 1 ? "Médico Cirujano y Homeópata" : c === 2 ? "Médico Cirujano y Partero" : String(c);
-        const s = String(c || "").toLowerCase();
-        if (s.includes("homeó") || s.includes("homeop")) return "Médico Cirujano y Homeópata";
-        if (s.includes("parter")) return "Médico Cirujano y Partero";
-        return String(c || "");
-    };
-
-    const plazasFiltradas = (plazas ?? []).filter(p => {
-        const txt = `${p.sede} ${p.promocion} ${carreraLabel(p.carrera)}`.toLowerCase();
-        const matchQ = !busqueda || txt.includes(busqueda.toLowerCase());
-        const matchCarrera =
-            filtroCarrera === "Todos" ||
-            carreraLabel(p.carrera).toLowerCase().includes(filtroCarrera.toLowerCase());
-        const matchEstatus =
-            filtroEstatus === "Todos" ||
-            String(p.estatus) === (filtroEstatus === "Baja" ? "0" : filtroEstatus === "Alta" ? "1" : filtroEstatus);
-        return matchQ && matchCarrera && matchEstatus;
-    });
+    const plazasFiltradas = plazas.filter(plaza => (
+        plaza.sede.toLowerCase().includes(busqueda.toLowerCase()) ||
+        plaza.promocion.toLowerCase().includes(busqueda.toLowerCase())
+    ) &&
+        (filtroEstatus === "Todos" || plaza.estatus === (filtroEstatus === "Baja" ? 0 : 1)) &&
+        (filtroCarrera === "Todos" || plaza.carrera === (filtroCarrera === "Partero" ? 2 : 1))
+    );
 
     const totalPaginas = Math.max(1, Math.ceil(plazasFiltradas.length / filasPorPagina));
     const plazasMostradas = plazasFiltradas.slice(
@@ -90,23 +77,9 @@ export default function GestionPlazas() {
         control: controlAgregar,
         handleSubmit: handleSubmitAgregar,
         reset: resetAgregar,
-        formState: { errors: errorsAgregar, isSubmitting: isSubmittingAgregar },
-    } = useForm<PlazaFormulario>({
-        resolver: zodResolver(plazaEsquema),
-        defaultValues: {
-            carrera: "Médico Cirujano y Homeópata",
-            promocion: "",
-            programa: "",
-            sede: "",
-            estatus: 1,
-            beca: "",
-            tarjeta: 1,
-            ubicacion: "",
-        },
-    });
-
-    const carreraToId = (c: PlazaFormulario["carrera"]) =>
-        c === "Médico Cirujano y Homeópata" ? 1 : 2;
+        formState: { errors: errorsAgregar, isSubmitting: isSubmittingAgregar } } = useForm<PlazaFormulario>({
+            resolver: zodResolver(plazaEsquema),
+        });
 
     const onSubmitAgregar = async (data: PlazaFormulario) => {
         verificarToken();
@@ -114,7 +87,8 @@ export default function GestionPlazas() {
         try {
             const payload = {
                 ...data,
-                carrera: carreraToId(data.carrera), 
+                carrera: data.carrera === "Médico Cirujano y Homeópata" ? 1 : 2,
+                estatus: data.estatus === "Baja" ? 0 : 1,
                 tk: sesion.token,
             };
 
@@ -126,7 +100,7 @@ export default function GestionPlazas() {
                 obtenerPlazas();
                 modalAPI.current?.show(true, "La plaza se ha registrado correctamente.");
             } else {
-                modalAPI.current?.show(false, response.message || "Hubo un problema al registrar la plaza.");
+                modalAPI.current?.show(false, "Hubo un problema al registrar la plaza. Inténtalo de nuevo más tarde.");
             }
         } catch {
             modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
@@ -148,10 +122,10 @@ export default function GestionPlazas() {
             setModalDarBaja(false);
 
             if (response.error === 0) {
-                modalAPI.current?.show(true, "La plaza se ha eliminado de forma correctamente.");
+                modalAPI.current?.show(true, "La plaza se ha dado de baja correctamente.");
                 obtenerPlazas();
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al eliminar la plaza. Inténtalo de nuevo más tarde.");
+                modalAPI.current?.show(false, "Hubo un problema al dar de baja la plaza. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
             setModalDarBaja(false);
@@ -159,84 +133,10 @@ export default function GestionPlazas() {
         }
     };
 
-    const {
-        handleSubmit: handleSubmitCargar,
-        formState: { isSubmitting: isSubmittingCargar } } = useForm<any>();
-
-    const subirArchivo = async (formData: FormData) => {
-        verificarToken();
-
-        try {
-            const response = await postData(
-                `users/cargarAlumnos?tk=${sesion?.token}&nombre=excel`,
-                formData
-            );
-
-            if (response.error === 0) {
-                setModalCargar(false);
-                setArchivoSeleccionado(null);
-                obtenerPlazas();
-
-                const totalErrores = response.errores.length;
-                const totalCorrectos = response.totalAlumnos - totalErrores - 1;
-                const resumen =
-                    `${totalCorrectos} alumno(s) se han registrado correctamente.\n` +
-                    `${totalErrores} errores encontrados.\n\nDetalles:\n` +
-                    (totalErrores > 0
-                        ? response.errores
-                            .map((e, i) => {
-                                const match = e.error.match(/(\d+)$/);
-                                const boleta = match ? match[1] : "Desconocido";
-
-                                const mensaje = e.error.includes("ya está registrada")
-                                    ? "Boleta duplicada"
-                                    : e.error.includes("inválida")
-                                        ? "Matrícula inválida"
-                                        : e.error;
-
-                                return `${i + 1}. [${boleta}] ${mensaje}.`;
-                            })
-                            .join('\n')
-                        : ""
-                    );
-                modalAPI.current?.show(true, resumen);
-            } else {
-                modalAPI.current?.show(false, "Hubo un problema al subir el archivo. Verifica el formato e inténtalo de nuevo.");
-            }
-        } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
-        }
-    };
-
-    const handleSubirArchivo = () => {
-        if (!archivoSeleccionado) {
-            setErrorArchivo("Selecciona un archivo para cargar.");
-            return;
-        } else if ((archivoSeleccionado.get("file").size / (1024 * 1024)) > 2) {
-            return;
-        }
-
-        setErrorArchivo("");
-        handleSubmitCargar(() => subirArchivo(archivoSeleccionado))();
-    };
-
-    const estatusLabel = (e: any) =>
-        typeof e === "object"
-            ? e?.DESCRIPCION ?? ""
-            : Number(e) === 1
-                ? "ALTA"
-                : Number(e) === 0
-                    ? "BAJA"
-                    : String(e ?? "");
-
-    const safeStr = (v: any) => (v === null || v === undefined ? "" : String(v));
-
     const renderModalDetalle = () => {
         if (!plazaSeleccion) return null;
 
         const { carrera, promocion, PROGRAMA, sede, estatus, tarjetaDisponible, ubicacion, tipoBeca } = plazaSeleccion;
-        const carreraTxt = typeof carreraLabel === "function" ? carreraLabel(carrera) : safeStr(carrera);
-        const estatusTxt = estatusLabel(estatus);
 
         return (
             <Modal
@@ -250,40 +150,39 @@ export default function GestionPlazas() {
                     behavior={Platform.OS === "web" ? undefined : "padding"}
                     keyboardVerticalOffset={80}
                 >
+                    <View style={{ marginTop: 5, marginBottom: 15 }}>
+                        <Entrada label="Sede" value={sede || ""} editable={false} />
+                    </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
-                            <Entrada label="Carrera" value={safeStr(carreraTxt)} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
-                            <Entrada label="Promoción" value={safeStr(promocion)} editable={false} />
-                        </View>
+                    <View style={{ marginBottom: 15 }}>
+                        <Entrada label="Ubicación" value={ubicacion || ""} editable={false} />
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
-                            <Entrada label="Programa" value={safeStr(PROGRAMA)} editable={false} />
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Entrada label="Programa" value={PROGRAMA || ""} editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
-                            <Entrada label="Número de tarjeta" value={safeStr(tarjetaDisponible)} editable={false} />
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Entrada label="Número de tarjeta" value={tarjetaDisponible || ""} editable={false} />
                         </View>
-                    </View>
-
-                    <View style={{ marginBottom: 15, pointerEvents: "none" }}>
-                        <Entrada label="Sede" value={safeStr(sede)} editable={false} />
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
-                            <Entrada label="Estatus" value={estatusTxt} editable={false} />
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Entrada label="Tipo de beca" value={tipoBeca || ""} editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
-                            <Entrada label="Tipo de beca" value={safeStr(tipoBeca)} editable={false} />
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Entrada label="Estatus" value={estatus === 0 ? "Baja" : "Alta"} editable={false} />
                         </View>
                     </View>
 
-                    <View style={{ marginBottom: 5, pointerEvents: "none" }}>
-                        <Entrada label="Ubicación" value={safeStr(ubicacion)} editable={false} />
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Entrada label="Carrera" value={carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Partero"} editable={false} />
+                        </View>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Entrada label="Promoción" value={promocion || ""} editable={false} />
+                        </View>
                     </View>
                 </KeyboardAvoidingView>
             </Modal>
@@ -303,111 +202,121 @@ export default function GestionPlazas() {
                 onAceptar={handleSubmitAgregar(onSubmitAgregar)}
             >
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
-
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Controller
-                                control={controlAgregar}
-                                name="carrera"
-                                render={({ field: { onChange, value } }) => (
-                                    <Selector
-                                        label="Carrera"
-                                        selectedValue={value}
-                                        onValueChange={onChange}
-                                        items={CARRERAS_PLAZA.map(c => ({ label: c, value: c }))}
-                                        error={errorsAgregar.carrera?.message}
-                                    />
-                                )}
-                            />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Controller
-                                control={controlAgregar}
-                                name="promocion"
-                                render={({ field }) => (
-                                    <Entrada label="Promoción" {...field} error={errorsAgregar.promocion?.message} />
-                                )}
-                            />
-                        </View>
-                    </View>
-
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Controller
-                                control={controlAgregar}
-                                name="programa"
-                                render={({ field }) => (
-                                    <Entrada label="Programa" {...field} error={errorsAgregar.programa?.message} />
-                                )}
-                            />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Controller
-                                control={controlAgregar}
-                                name="tarjeta"
-                                render={({ field: { onChange, value } }) => (
-                                    <Entrada
-                                        label="Número de tarjeta"
-                                        keyboardType="numeric"
-                                        value={value === null ? "" : String(value ?? "")}
-                                        onChangeText={(txt) => onChange(txt.replace(/[^\d]/g, ""))} 
-                                        error={errorsAgregar.tarjeta?.message}
-                                    />
-                                )}
-                            />
-
-                        </View>
-                    </View>
-
                     <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlAgregar}
                             name="sede"
+                            defaultValue=""
                             render={({ field }) => (
                                 <Entrada label="Sede" {...field} error={errorsAgregar.sede?.message} />
                             )}
                         />
                     </View>
 
+                    <View style={{ marginBottom: 15 }}>
+                        <Controller
+                            control={controlAgregar}
+                            name="ubicacion"
+                            defaultValue=""
+                            render={({ field }) => (
+                                <Entrada label="Ubicación" {...field} error={errorsAgregar.ubicacion?.message} />
+                            )}
+                        />
+                    </View>
+
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.programa && !errorsAgregar.tarjeta ? 30 : 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="programa"
+                                defaultValue=""
+                                render={({ field }) => (
+                                    <Entrada label="Programa" {...field} error={errorsAgregar.programa?.message} />
+                                )}
+                            />
+                        </View>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.tarjeta && !errorsAgregar.beca ? 30 : 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="tarjeta"
+                                defaultValue=""
+                                render={({ field }) => (
+                                    <Entrada
+                                        label="Número de tarjeta"
+                                        keyboardType="numeric"
+                                        value={field.value?.toString() ?? ""}
+                                        onChangeText={(v) => field.onChange(v)}
+                                        onBlur={field.onBlur}
+                                        error={errorsAgregar.tarjeta?.message}
+                                    />
+                                )}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.beca && !errorsAgregar.estatus ? 30 : 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="beca"
+                                defaultValue=""
+                                render={({ field }) => (
+                                    <Entrada label="Tipo de beca" {...field} error={errorsAgregar.beca?.message} />
+                                )}
+                            />
+                        </View>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.estatus && !errorsAgregar.carrera ? 30 : 15 }}>
                             <Controller
                                 control={controlAgregar}
                                 name="estatus"
+                                defaultValue=""
                                 render={({ field: { onChange, value } }) => (
                                     <Selector
                                         label="Estatus"
-                                        selectedValue={String(value)}
-                                        onValueChange={(v) => onChange(Number(v) as 0 | 1)}
+                                        selectedValue={value}
+                                        onValueChange={onChange}
                                         items={[
-                                            { label: "Baja", value: "0" },
-                                            { label: "Alta", value: "1" },
+                                            { label: "Baja", value: "Baja" },
+                                            { label: "Alta", value: "Alta" },
                                         ]}
                                         error={errorsAgregar.estatus?.message as string | undefined}
                                     />
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                    </View>
+
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.carrera && !errorsAgregar.promocion ? 30 : 15 }}>
                             <Controller
                                 control={controlAgregar}
-                                name="beca"
-                                render={({ field }) => (
-                                    <Entrada label="Tipo de beca" {...field} error={errorsAgregar.beca?.message} />
+                                name="carrera"
+                                defaultValue=""
+                                render={({ field: { onChange, value } }) => (
+                                    <Selector
+                                        label="Carrera"
+                                        selectedValue={value}
+                                        onValueChange={onChange}
+                                        items={[
+                                            { label: "Médico Cirujano y Homeópata", value: "Médico Cirujano y Homeópata" },
+                                            { label: "Médico Cirujano y Partero", value: "Médico Cirujano y Partero" },
+                                        ]}
+                                        error={errorsAgregar.carrera?.message}
+                                    />
                                 )}
                             />
                         </View>
-                    </View>
 
-                    {/* 5) Ubicación */}
-                    <View style={{ marginBottom: 5 }}>
-                        <Controller
-                            control={controlAgregar}
-                            name="ubicacion"
-                            render={({ field }) => (
-                                <Entrada label="Ubicación" {...field} error={errorsAgregar.ubicacion?.message} />
-                            )}
-                        />
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Controller
+                                control={controlAgregar}
+                                name="promocion"
+                                defaultValue=""
+                                render={({ field }) => (
+                                    <Entrada label="Promoción" {...field} error={errorsAgregar.promocion?.message} />
+                                )}
+                            />
+                        </View>
                     </View>
                 </KeyboardAvoidingView>
             </Modal>
@@ -418,40 +327,22 @@ export default function GestionPlazas() {
         if (!modalDarBaja) return null;
 
         return (
-            <Modal visible={modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de Baja Alumno" maxWidth={500}
+            <Modal visible={modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de baja plaza" maxWidth={500}
                 cancelar deshabilitado={isSubmittingDarBaja}
                 textoAceptar={isSubmittingDarBaja ? "Enviando…" : "Dar de baja"} onAceptar={() => { handleSubmitDarBaja(() => eliminarPlaza(modalDarBaja.ID))(); }}>
                 <Text style={{ marginBottom: 20 }}>
-                    ¿Estás seguro de que deseas eliminar la plaza {" "}
+                    ¿Estás seguro de que deseas dar de baja la plaza {" "}
                     <Text style={{ fontWeight: "700" }}>{modalDarBaja.sede}</Text>?
                 </Text>
             </Modal>
         );
     };
 
-    const renderModalCargarAlumnos = () => {
-        return (
-            <Modal visible={modalCargar} titulo="Cargar Alumnos" maxWidth={600}
-                onClose={() => { setModalCargar(false); setArchivoSeleccionado(null); }}
-                textoAceptar={isSubmittingCargar ? "Cargando…" : "Cargar archivo"}
-                cancelar onAceptar={handleSubirArchivo} deshabilitado={isSubmittingCargar}>
-                <Text>
-                    Para cargar alumnos al sistema, el archivo debe estar en formato Excel (.xls, .xlsx) y no puede exceder un tamaño de 2MB.
-                </Text>
-                <View style={{ marginTop: 20, marginBottom: 5 }}>
-                    <SelectorArchivo
-                        label="Archivo"
-                        allowedTypes={[".xls", ".xlsx", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]}
-                        onArchivoSeleccionado={(file) => {
-                            setArchivoSeleccionado(file);
-                            setErrorArchivo("");
-                        }}
-                        error={errorArchivo}
-                    />
-                </View>
-            </Modal>
-        );
-    };
+    useEffect(() => {
+        if (Object.keys(errorsAgregar).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errorsAgregar]);
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -460,9 +351,6 @@ export default function GestionPlazas() {
                 <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
                     <View>
                         <Boton title="Agregar plaza" onPress={() => { setModalAgregar(true) }} />
-                    </View>
-                    <View>
-                        <Boton title="Cargar plazas" onPress={() => setModalCargar(true)} disabled />
                     </View>
                 </View>
 
@@ -483,45 +371,67 @@ export default function GestionPlazas() {
                         <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
                     </View>
 
-                    <View
-                        style={[
-                            esPantallaPequeña
-                                ? { width: "100%" }
-                                : {
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    gap: 8,
-                                    width: "70%",
-                                },
-                        ]}
-                    >
-                        <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { flexGrow: 1, marginRight: 8 }]}>
-                            <Entrada label="Buscar" value={busqueda} onChangeText={setBusqueda} />
-                        </View>
-
-                        <View style={esPantallaPequeña ? { width: "100%" } : { width: 260, marginRight: 0 }}>
-                            <Selector
-                                label="Carrera"
-                                selectedValue={filtroCarrera}
-                                onValueChange={setFiltroCarrera}
-                                items={[
-                                    { label: "Todos", value: "Todos" },
-                                    { label: "Médico Cirujano y Partero", value: "Partero" },
-                                    { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
-                                ]}
+                    <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
+                        <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
+                            <Entrada
+                                label="Buscar"
+                                value={busqueda}
+                                onChangeText={setBusqueda}
                             />
                         </View>
+
+                        <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
+                            <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                                <Selector
+                                    label="Carrera"
+                                    selectedValue={filtroCarrera}
+                                    onValueChange={setFiltroCarrera}
+                                    items={[
+                                        { label: "Todos", value: "Todos" },
+                                        { label: "Médico Cirujano y Partero", value: "Partero" },
+                                        { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
+                                    ]}
+                                />
+                            </View>
+
+                            <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
+                                <Selector
+                                    label="Estatus"
+                                    selectedValue={filtroEstatus}
+                                    onValueChange={setFiltroEstatus}
+                                    items={[
+                                        { label: "Todos", value: "Todos" },
+                                        { label: "Baja", value: "Baja" },
+                                        { label: "Alta", value: "Alta" },
+                                    ]}
+                                />
+                            </View>
+                        </View>
                     </View>
-
                 </View>
-
 
                 <ScrollView horizontal={esPantallaPequeña}>
                     <Tabla
                         columnas={[
+                            { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 350 }) },
                             { key: "carrera", titulo: "Carrera", ancho: 250 },
-                            { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 250 }) },
                             { key: "promocion", titulo: "Promoción", ancho: 150 },
+                            {
+                                key: "estatus",
+                                titulo: "Estatus",
+                                ancho: 150,
+                                render: (valor) => (
+                                    <Text
+                                        style={[
+                                            styles.texto,
+                                            valor === 0 && { color: Colores.textoError },
+                                            valor === 1 && { color: Colores.textoInfo },
+                                        ]}
+                                    >
+                                        {valor === 0 ? "Baja" : "Alta"}
+                                    </Text>
+                                ),
+                            },
                             {
                                 key: "acciones",
                                 titulo: "Acciones",
@@ -532,7 +442,7 @@ export default function GestionPlazas() {
                                             onPress={() => { setModalDarBaja(fila) }}
                                             icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
                                             color={Colores.textoError}
-                                            disabled={Number(fila.estatus) === 0} 
+                                            disabled={Number(fila.estatus) === 0}
                                         />
                                     </View>
                                 ),
@@ -540,7 +450,7 @@ export default function GestionPlazas() {
                         ]}
                         datos={plazasMostradas.map((p) => ({
                             ...p,
-                            carrera: carreraLabel(p.carrera), 
+                            carrera: p.carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Partero",
                             onPress: () => { setPlazaSeleccion(p); setModalDetalle(true); },
                         }))}
                     />
@@ -548,21 +458,30 @@ export default function GestionPlazas() {
 
                 </ScrollView>
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row", marginVertical: 15, gap: 6 }}>
+                <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
                         <Paginacion
                             paginaActual={paginaActual}
                             totalPaginas={totalPaginas}
                             setPaginaActual={setPaginaActual}
                         />
                     </View>
+
+                    <Text
+                        style={{
+                            color: Colores.textoClaro,
+                            fontSize: Fuentes.caption,
+                            marginTop: 15,
+                        }}
+                    >
+                        {`Mostrando ${plazasMostradas.length} de ${plazasFiltradas.length} resultados`}
+                    </Text>
                 </View>
 
             </View>
             {renderModalDetalle()}
             {renderModalAgregar()}
             {renderModalDarBaja()}
-            {renderModalCargarAlumnos()}
             <ModalAPI ref={modalAPI} />
         </ScrollView >
     );

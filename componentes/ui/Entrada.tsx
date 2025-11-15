@@ -52,6 +52,7 @@ export default function Entrada({
               : focused && editable
                 ? Colores.textoInfo
                 : Colores.borde,
+            paddingTop: secureTextEntry ? 0 : 10
           },
         ]}
       >
@@ -72,11 +73,12 @@ export default function Entrada({
           style={[
             styles.entrada,
             style,
+            { height: secureTextEntry ? 48 : 38},
             Platform.OS === "web"
               ? ({ outlineStyle: "none" } as any)
               : null,
           ]}
-          multiline={true}
+          multiline={secureTextEntry ? false : true}
         />
 
         {secureTextEntry && (
@@ -109,11 +111,9 @@ const styles = StyleSheet.create({
     position: "relative",
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 10,
   },
   entrada: {
     flex: 1,
-    height: 38,
     fontSize: 15,
     paddingHorizontal: 12,
     paddingTop: 5,

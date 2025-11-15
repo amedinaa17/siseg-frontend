@@ -25,7 +25,7 @@ export default function AdministrativoMenuWeb() {
     if (pathname === "/") return "inicio";
     if (["/validar-documentos", "/lista-asistencia", "/gestionar-alumnos"].includes(pathname)) return "alumnos";
     if (pathname === "/gestionar-personal") return "personal";
-    if (["/catalogo-plazas", "/asignar-plaza", "/mapa-plazas"].includes(pathname)) return "plazas";
+    if (["/gestionar-plazas", "/asignar-plaza", "/mapa-plazas"].includes(pathname)) return "plazas";
     if (["/revisar-reportes-riesgo", "/reportes-encuestas"].includes(pathname)) return "reportes";
     if (pathname === "/perfil") return "perfil";
     return null;
@@ -180,16 +180,16 @@ export default function AdministrativoMenuWeb() {
 
               {mostrarSubmenuPlazas && (
                 <View style={menuHamburguesa ? styles.submenuHamburguesa : styles.submenu}>
-                  <Link href="/catalogo-plazas" asChild>
+                  <Link href="/gestionar-plazas" asChild>
                     <Pressable
-                      onHoverIn={() => setmenuItemHoverSubItem("catalogo-plazas")}
+                      onHoverIn={() => setmenuItemHoverSubItem("gestionar-plazas")}
                       onHoverOut={() => setmenuItemHoverSubItem(null)}
                       onPress={() => { toggleCerrar(); setMenuHamburguesaVisible(false) }}
                     >
                       <Text style={[
                         styles.submenuItem,
-                        menuItemHoverSubItem === "catalogo-plazas" && styles.submenuItemHover
-                      ]}>Cátalogo de Plazas</Text>
+                        menuItemHoverSubItem === "gestionar-plazas" && styles.submenuItemHover
+                      ]}>Gestionar Plazas</Text>
                     </Pressable>
                   </Link>
                   <Link href="/asignar-plaza" asChild>

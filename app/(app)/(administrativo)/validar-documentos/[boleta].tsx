@@ -83,7 +83,6 @@ export default function RevisarExpediente() {
     }
   };
 
-
   const renderModalDetalle = () => {
     if (!docSeleccionado) return null;
     const { adminEncargado, estatus, fechaRegistro, nombreArchivo,
@@ -123,7 +122,7 @@ export default function RevisarExpediente() {
         {estatus === "Pendiente" && (
           <>
             <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 15, gap: 10 }}>
-              <View style={{ flex: 1, pointerEvents: "none" }} >
+              <View style={{ flex: 1 }} >
                 <Entrada label="Archivo" value={rutaArchivo.split('/').pop()} editable={false} />
               </View>
               <Boton
@@ -132,13 +131,13 @@ export default function RevisarExpediente() {
                 icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} style={{ paddingHorizontal: 10 }} />}
               />
             </View>
-            <View style={{ pointerEvents: "none", marginBottom: 15 }} >
+            <View style={{ marginBottom: 15 }} >
               <Entrada label="Fecha de envío" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
             </View>
             {adminEncargado && (
               <>
                 <Text style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, marginBottom: 15, textAlign: "right" }}>Nota: Este documento fue rechazado anteriormente.</Text>
-                <View style={{ pointerEvents: "none", marginBottom: 15 }} >
+                <View style={{ marginBottom: 15 }} >
                   <Entrada label="Revisado anteriormente por" value={adminEncargado.nombre + " " + adminEncargado.APELLIDO_PATERNO + " " + adminEncargado.APELLIDO_MATERNO} editable={false} />
                 </View>
                 <View style={{ marginBottom: 20 }}>
@@ -180,7 +179,7 @@ export default function RevisarExpediente() {
         {estatus === "Aprobado" && (
           <>
             <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 15, gap: 10 }}>
-              <View style={{ flex: 1, pointerEvents: "none" }} >
+              <View style={{ flex: 1 }} >
                 <Entrada label="Archivo" value={rutaArchivo.split('/').pop()} editable={false} />
               </View>
               <Boton
@@ -189,13 +188,13 @@ export default function RevisarExpediente() {
                 icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} style={{ paddingHorizontal: 10 }} />}
               />
             </View>
-            <View style={{ pointerEvents: "none", marginBottom: 15 }} >
+            <View style={{ marginBottom: 15 }} >
               <Entrada label="Fecha de envío" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
             </View>
-            <View style={{ pointerEvents: "none", marginBottom: 15 }} >
+            <View style={{ marginBottom: 15 }} >
               <Entrada label="Revisado por" value={adminEncargado.nombre + " " + adminEncargado.APELLIDO_PATERNO + " " + adminEncargado.APELLIDO_MATERNO} editable={false} />
             </View>
-            <View style={{ pointerEvents: "none" }}>
+            <View>
               <EntradaMultilinea
                 label="Observaciones"
                 value={observacion}
@@ -207,7 +206,7 @@ export default function RevisarExpediente() {
         {estatus === "Rechazado" && (
           <>
             <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 15, gap: 10 }}>
-              <View style={{ flex: 1, pointerEvents: "none" }} >
+              <View style={{ flex: 1 }} >
                 <Entrada label="Archivo" value={rutaArchivo.split('/').pop()} editable={false} />
               </View>
               <Boton
@@ -216,13 +215,13 @@ export default function RevisarExpediente() {
                 icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} style={{ paddingHorizontal: 10 }} />}
               />
             </View>
-            <View style={{ pointerEvents: "none", marginBottom: 15 }} >
+            <View style={{ marginBottom: 15 }} >
               <Entrada label="Fecha de envío" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
             </View>
-            <View style={{ pointerEvents: "none", marginBottom: 15 }} >
+            <View style={{ marginBottom: 15 }} >
               <Entrada label="Revisado por" value={adminEncargado.nombre + " " + adminEncargado.APELLIDO_PATERNO + " " + adminEncargado.APELLIDO_MATERNO} editable={false} />
             </View>
-            <View style={{ pointerEvents: "none" }}>
+            <View>
               <EntradaMultilinea
                 label="Observaciones"
                 value={observacion}
@@ -277,7 +276,7 @@ export default function RevisarExpediente() {
             />
           }
         </View>
-        <Text style={styles.titulo}>Expediente Digital</Text>
+        <Text style={styles.titulo}>Expediente digital</Text>
         <Text style={styles.alumno}>{boleta}</Text>
 
         <Text style={styles.subtitulo}>Registro al servicio social</Text>

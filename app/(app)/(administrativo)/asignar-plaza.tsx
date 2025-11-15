@@ -17,7 +17,7 @@ export default function AsignarPlaza() {
     const modalAPI = useRef<ModalAPIRef>(null);
     const [alumnos, setAlumnos] = useState<any[]>([]);
     const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any | null>(null);
-    const [modalEditar, setModalEditar] = useState(false);
+    const [modalAsignar, setModalAsignar] = useState(false);
     const [plazas, setPlazas] = useState<any[]>([]);
     const [programaSeleccionado, setProgramaSeleccionado] = useState<string>("");
     const [plazaSeleccionadaId, setPlazaSeleccionadaId] = useState<string>("");
@@ -25,6 +25,7 @@ export default function AsignarPlaza() {
     const [isSubmittingAsignar, setIsSubmittingAsignar] = useState(false);
     const [busqueda, setBusqueda] = useState("");
     const [filtroCarrera, setFiltroCarrera] = useState("Todos");
+    const [filtroEstatus, setFiltroEstatus] = useState("Sin asignar");
     const [paginaActual, setPaginaActual] = useState(1);
     const [filasPorPagina, setFilasPorPagina] = useState(5);
     const { width } = useWindowDimensions();
@@ -88,9 +89,9 @@ export default function AsignarPlaza() {
         try {
             const response = await fetchData(`users/obtenerTodosAlumnos?tk=${sesion.token}`);
             if (response.error === 0) setAlumnos(response.data);
-            else modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor.");
+            else modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
         } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor.");
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
     };
 
@@ -99,9 +100,9 @@ export default function AsignarPlaza() {
         try {
             const response = await fetchData(`plaza/obtenerPlazas?tk=${sesion.token}`);
             if (response.error === 0) setPlazas(response.plazas ?? response.data ?? []);
-            else modalAPI.current?.show(false, "Hubo un problema al obtener las plazas.");
+            else modalAPI.current?.show(false, "Hubo un problema al obtener las plazas del servidor. Inténtalo de nuevo más tarde.");
         } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor.");
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
     };
 
@@ -110,39 +111,21 @@ export default function AsignarPlaza() {
         obtenerPlazas();
     }, []);
 
-    const alumnosFiltrados = alumnos
-        .filter(
-            (alumno) =>
-                `${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`
-                    .toLowerCase()
-                    .includes(busqueda.toLowerCase()) ||
-                alumno.boleta.toLowerCase().includes(busqueda.toLowerCase())
-        )
-        .filter(
-            (alumno) =>
-                filtroCarrera === "Todos" ||
-                alumno.carrera.NOMBRE === "Médico Cirujano y " + filtroCarrera
-        );
+    const alumnosFiltrados = alumnos.filter(alumno => (
+        `${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`
+            .toLowerCase()
+            .includes(busqueda.toLowerCase()) ||
+        alumno.boleta.toLowerCase().includes(busqueda.toLowerCase())
+    ) &&
+        (filtroEstatus === "Todos" || (alumno.sede ? "Asignado" : "Sin asignar") === filtroEstatus) &&
+        (filtroCarrera === "Todos" || alumno.carrera.NOMBRE === "Médico Cirujano y " + filtroCarrera)
+    );
 
     const totalPaginas = Math.ceil(alumnosFiltrados.length / filasPorPagina);
-
     const alumnosMostrados = alumnosFiltrados.slice(
         (paginaActual - 1) * filasPorPagina,
         paginaActual * filasPorPagina
     );
-
-    const datosTabla = alumnosMostrados.map((fila) => {
-        const asignado = !!Number(fila.sede);
-        const plazaObj = plazas.find((p) => getPlazaId(p) === String(fila.sede));
-        const sedeNombre = asignado ? (plazaObj ? getPlazaSede(plazaObj) : String(fila.sede)) : "";
-        return {
-            ...fila,
-            nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
-            carrera: fila.carrera?.NOMBRE ?? "",
-            sedeNombre,
-            estatusAsignacion: asignado ? "Asignado" : "Sin asignar",
-        };
-    });
 
     const asignarPlaza = async () => {
         if (!alumnoSeleccionado) return;
@@ -167,32 +150,31 @@ export default function AsignarPlaza() {
             const resp = await postData(`plaza/asignarPlaza`, payload);
             if (resp.error === 0) {
                 modalAPI.current?.show(true, "Plaza asignada correctamente.");
-                setModalEditar(false);
+                setModalAsignar(false);
                 setProgramaSeleccionado("");
                 setPlazaSeleccionadaId("");
                 setPlazaSeleccionadaLabel("");
                 await obtenerAlumnos();
             } else {
-                modalAPI.current?.show(false, resp.message || "No se pudo asignar la plaza.");
+                modalAPI.current?.show(false, "Hubo un problema al asignar la plaza. Inténtalo de nuevo más tarde.");
             }
         } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor.");
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         } finally {
             setIsSubmittingAsignar(false);
         }
     };
-    const sedeSel = plazaSeleccionada ? getPlazaSede(plazaSeleccionada) : "";
 
-    const abrirModalEditar = async (fila: any) => {
+    const abrirModalAsignar = async (fila: any) => {
         setAlumnoSeleccionado(fila);
         setProgramaSeleccionado("");
         setPlazaSeleccionadaId("");
         setPlazaSeleccionadaLabel("");
         await obtenerPlazas();
-        setModalEditar(true);
+        setModalAsignar(true);
     };
 
-    const renderModalEditar = () => {
+    const renderModalAsignar = () => {
         if (!alumnoSeleccionado) return null;
 
         const tarjetaSel = plazaSeleccionada ? getPlazaTarjeta(plazaSeleccionada) : "";
@@ -206,8 +188,8 @@ export default function AsignarPlaza() {
 
         return (
             <Modal
-                visible={modalEditar}
-                onClose={() => setModalEditar(false)}
+                visible={modalAsignar}
+                onClose={() => setModalAsignar(false)}
                 titulo={`Asignar plaza`}
                 maxWidth={700}
                 cancelar
@@ -222,75 +204,37 @@ export default function AsignarPlaza() {
                 >
                     <ModalBody>
                         <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{alumnoSeleccionado.nombre} {alumnoSeleccionado.apellido_materno} {alumnoSeleccionado.apellido_paterno}</Text>
-                        <View style={{ marginTop: 5, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ marginTop: 5, marginBottom: 15 }}>
                             <Entrada label="Boleta" value={`${alumnoSeleccionado.boleta}`} editable={false} />
                         </View>
 
-                        {Platform.OS === "web" ? (
-                            <View style={{ marginBottom: 15 }}>
-                                <Selector
-                                    label="Programa"
-                                    items={programasOpts}
-                                    selectedValue={programaSeleccionado}
-                                    onValueChange={(v) => {
-                                        setProgramaSeleccionado(v as string);
-                                        setPlazaSeleccionadaId("");
-                                        setPlazaSeleccionadaLabel("");
-                                    }}
-                                />
-                            </View>
-                        ) : (
-                            <View style={{ marginBottom: 15 }}>
-                                <Selector
-                                    label="Programa"
-                                    items={programasOpts}
-                                    selectedValue={programaSeleccionado}
-                                    onValueChange={(v) => {
-                                        setProgramaSeleccionado(v as string);
-                                        setPlazaSeleccionadaId("");
-                                        setPlazaSeleccionadaLabel("");
-                                    }}
-                                />
-                            </View>
-                        )}
-
-                        {Platform.OS === "web" ? (
-                            <View style={{ marginBottom: 15 }}>
-                                <Selector
-                                    label="Plaza"
-                                    items={plazaOptions.map(o => ({ label: o.label, value: o.label }))}
-                                    selectedValue={plazaSeleccionadaLabel}
-                                    onValueChange={(lbl) => {
-                                        const label = String(lbl || "");
-                                        setPlazaSeleccionadaLabel(label);
-                                        setPlazaSeleccionadaId(label ? (labelToId.get(label) || "") : "");
-                                    }}
-                                />
-                            </View>
-                        ) : (
-                            <View style={{ marginBottom: 15 }}>
-                                <Selector
-                                    label="Plaza"
-                                    items={plazaOptions.map(o => ({ label: o.label, value: o.label }))}
-                                    selectedValue={plazaSeleccionadaLabel}
-                                    onValueChange={(lbl) => {
-                                        const label = String(lbl || "");
-                                        setPlazaSeleccionadaLabel(label);
-                                        setPlazaSeleccionadaId(label ? (labelToId.get(label) || "") : "");
-                                    }}
-                                />
-                            </View>
-                        )}
-
                         <View style={{ marginBottom: 15 }}>
-                            <Entrada
-                                label="Sede seleccionada"
-                                value={sedeSel}
-                                editable={false}
+                            <Selector
+                                label="Programa"
+                                items={programasOpts}
+                                selectedValue={programaSeleccionado}
+                                onValueChange={(v) => {
+                                    setProgramaSeleccionado(v as string);
+                                    setPlazaSeleccionadaId("");
+                                    setPlazaSeleccionadaLabel("");
+                                }}
                             />
                         </View>
 
-                        <View style={{ marginTop: 2, marginBottom: 10, pointerEvents: "none" }}>
+                        <View style={{ marginBottom: 15 }}>
+                            <Selector
+                                label="Plaza"
+                                items={plazaOptions.map(o => ({ label: o.label, value: o.label }))}
+                                selectedValue={plazaSeleccionadaLabel}
+                                onValueChange={(lbl) => {
+                                    const label = String(lbl || "");
+                                    setPlazaSeleccionadaLabel(label);
+                                    setPlazaSeleccionadaId(label ? (labelToId.get(label) || "") : "");
+                                }}
+                            />
+                        </View>
+
+                        <View style={{ marginTop: 2, marginBottom: 10 }}>
                             <Entrada label="Número de tarjeta" value={tarjetaSel} editable={false} />
                         </View>
                     </ModalBody>
@@ -323,11 +267,15 @@ export default function AsignarPlaza() {
 
                     <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
                         <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
-                            <Entrada label="Buscar" value={busqueda} onChangeText={setBusqueda} />
+                            <Entrada
+                                label="Buscar"
+                                value={busqueda}
+                                onChangeText={setBusqueda}
+                            />
                         </View>
 
                         <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
-                            <View style={[esPantallaPequeña ? { width: "50%" } : { width: "50%" }]}>
+                            <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
                                 <Selector
                                     label="Carrera"
                                     selectedValue={filtroCarrera}
@@ -336,6 +284,18 @@ export default function AsignarPlaza() {
                                         { label: "Todos", value: "Todos" },
                                         { label: "Médico Cirujano y Partero", value: "Partero" },
                                         { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
+                                    ]}
+                                />
+                            </View>
+                            <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
+                                <Selector
+                                    label="Estatus"
+                                    selectedValue={filtroEstatus}
+                                    onValueChange={setFiltroEstatus}
+                                    items={[
+                                        { label: "Todos", value: "Todos" },
+                                        { label: "Asignado", value: "Asignado" },
+                                        { label: "Sin asignar", value: "Sin asignar" },
                                     ]}
                                 />
                             </View>
@@ -349,7 +309,7 @@ export default function AsignarPlaza() {
                             { key: "boleta", titulo: "Boleta", ancho: 130 },
                             { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
                             { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
-                            { key: "sedeNombre", titulo: "Sede", ...(esPantallaPequeña && { ancho: 250 }) },
+                            { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 350 }) },
                             {
                                 key: "estatusAsignacion",
                                 titulo: "Estatus",
@@ -375,9 +335,9 @@ export default function AsignarPlaza() {
                                         <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
                                             <Boton
                                                 onPress={async () => {
-                                                    await abrirModalEditar(fila);
+                                                    await abrirModalAsignar(fila);
                                                 }}
-                                                icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                icon={<Ionicons name="add-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
                                                 color={Colores.textoInfo}
                                                 disabled={asignado}
                                             />
@@ -386,22 +346,41 @@ export default function AsignarPlaza() {
                                 },
                             },
                         ]}
-                        datos={datosTabla}
+                        datos={alumnosMostrados.map((fila) => {
+                            const plazaObj = plazas.find((p) => getPlazaId(p) === String(fila.sede));
+                            return {
+                                ...fila,
+                                nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                                carrera: fila.carrera?.NOMBRE ?? "",
+                                sede: plazaObj ? getPlazaSede(plazaObj) : "-",
+                                estatusAsignacion: fila.sede ? "Asignado" : "Sin asignar"
+                            }
+                        })}
                     />
                 </ScrollView>
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row", marginVertical: 15, gap: 6 }}>
+                <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
                         <Paginacion
                             paginaActual={paginaActual}
                             totalPaginas={totalPaginas}
                             setPaginaActual={setPaginaActual}
                         />
                     </View>
+
+                    <Text
+                        style={{
+                            color: Colores.textoClaro,
+                            fontSize: Fuentes.caption,
+                            marginTop: 15,
+                        }}
+                    >
+                        {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
+                    </Text>
                 </View>
             </View>
 
-            {renderModalEditar()}
+            {renderModalAsignar()}
             <ModalAPI ref={modalAPI} />
         </ScrollView>
     );

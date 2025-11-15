@@ -10,7 +10,6 @@ import { Colores, Fuentes } from "@/temas/colores";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
-
 type Alumno = {
   boleta: string;
   nombre: string;
@@ -29,7 +28,6 @@ type Encuesta = {
   respuesta?: string | null;
 };
 
-type ScaleValue = 1 | 2 | 3 | 4 | 5;
 type Question = {
   index: number;
   text: string;
@@ -37,15 +35,15 @@ type Question = {
 };
 
 const QUESTIONS: Question[] = [
-  { index: 1,  text: "¿Cómo consideras que es el ambiente de trabajo en la institución?", scale: "AGREE" },
-  { index: 2,  text: "¿Cuentas con los recursos y herramientas necesarios para realizar tus actividades?", scale: "FREQ" },
-  { index: 3,  text: "¿Tu lugar de trabajo es seguro y cómodo?", scale: "AGREE" },
-  { index: 4,  text: "¿Las actividades que realizas están relacionadas con tu formación académica?", scale: "FREQ" },
-  { index: 5,  text: "¿Te asignan tareas claras y organizadas?", scale: "FREQ" },
-  { index: 6,  text: "¿Se respeta tu horario establecido en la carta compromiso?", scale: "FREQ" },
-  { index: 7,  text: "¿Recibes orientación o supervisión por parte del responsable del hospital?", scale: "FREQ" },
-  { index: 8,  text: "¿El responsable del hospital se encuentra disponible para resolver dudas o problemas?", scale: "FREQ" },
-  { index: 9,  text: "¿Te informan oportunamente sobre cambios en tus actividades?", scale: "FREQ" },
+  { index: 1, text: "¿Cómo consideras que es el ambiente de trabajo en la institución?", scale: "AGREE" },
+  { index: 2, text: "¿Cuentas con los recursos y herramientas necesarios para realizar tus actividades?", scale: "FREQ" },
+  { index: 3, text: "¿Tu lugar de trabajo es seguro y cómodo?", scale: "AGREE" },
+  { index: 4, text: "¿Las actividades que realizas están relacionadas con tu formación académica?", scale: "FREQ" },
+  { index: 5, text: "¿Te asignan tareas claras y organizadas?", scale: "FREQ" },
+  { index: 6, text: "¿Se respeta tu horario establecido en la carta compromiso?", scale: "FREQ" },
+  { index: 7, text: "¿Recibes orientación o supervisión por parte del responsable del hospital?", scale: "FREQ" },
+  { index: 8, text: "¿El responsable del hospital se encuentra disponible para resolver dudas o problemas?", scale: "FREQ" },
+  { index: 9, text: "¿Te informan oportunamente sobre cambios en tus actividades?", scale: "FREQ" },
   { index: 10, text: "¿Qué tan satisfecho te sientes con tu experiencia en esta etapa del servicio social?", scale: "FREQ" },
   { index: 11, text: "¿Recomendarías esta plaza a otros compañeros?", scale: "AGREE" },
   { index: 12, text: "¿Te has sentido apoyado(a) por la institución durante este mes?", scale: "FREQ" },
@@ -76,32 +74,29 @@ function valueToLabel(q: Question, valor: number): string {
   return prettyLabel(q.index, valor, base);
 }
 
-function labelColor(valor: number): any {
-  if (valor >= 4) return { color: Colores.textoExito, fontWeight: "700" };
-  if (valor === 3) return { color: Colores.textoAdvertencia, fontWeight: "700" };
-  return { color: Colores.textoError, fontWeight: "700" };
+function fullName(a: Alumno) {
+  return `${a.nombre} ${a.apellido_paterno} ${a.apellido_materno}`.trim();
 }
 
-function fullName(a: Alumno) {
-  return `${a.nombre ?? ""} ${a.apellido_paterno ?? ""} ${a.apellido_materno ?? ""}`.trim();
-}
 function carreraTexto(c: Alumno["carrera"]) {
   if (!c) return "";
   if (typeof c === "string") return c;
   if (typeof c === "number") return String(c);
   return c.NOMBRE ?? "";
 }
+
 function fechaCorta(iso?: string | null) {
   if (!iso) return "";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleDateString("es-MX", { month: "long", year: "numeric" });
 }
+
 function parseRespuesta(resp?: string | null): number[] {
   if (!resp) return [];
   try {
     const arr = JSON.parse(resp);
-    if (Array.isArray(arr)) return arr.map((n) => Number(n));
+    if (Array.isArray(arr)) return arr.map(Number);
   } catch {
     const s = resp.replace(/[\[\]\s]/g, "");
     if (s.includes(",")) return s.split(",").map((x) => Number(x.trim()));
@@ -109,29 +104,37 @@ function parseRespuesta(resp?: string | null): number[] {
   return [];
 }
 
+function colorRespuesta(valor: number) {
+  if (valor === 5) return { color: "#15793bff" };
+  if (valor === 4) return { color: Colores.textoExito };
+  if (valor === 3) return { color: Colores.textoAdvertencia };
+  if (valor === 2) return { color: "#b35802ff" };
+  return { color: Colores.textoError };
+}
+
 export default function EncuestasAdmin() {
   const { sesion, verificarToken } = useAuth();
   const modalAPI = useRef<ModalAPIRef>(null);
+
   const { width } = useWindowDimensions();
-  const esChica = width < 900;
+  const esPantallaPequeña = width < 790;
 
   const [alumnos, setAlumnos] = useState<Alumno[]>([]);
   const [encuestas, setEncuestas] = useState<Encuesta[]>([]);
-  const [cargando, setCargando] = useState(false);
 
   const [busqueda, setBusqueda] = useState("");
-  const [filtroCarrera, setFiltroCarrera] = useState<string>("Todos");
-  const [filtroEstatus, setFiltroEstatus] = useState<string>("Todos"); 
-  const [filasPorPagina, setFilasPorPagina] = useState<number>(20);
-  const [pagina, setPagina] = useState<number>(1);
+  const [filtroCarrera, setFiltroCarrera] = useState("Todos");
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [filasPorPagina, setFilasPorPagina] = useState(5);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalTitulo, setModalTitulo] = useState("");
   const [modalFecha, setModalFecha] = useState("");
+  const [modalAlumno, setModalAlumno] = useState("");
+  const [modalBoleta, setModalBoleta] = useState("");
+
   const [modalValores, setModalValores] = useState<number[]>([]);
 
   const cargar = async () => {
-    setCargando(true);
     try {
       await verificarToken();
       const tk = encodeURIComponent(sesion?.token ?? "");
@@ -141,8 +144,8 @@ export default function EncuestasAdmin() {
         fetchData(`encuesta/obtenerEncuestaAlumnos?tk=${tk}`),
       ]);
 
-      if (rAlu?.error === 0) {
-        const lista: Alumno[] = (rAlu.data ?? rAlu.alumnos ?? []).map((a: any) => ({
+      if (rAlu.error === 0) {
+        const lista = (rAlu.data ?? []).map((a: any) => ({
           boleta: a.boleta,
           nombre: a.nombre,
           apellido_paterno: a.apellido_paterno,
@@ -150,12 +153,10 @@ export default function EncuestasAdmin() {
           carrera: a.carrera,
         }));
         setAlumnos(lista);
-      } else {
-        throw new Error(rAlu?.message || "No se pudieron cargar alumnos");
       }
 
-      if (rEnc?.error === 0) {
-        const listaEnc: Encuesta[] = (rEnc.encuestas ?? rEnc.data ?? []).map((e: any) => ({
+      if (rEnc.error === 0) {
+        const listaEnc = (rEnc.encuestas ?? []).map((e: any) => ({
           ID: e.ID ?? e.id,
           ALUMNO: e.ALUMNO ?? e.alumnoBoleta ?? e.alumno?.boleta ?? null,
           alumnoBoleta: e.alumnoBoleta ?? e.ALUMNO ?? null,
@@ -165,14 +166,11 @@ export default function EncuestasAdmin() {
           respuesta: e.respuesta ?? e.RESPUESTA ?? null,
         }));
         setEncuestas(listaEnc);
-      } else {
-        throw new Error(rEnc?.message || "No se pudieron cargar encuestas");
       }
-    } catch (e: any) {
-      modalAPI.current?.show(false, e?.message ?? "Error al cargar información.");
+    } catch (e) {
+      modalAPI.current?.show(false, "Error al cargar información.");
     } finally {
-      setCargando(false);
-      setPagina(1);
+      setPaginaActual(1);
     }
   };
 
@@ -181,180 +179,135 @@ export default function EncuestasAdmin() {
   }, []);
 
   const alumnosByBoleta = useMemo(() => {
-    const m = new Map<string, Alumno>();
-    alumnos.forEach((a) => m.set(a.boleta, a));
-    return m;
-  }, [alumnos]);
-
-  const opcionesCarrera = useMemo(() => {
-    const set = new Set<string>();
-    alumnos.forEach((a) => {
-      const c = carreraTexto(a.carrera);
-      if (c) set.add(c);
-    });
-    return ["Todos", ...Array.from(set).sort()];
+    const map = new Map();
+    alumnos.forEach((a) => map.set(a.boleta, a));
+    return map;
   }, [alumnos]);
 
   const filas = useMemo(() => {
-    const term = busqueda.trim().toLowerCase();
-    const filasConEncuestas = encuestas
+    const term = busqueda.toLowerCase().trim();
+
+    // Solo encuestas completadas
+    const contestadas = encuestas
       .map((e) => {
         const boleta = (e.alumnoBoleta ?? e.ALUMNO ?? "") as string;
-        const a = alumnosByBoleta.get(boleta);
-        if (!a) return null;
+        const al = alumnosByBoleta.get(boleta);
+        if (!al) return null;
 
-        const nombre = fullName(a);
-        const carrera = carreraTexto(a.carrera);
-        const fecha = e.fechaRegistro ?? e.FECHA_REGISTRO ?? null;
+        const valores = parseRespuesta(e.respuesta ?? e.RESPUESTA ?? "");
+        const fechaISO = e.fechaRegistro ?? e.FECHA_REGISTRO ?? null;
 
         return {
-          key: `E-${e.ID}`,
+          key: `C-${e.ID}`,
           boleta,
-          nombre,
-          carrera,
-          fechaUltima: fecha ? fechaCorta(fecha) : "",
+          nombre: fullName(al),
+          carrera: carreraTexto(al.carrera),
+          fechaUltima: fechaISO ? fechaCorta(fechaISO) : "",
           estatus: "Completada",
-          _valores: parseRespuesta(e.respuesta ?? e.RESPUESTA ?? null),
-          _fechaIso: fecha ?? "",
+          _valores: valores,
+          _fechaISO: fechaISO ?? "",
         };
       })
       .filter(Boolean) as any[];
 
-    const conEncuesta = new Set(
-      filasConEncuestas.map((f: any) => f.boleta)
-    );
-    const filasSin = alumnos
-      .filter((a) => !conEncuesta.has(a.boleta))
-      .map((a) => ({
-        key: `S-${a.boleta}`,
-        boleta: a.boleta,
-        nombre: fullName(a),
-        carrera: carreraTexto(a.carrera),
-        fechaUltima: "",
-        estatus: "Sin encuesta",
-        _valores: [] as number[],
-        _fechaIso: "",
-      }));
-
-    const todas = [...filasConEncuestas, ...filasSin];
-
     // Filtros
-    return todas
-      .filter((r) => {
-        const m =
-          r.boleta.toLowerCase().includes(term) ||
-          r.nombre.toLowerCase().includes(term);
-        if (!m) return false;
+    let todas = contestadas.filter((r) => {
+      const match =
+        r.boleta.toLowerCase().includes(term) ||
+        r.nombre.toLowerCase().includes(term);
 
-        if (filtroCarrera !== "Todos" && r.carrera !== filtroCarrera) return false;
-        if (filtroEstatus === "Con encuesta" && r.estatus !== "Completada") return false;
-        if (filtroEstatus === "Sin encuesta" && r.estatus !== "Sin encuesta") return false;
+      if (!match) return false;
+      if (filtroCarrera !== "Todos" && r.carrera !== filtroCarrera) return false;
 
-        return true;
-      })
+      return true;
+    });
 
-      .sort((a, b) => (b._fechaIso ? +new Date(b._fechaIso) : 0) - (a._fechaIso ? +new Date(a._fechaIso) : 0));
-  }, [encuestas, alumnos, alumnosByBoleta, busqueda, filtroCarrera, filtroEstatus]);
+    return todas.sort(
+      (a, b) => (b._fechaISO ? +new Date(b._fechaISO) : 0) - (a._fechaISO ? +new Date(a._fechaISO) : 0)
+    );
+  }, [alumnos, encuestas, alumnosByBoleta, busqueda, filtroCarrera]);
+
 
   const totalPaginas = Math.max(1, Math.ceil(filas.length / filasPorPagina));
-  const pageRows = useMemo(
-    () => filas.slice((pagina - 1) * filasPorPagina, pagina * filasPorPagina),
-    [filas, pagina, filasPorPagina]
+  const filasPaginadas = filas.slice(
+    (paginaActual - 1) * filasPorPagina,
+    paginaActual * filasPorPagina
   );
 
-  function abrirDetalle(fila: any) {
+  const abrirDetalle = (fila: any) => {
     if (!fila) return;
-    setModalTitulo(`${fila.nombre} (${fila.boleta})`);
-    setModalFecha(fila.fechaUltima || "");
+    setModalFecha(fila.fechaUltima);
+    setModalAlumno(fila.nombre);
+    setModalBoleta(fila.boleta);
     setModalValores(fila._valores ?? []);
     setModalOpen(true);
-  }
+  };
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={[styles.container, esChica && { maxWidth: "96%" }]}>
-        <Text style={styles.title}>Encuestas de satisfacción</Text>
+      <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+        <Text style={styles.titulo}>Encuestas de satisfacción</Text>
 
-        <View style={[styles.controls, esChica && { flexDirection: "column", gap: 10 }]}>
-          <View style={esChica ? { width: "100%" } : { flex: 1 }}>
-            <Entrada
-              label="Buscar por nombre o boleta"
-              value={busqueda}
-              onChangeText={setBusqueda}
-            />
+        <View style={styles.controlesSuperiores}>
+          <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+              <Selector
+                label=""
+                selectedValue={String(filasPorPagina)}
+                onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                items={[
+                  { label: "5", value: "5" },
+                  { label: "10", value: "10" },
+                  { label: "20", value: "20" },
+                ]}
+              />
+            </View>
+            <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
           </View>
 
-          <View style={esChica ? { width: "100%" } : { width: 260 }}>
-            {Platform.OS === "web" ? (
-              <View>
-                <Text style={styles.label}>Carrera</Text>
-                <select
-                  value={filtroCarrera}
-                  onChange={(e) => setFiltroCarrera(e.target.value)}
-                  style={styles.selectWeb}
-                >
-                  {opcionesCarrera.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </View>
-            ) : (
+          <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "50%" }]}>
+            <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "70%" }]}>
+              <Entrada
+                label="Buscar"
+                value={busqueda}
+                onChangeText={setBusqueda}
+              />
+            </View>
+
+            <View style={[esPantallaPequeña ? { width: "100%" } : { width: "30%" }]}>
               <Selector
                 label="Carrera"
                 selectedValue={filtroCarrera}
-                onValueChange={(v) => setFiltroCarrera(String(v))}
-                items={opcionesCarrera.map((c) => ({ label: c, value: c }))}
-              />
-            )}
-          </View>
-
-          <View style={esChica ? { width: "100%" } : { width: 200 }}>
-            {Platform.OS === "web" ? (
-              <View>
-                <Text style={styles.label}>Estatus</Text>
-                <select
-                  value={filtroEstatus}
-                  onChange={(e) => setFiltroEstatus(e.target.value)}
-                  style={styles.selectWeb}
-                >
-                  {["Todos", "Con encuesta", "Sin encuesta"].map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </View>
-            ) : (
-              <Selector
-                label="Estatus"
-                selectedValue={filtroEstatus}
-                onValueChange={(v) => setFiltroEstatus(String(v))}
+                onValueChange={setFiltroCarrera}
                 items={[
                   { label: "Todos", value: "Todos" },
-                  { label: "Con encuesta", value: "Con encuesta" },
-                  { label: "Sin encuesta", value: "Sin encuesta" },
+                  ...Array.from(new Set(alumnos.map((a) => carreraTexto(a.carrera)))).map((c) => ({
+                    label: c,
+                    value: c,
+                  })),
                 ]}
               />
-            )}
+            </View>
           </View>
-
-          
         </View>
 
-        <ScrollView horizontal={esChica}>
+        <ScrollView horizontal={esPantallaPequeña}>
           <Tabla
             columnas={[
-              { key: "boleta", titulo: "Boleta", ancho: 140 },
-              { key: "nombre", titulo: "Nombre", ...(esChica ? { ancho: 280 } : {}) },
-              { key: "carrera", titulo: "Carrera", ...(esChica ? { ancho: 280 } : {}) },
-              { key: "fechaUltima", titulo: "Fecha última encuesta", ancho: 210 },
+              { key: "boleta", titulo: "Boleta", ancho: 150 },
+              { key: "nombre", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
+              { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
+              { key: "fechaUltima", titulo: "Período", ancho: 200 },
               {
                 key: "estatus",
                 titulo: "Estatus",
-                ancho: 150,
+                ancho: 140,
                 render: (valor) => (
                   <Text
                     style={[
-                      styles.estatus,
-                      valor === "Completada" ? { color: Colores.textoExito } : { color: Colores.textoAdvertencia },
+                      styles.texto,
+                      valor === "Completada" && { color: Colores.textoExito },
+                      valor === "Pendiente" && { color: Colores.textoAdvertencia },
                     ]}
                   >
                     {valor}
@@ -362,57 +315,73 @@ export default function EncuestasAdmin() {
                 ),
               },
             ]}
-            datos={pageRows.map((r) => ({
-              ...r,
-              onPress: () => abrirDetalle(r), 
+            datos={filasPaginadas.map((f) => ({
+              ...f,
+              onPress: () => abrirDetalle(f),
             }))}
           />
         </ScrollView>
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
-          <Paginacion paginaActual={pagina} totalPaginas={totalPaginas} setPaginaActual={setPagina} />
-          <Text style={{ color: Colores.textoClaro }}>{filas.length} resultado(s)</Text>
+        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+          <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+            <Paginacion
+              paginaActual={paginaActual}
+              totalPaginas={totalPaginas}
+              setPaginaActual={setPaginaActual}
+            />
+          </View>
+
+          <Text
+            style={{
+              color: Colores.textoClaro,
+              fontSize: Fuentes.caption,
+              marginTop: 15,
+            }}
+          >
+            {`Mostrando ${filasPaginadas.length} de ${filas.length} resultados`}
+          </Text>
         </View>
       </View>
 
       <Modal
         visible={modalOpen}
         onClose={() => setModalOpen(false)}
-        titulo={`Respuestas — ${modalTitulo}${modalFecha ? ` — ${modalFecha}` : ""}`}
+        titulo="Encuesta de satisfacción mensual"
         maxWidth={900}
         cancelar
       >
-        {modalValores.length === 0 ? (
-          <Text style={{ color: Colores.textoClaro }}>Sin encuesta.</Text>
-        ) : (
-          <View style={{ borderWidth: 1, borderColor: Colores.borde, borderRadius: 8 }}>
+        <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 15, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Período: </Text> {modalFecha}</Text>
+        <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{modalAlumno}</Text>
+        <Text style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, fontWeight: "600", marginBottom: 20 }}>{modalBoleta}</Text>
+        <ScrollView horizontal={esPantallaPequeña}>
+          <Tabla
+            columnas={[
+              { key: "pregunta", titulo: "Pregunta", ...(esPantallaPequeña && { ancho: 600 }) },
+              {
+                key: "respuesta",
+                titulo: "Respuesta",
+                ancho: 200,
+                render: (_, fila) => {
+                  const index = fila.pregunta.split(".")[0];
+                  const q = QUESTIONS.find((x) => String(x.index) === index);
+                  const valor = modalValores[q!.index - 1] ?? 0;
 
-            <View style={{ flexDirection: "row", backgroundColor: "#f7f7f9", borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
-              <Text style={[styles.th, { flex: 1.5 }]}>Pregunta</Text>
-              <Text style={[styles.th, { flex: 1 }]}>Respuesta</Text>
-            </View>
-
-            {QUESTIONS.map((q, i) => {
-              const valor = modalValores[i];
-              const etiqueta = valueToLabel(q, valor);
-              return (
-                <View
-                  key={`row-${q.index}`}
-                  style={{ flexDirection: "row", borderTopWidth: 1, borderColor: Colores.borde }}
-                >
-                  <Text style={[styles.td, { flex: 1.5 }]}>
-                    <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
-                    {q.text}
-                  </Text>
-                  <Text style={[styles.td, { flex: 1 }, labelColor(valor)]}>
-                    {etiqueta}
-                  </Text>
-                </View>
-              );
-            })}
-          </View>
-        )}
+                  return (
+                    <Text style={[styles.texto, colorRespuesta(valor)]}>
+                      {valueToLabel(q!, valor)}
+                    </Text>
+                  );
+                },
+              },
+            ]}
+            datos={QUESTIONS.map((q, i) => ({
+              pregunta: `${q.index}. ${q.text}`,
+              respuesta: valueToLabel(q, modalValores[i] ?? 0),
+            }))}
+          />
+        </ScrollView>
       </Modal>
+
 
       <ModalAPI ref={modalAPI} />
     </ScrollView>
@@ -420,7 +389,7 @@ export default function EncuestasAdmin() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  contenedorFormulario: {
     width: "90%",
     margin: "auto",
     padding: 24,
@@ -436,37 +405,23 @@ const styles = StyleSheet.create({
     elevation: 2,
     marginVertical: 30,
   },
-  title: {
+  titulo: {
     fontSize: Fuentes.titulo,
     fontWeight: "700",
     color: Colores.textoPrincipal,
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 20,
   },
-  controls: {
+  texto: {
+    fontSize: Fuentes.cuerpoPrincipal,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    fontWeight: "500",
+  },
+  controlesSuperiores: {
     flexDirection: "row",
-    gap: 12,
-    alignItems: "flex-end",
-    marginBottom: 12,
+    justifyContent: "space-between",
+    marginBottom: 20,
     flexWrap: "wrap",
-  },
-  label: { marginBottom: 6, color: Colores.textoClaro },
-  selectWeb: {
-    width: "100%",
-    padding: 10,
-    borderRadius: 8,
-    border: `1px solid ${Colores.borde}` as any,
-  },
-  estatus: { fontSize: Fuentes.cuerpo, fontWeight: "600" },
-  th: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontWeight: "700",
-    color: Colores.textoPrincipal,
-  },
-  td: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    color: Colores.textoPrincipal,
   },
 });

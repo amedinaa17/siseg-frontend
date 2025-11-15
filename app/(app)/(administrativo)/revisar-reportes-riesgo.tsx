@@ -120,6 +120,12 @@ export default function ReportesRiesgo() {
         }
     };
 
+    useEffect(() => {
+        if (Object.keys(errors).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errors]);
+
     // --- Render de modales ---
     const renderModalDetalle = () => {
         if (!reporteSeleccionado) return null;
@@ -129,7 +135,7 @@ export default function ReportesRiesgo() {
                 onClose={() => { setReporteSeleccionado(null); setModalDetalle(false); }}
                 deshabilitado={isSubmittingEstatus} textoAceptar={isSubmittingEstatus ? "Actualizando…" : undefined}
                 onAceptar={reporteSeleccionado.estatus != estatus ? handleSubmitEstatus(cambiarEstatusReporte) : () => { setReporteSeleccionado(null); setModalDetalle(false); }}
-                titulo={"Detalles del Reporte"}
+                titulo={"Detalles del reporte"}
                 maxWidth={700}
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -186,14 +192,14 @@ export default function ReportesRiesgo() {
 
                     {reporteSeleccionado.adminEncargado && (
                         <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                            <View style={{ flex: 1, marginBottom: 0 }}>
                                 {reporteSeleccionado.estatus === 2 ? (
                                     <Entrada label="Última actualización" value={new Date(reporteSeleccionado.fechaModificacion).toLocaleDateString()} editable={false} />
                                 ) : (
                                     <Entrada label="Fecha de finalización" value={new Date(reporteSeleccionado.fechaFinalizado).toLocaleDateString()} editable={false} />
                                 )}
                             </View>
-                            <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                            <View style={{ flex: 1, marginBottom: 0 }}>
 
                                 <Entrada label="Revisado por" value={reporteSeleccionado.adminEncargado.nombre + " " + reporteSeleccionado.adminEncargado.APELLIDO_PATERNO + " " + reporteSeleccionado.adminEncargado.APELLIDO_MATERNO} editable={false} />
                             </View>
@@ -359,7 +365,7 @@ export default function ReportesRiesgo() {
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={[styles.container, esPantallaPequeña && { maxWidth: "95%" }]}>
-                <Text style={styles.titulo}>Reportes de Situación de Riesgo</Text>
+                <Text style={styles.titulo}>Reportes de situación de riesgo</Text>
 
                 <View style={styles.controlesSuperiores}>
                     <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
@@ -454,12 +460,24 @@ export default function ReportesRiesgo() {
                     />
                 </ScrollView>
 
-                <View style={{ marginTop: 15 }}>
-                    <Paginacion
-                        paginaActual={paginaActual}
-                        totalPaginas={totalPaginas}
-                        setPaginaActual={setPaginaActual}
-                    />
+                <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                        <Paginacion
+                            paginaActual={paginaActual}
+                            totalPaginas={totalPaginas}
+                            setPaginaActual={setPaginaActual}
+                        />
+                    </View>
+
+                    <Text
+                        style={{
+                            color: Colores.textoClaro,
+                            fontSize: Fuentes.caption,
+                            marginTop: 15,
+                        }}
+                    >
+                        {`Mostrando ${reportesMostrados.length} de ${reportesFiltrados.length} resultados`}
+                    </Text>
                 </View>
             </View>
             {renderModalDetalle()}

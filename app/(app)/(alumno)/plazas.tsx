@@ -40,7 +40,7 @@ export default function CatalogoPlazas() {
   const modalAPI = useRef<ModalAPIRef>(null);
   const [busqueda, setBusqueda] = useState("");
   const [paginaActual, setPaginaActual] = useState(1);
-  const [filasPorPagina, setFilasPorPagina] = useState(10);
+  const [filasPorPagina, setFilasPorPagina] = useState(5);
 
   useEffect(() => {
     const cargarAlumno = async () => {

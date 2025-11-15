@@ -49,9 +49,9 @@ export default function CursoInduccion() {
             });
 
             if (response.error === 0) {
-                modalAPI.current?.show(true, `${response.message || "Registro de QR exitoso."}\n\nBoleta registrada: ${boleta}`);
+                modalAPI.current?.show(true, `Asistencia registrada correctamente para el alumno ${boleta}`);
             } else {
-                modalAPI.current?.show(false, response.message || "Hubo un problema al registrar la asistencia del alumno. Inténtalo de nuevo más tarde.");
+                modalAPI.current?.show(false, "Hubo un problema al registrar la asistencia del alumno. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
             modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");

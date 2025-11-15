@@ -97,7 +97,7 @@ export default function GestionAlumnos() {
         try {
             const alumnoData = {
                 ...data,
-                carrera: data.carrera === "Médico Cirujano y Homeópata" ? 1 : 0,
+                carrera: data.carrera === "Médico Cirujano y Homeópata" ? 1 : 2,
                 estatus: data.estatus === "Candidato" ? 1 :
                     data.estatus === "Aspirante" ? 2 :
                         data.estatus === "En proceso" ? 3 :
@@ -398,7 +398,7 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1 }}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.apellido_paterno && !errorsEditar.apellido_materno ? 30 : 15 }}>
                             <Controller
                                 control={controlAgregar}
                                 name="apellido_paterno"
@@ -439,7 +439,7 @@ export default function GestionAlumnos() {
 
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1 }}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.boleta && errorsAgregar.estatus ? 20 : 15 }}>
                             <Controller
                                 control={controlAgregar}
                                 name="boleta"
@@ -792,7 +792,6 @@ export default function GestionAlumnos() {
             </Modal>
         );
     };
-
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>

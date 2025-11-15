@@ -177,7 +177,7 @@ export default function ReportesRiesgo() {
             if (response.error === 0) {
                 handleCancelar();
                 obtenerReportes();
-                modalAPI.current?.show(true, "Reporte enviado con éxito.");
+                modalAPI.current?.show(true, "Reporte enviado correctamente.");
             } else {
                 modalAPI.current?.show(false, "Hubo un problema al enviar el reporte. Inténtalo de nuevo más tarde.");
             }

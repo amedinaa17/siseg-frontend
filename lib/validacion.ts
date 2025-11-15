@@ -358,34 +358,29 @@ export type PersonalFormulario = z.infer<typeof personalEsquema>;
 
 // Esquema para reportes
 export const reporteEsquema = z.object({
-  descripcion: z.string().min(1, "La descripción no puede estar vacía."),
+  descripcion: z.string().min(1, "La descripción no puede estar vacía"),
   evidencias: z
     .array(z.object({
       nombre: z.string(),
       peso: z.string(),
       tipo: z.enum(["image", "audio", "pdf"]),
     }))
-    .max(5, "No puedes agregar más de 5 evidencias."),
+    .max(5, "No puedes agregar más de 5 evidencias"),
 });
 
 export type ReporteFormulario = z.infer<typeof reporteEsquema>;
 
 // Esquema para observaciones
 export const observacionEsquema = z.object({
-  observacion: z.string().min(1, "La observación no puede estar vacía.")
+  observacion: z.string().min(1, "La observación no puede estar vacía")
 });
 
 export type ObservacionFormulario = z.infer<typeof observacionEsquema>;
 
-export const CARRERAS_PLAZA = [
-  "Médico Cirujano y Homeópata",
-  "Médico Cirujano y Partero",
-] as const;
-
 export const plazaEsquema = z.object({
-  carrera: z.enum(CARRERAS_PLAZA).refine((val) => CARRERAS_PLAZA.includes(val), {
-    message: "Selecciona una carrera válida",
-  }),
+  carrera: z
+    .string()
+    .nonempty("La carrera es obligatoria"),
 
   promocion: z
     .string()
@@ -401,16 +396,21 @@ export const plazaEsquema = z.object({
     .nonempty("La sede es obligatoria")
     .min(3, "La sede debe tener al menos 3 caracteres"),
 
-  estatus: z.union([z.literal(0), z.literal(1)]),
+  estatus: z
+    .string()
+    .nonempty("El estatus es obligatorio"),
 
   beca: z
     .string()
     .nonempty("El tipo de beca es obligatorio"),
 
   tarjeta: z
-    .union([z.string(), z.number()])
-    .transform((v) => (v === "" ? null : Number(v)))
-    .refine((v) => v === null || (Number.isInteger(v) && v >= 0), {
+    .string()
+    .nonempty("El número de tarjeta es obligatorio")
+    .refine((v) => /^\d+$/.test(v), {
+      message: "La tarjeta debe contener solo dígitos",
+    })
+    .refine((v) => Number(v) >= 0, {
       message: "La tarjeta debe ser un número entero positivo",
     }),
 

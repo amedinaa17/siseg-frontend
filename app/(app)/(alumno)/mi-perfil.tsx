@@ -135,7 +135,7 @@ export default function MiPerfil() {
                 >
                     {vista === 1 && (
                         <>
-                            <Text style={styles.titulo}>Perfil</Text>
+                            <Text style={styles.titulo}>Mi perfil</Text>
 
                             <View style={{ marginBottom: 15 }} >
                                 <Entrada label="Nombre" value={datosAlumno?.nombre || ""} editable={false} />

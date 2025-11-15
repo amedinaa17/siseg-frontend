@@ -105,32 +105,44 @@ export default function MiPerfil() {
         }
     };
 
+    useEffect(() => {
+        if (Object.keys(errorsPerfil).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errorsPerfil]);
+
+    useEffect(() => {
+        if (Object.keys(errorsContraseña).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errorsContraseña]);
+
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                 <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }, vista != 1 && { marginTop: 100 }]}>
                     {vista === 1 && (
                         <>
-                            <Text style={styles.titulo}>Mi Perfil</Text>
+                            <Text style={styles.titulo}>Mi perfil</Text>
 
-                            <View style={{ marginBottom: 15, pointerEvents: "none" }}>
+                            <View style={{ marginBottom: 15 }}>
                                 <Entrada label="Nombre" value={datosAdministrativo?.nombre || ""} editable={false} />
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 0 }}>
                                     <Entrada label="Apellido Paterno" value={datosAdministrativo?.apellido_paterno || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 0 }}>
                                     <Entrada label="Apellido Materno" value={datosAdministrativo?.apellido_materno || ""} editable={false} />
                                 </View>
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 0 }}>
                                     <Entrada label="CURP" value={datosAdministrativo?.curp || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 0 }}>
                                     <Selector
                                         label="Sexo"
                                         selectedValue={datosAdministrativo ? (datosAdministrativo.sexo === "F" ? "Femenino" : "Masculino") : ""}
@@ -144,15 +156,15 @@ export default function MiPerfil() {
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 0 }}>
                                     <Entrada label="Número de Empleado" value={datosAdministrativo?.numempleado || ""} keyboardType="numeric" editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 0 }}>
                                     <Entrada label="Perfil" value={datosAdministrativo ? (datosAdministrativo.perfil === "1" ? "Administrador de seguimiento" : "Administrador general") : ""} editable={false} />
                                 </View>
                             </View>
 
-                            <View style={{ marginBottom: 15, pointerEvents: "none" }}>
+                            <View style={{ marginBottom: 15 }}>
                                 <Entrada
                                     label="Correo Electrónico Institucional"
                                     value={datosAdministrativo?.correo || ""}
@@ -162,10 +174,10 @@ export default function MiPerfil() {
                             </View>
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                <View style={{ flex: 1, marginBottom: 0, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 0 }}>
                                     <Entrada label="Teléfono Celular" value={datosAdministrativo?.telcelular || ""} keyboardType="phone-pad" editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 25, pointerEvents: "none" }}>
+                                <View style={{ flex: 1, marginBottom: 25 }}>
                                     <Entrada label="Teléfono Local" value={datosAdministrativo?.tellocal || ""} keyboardType="phone-pad" editable={false} />
                                 </View>
                             </View>

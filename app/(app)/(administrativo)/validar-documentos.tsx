@@ -70,7 +70,7 @@ export default function ValidarDocumentos() {
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                <Text style={styles.titulo}>Validar Documentos</Text>
+                <Text style={styles.titulo}>Validar documentos</Text>
                 <View style={styles.controlesSuperiores}>
                     <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
                         <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
@@ -136,7 +136,7 @@ export default function ValidarDocumentos() {
                             { key: "boleta", titulo: "Boleta", ancho: 150 },
                             { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
                             { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
-                            { key: "generacion", titulo: "Generación", ancho: 150 },
+                            { key: "generacion", titulo: "Generación", ancho: 200 },
                             {
                                 key: "estatus",
                                 titulo: "Estatus",
@@ -186,14 +186,24 @@ export default function ValidarDocumentos() {
                     />
                 </ScrollView>
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row", marginVertical: 15, gap: 6 }}>
+                <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
                         <Paginacion
                             paginaActual={paginaActual}
                             totalPaginas={totalPaginas}
                             setPaginaActual={setPaginaActual}
                         />
                     </View>
+
+                    <Text
+                        style={{
+                            color: Colores.textoClaro,
+                            fontSize: Fuentes.caption,
+                            marginTop: 15,
+                        }}
+                    >
+                        {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
+                    </Text>
                 </View>
             </View>
             <ModalAPI ref={modalAPI} />
