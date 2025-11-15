@@ -6,7 +6,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 function AuthGate() {
   const { sesion, errorMessage, cargando, verificarToken } = useAuth();
   const router = useRouter();
-  const segmentos = useSegments();
+  const segmentos = useSegments() as string[];
   const [montado, setMontado] = useState(false);
 
   useEffect(() => {
@@ -23,8 +23,8 @@ function AuthGate() {
     const enSubgrupo = segmentos[1];
 
     // Redirigir según la sesión y rol del usuario
-    if (segmentos[0] == "[...404]") {
-      router.replace("/[...404]");
+    if (segmentos[0] == "+not-found") {
+      router.replace("/+not-found");
     } else if (!sesion && !enGrupoAuth) {
       router.replace("/(auth)/iniciar-sesion");
     } else if (sesion?.estatus === 0) {

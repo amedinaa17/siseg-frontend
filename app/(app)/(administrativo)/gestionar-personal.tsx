@@ -170,33 +170,45 @@ export default function GestionPersonalAdministrativo() {
         }
     };
 
+    useEffect(() => {
+        if (Object.keys(errorsAgregar).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errorsAgregar]);
+
+    useEffect(() => {
+        if (Object.keys(errorsEditar).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errorsEditar]);
+
     // --- Render de modales ---
     const renderModalDetalle = () => {
         if (!personalSeleccionado) return null;
         const { estatus, perfil, persona } = personalSeleccionado;
 
         return (
-            <Modal visible={modalDetalle} onClose={() => { setPersonalSeleccionado(null); setModalDetalle(false); }} titulo="Datos del Personal Administrativo" maxWidth={750}>
+            <Modal visible={modalDetalle} onClose={() => { setPersonalSeleccionado(null); setModalDetalle(false); }} titulo="Datos del personal administrativo" maxWidth={750}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                        <View style={{ marginTop: 5, marginBottom: 15, pointerEvents: "none" }} >
+                        <View style={{ marginTop: 5, marginBottom: 15 }} >
                             <Entrada label="Nombre" value={persona.nombre || ""} editable={false} />
                         </View>
 
                         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                            <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <View style={{ flex: 1, marginBottom: 15 }}>
                                 <Entrada label="Apellido Paterno" value={persona.APELLIDO_PATERNO || ""} editable={false} />
                             </View>
-                            <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <View style={{ flex: 1, marginBottom: 15 }}>
                                 <Entrada label="Apellido Materno" value={persona.APELLIDO_MATERNO || ""} editable={false} />
                             </View>
                         </View>
 
                         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                            <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <View style={{ flex: 1, marginBottom: 15 }}>
                                 <Entrada label="CURP" value={persona.curp || ""} editable={false} />
                             </View>
-                            <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <View style={{ flex: 1, marginBottom: 15 }}>
                                 <Selector
                                     label="Sexo"
                                     selectedValue={persona.sexo === "F" ? "Femenino" : persona.sexo === "M" ? "Masculino" : ""}
@@ -209,28 +221,28 @@ export default function GestionPersonalAdministrativo() {
                             </View>
                         </View>
 
-                        <View style={{ marginBottom: 15, pointerEvents: "none" }} >
+                        <View style={{ marginBottom: 15 }} >
                             <Entrada label="No. Empleado" value={persona.boleta || ""} keyboardType="numeric" editable={false} />
                         </View>
 
                         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                            <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <View style={{ flex: 1, marginBottom: 15 }}>
                                 <Entrada label="Estatus" value={estatus.DESCRIPCION || ""} editable={false} />
                             </View>
-                            <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <View style={{ flex: 1, marginBottom: 15 }}>
                                 <Entrada label="Perfil" value={perfil || ""} editable={false} />
                             </View>
                         </View>
 
-                        <View style={{ marginBottom: 15, pointerEvents: "none" }} >
+                        <View style={{ marginBottom: 15 }} >
                             <Entrada label="Correo Electrónico Institucional" value={persona.correo || ""} editable={false} />
                         </View>
 
                         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                            <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                            <View style={{ flex: 1, marginBottom: 15 }}>
                                 <Entrada label="Teléfono Celular" value={persona.telefonoMovil || ""} keyboardType="phone-pad" editable={false} />
                             </View>
-                            <View style={{ flex: 1, marginBottom: 25, pointerEvents: "none" }}>
+                            <View style={{ flex: 1, marginBottom: 25 }}>
                                 <Entrada label="Teléfono Local" value={persona.telefonoFijo || ""} keyboardType="phone-pad" editable={false} />
                             </View>
                         </View>
@@ -242,7 +254,7 @@ export default function GestionPersonalAdministrativo() {
 
     const renderModalAgregar = () => {
         return (
-            <Modal visible={modalAgregar} onClose={() => { setModalAgregar(false); resetAgregar(); }} titulo="Agregar Personal Administrativo" maxWidth={700}
+            <Modal visible={modalAgregar} onClose={() => { setModalAgregar(false); resetAgregar(); }} titulo="Agregar personal administrativo" maxWidth={700}
                 cancelar deshabilitado={isSubmittingAgregar} textoAceptar={isSubmittingAgregar ? "Agregando…" : "Agregar personal"} onAceptar={handleSubmitAgregar(onSubmitAgregar)}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
                     <View style={{ marginTop: 10, marginBottom: 15 }}>
@@ -412,10 +424,10 @@ export default function GestionPersonalAdministrativo() {
         const { estatus, perfil, persona } = personalSeleccionado;
 
         return (
-            <Modal visible={modalEditar} titulo="Editar Personal Administrativo" maxWidth={750}
+            <Modal visible={modalEditar} titulo="Editar personal administrativo" maxWidth={750}
                 onClose={() => { setPersonalSeleccionado(null); setModalEditar(false); resetEditar(); }}
                 cancelar deshabilitado={isSubmittingEditar}
-                textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar Cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
+                textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
             >
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
                     <View style={{ marginTop: 10, marginBottom: 15 }} >
@@ -461,7 +473,7 @@ export default function GestionPersonalAdministrativo() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, pointerEvents: "none", marginBottom: esPantallaPequeña && errorsEditar.sexo ? 5 : 15 }}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.sexo ? 5 : 15 }}>
                             <Controller
                                 control={controlEditar}
                                 name="curp"
@@ -497,7 +509,7 @@ export default function GestionPersonalAdministrativo() {
                         </View>
                     </View>
 
-                    <View style={{ flex: 1, pointerEvents: "none", marginBottom: esPantallaPequeña && errorsEditar.sexo ? 5 : 15 }}>
+                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.sexo ? 5 : 15 }}>
                         <Controller
                             control={controlEditar}
                             name="numempleado"
@@ -613,7 +625,7 @@ export default function GestionPersonalAdministrativo() {
         if (!modalDarBaja) return null;
 
         return (
-            <Modal visible={modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de Baja Personal" maxWidth={500}
+            <Modal visible={modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de baja personal" maxWidth={500}
                 cancelar deshabilitado={isSubmittingDarBaja}
                 textoAceptar={isSubmittingDarBaja ? "Enviando…" : "Dar de baja"} onAceptar={() => { handleSubmitDarBaja(() => darBajaPersonal(modalDarBaja.boleta))(); }}>
                 <Text style={{ marginBottom: 20 }}>
@@ -627,7 +639,7 @@ export default function GestionPersonalAdministrativo() {
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                <Text style={styles.titulo}>Gestionar Personal Administrativo</Text>
+                <Text style={styles.titulo}>Gestionar personal administrativo</Text>
                 {sesion?.perfil === 2 && (
                     <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
                         <View>
@@ -747,14 +759,24 @@ export default function GestionPersonalAdministrativo() {
                     />
                 </ScrollView>
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row", marginVertical: 15, gap: 6 }}>
+                <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
                         <Paginacion
                             paginaActual={paginaActual}
                             totalPaginas={totalPaginas}
                             setPaginaActual={setPaginaActual}
                         />
                     </View>
+
+                    <Text
+                        style={{
+                            color: Colores.textoClaro,
+                            fontSize: Fuentes.caption,
+                            marginTop: 15,
+                        }}
+                    >
+                        {`Mostrando ${personalMostrados.length} de ${personalFiltrados.length} resultados`}
+                    </Text>
                 </View>
             </View>
             {renderModalDetalle()}

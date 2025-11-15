@@ -1,0 +1,8 @@
+{
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/+not-found", 
+      "statusCode": 404
+    }
+  }
+}

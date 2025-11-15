@@ -1,26 +1,18 @@
-import { useAuth } from "@/context/AuthProvider";
 import { postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
-import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import React, { useEffect, useRef, useState, } from "react";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 type Msg = { id: string; role: "user" | "bot"; text: string };
 
 const ChatbotWidget: React.FC<{
-  endpoint?: string;    
-  title?: string;      
+  endpoint?: string;
+  title?: string;
 }> = ({ endpoint = "chatbot/chatbotQuery", title = "Asistente SISEG" }) => {
-  const { sesion } = useAuth();
+  const { width } = useWindowDimensions();
+  const esPantallaPequeña = width < 790;
+
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,7 +21,7 @@ const ChatbotWidget: React.FC<{
       id: "greet",
       role: "bot",
       text:
-        "¡Hola! Soy tu asistente sobre el documento de servicio social. Responderé solo con base en el documento. 😊",
+        "¡Hola! Soy tu asistente virtual. ¿Cómo puedo ayudarte hoy?",
     },
   ]);
 
@@ -46,7 +38,7 @@ const ChatbotWidget: React.FC<{
 
     try {
       const body: any = { question: q };
-      const resp = await postData(endpoint, body); 
+      const resp = await postData(endpoint, body);
       let answer = "Lo siento, no pude responder en este momento.";
 
       if (resp && resp.error === 0 && typeof resp.answer === "string") {
@@ -86,21 +78,22 @@ const ChatbotWidget: React.FC<{
 
   return (
     <>
-      <TouchableOpacity
-        onPress={() => setOpen((v) => !v)}
-        activeOpacity={0.9}
-        style={styles.fab}
-      >
-        <Ionicons name={open ? "close" : "chatbubble-ellipses"} size={26} color="#fff" />
-      </TouchableOpacity>
-
+      {!open && (
+        <TouchableOpacity
+          onPress={() => setOpen((v) => !v)}
+          activeOpacity={0.9}
+          style={styles.fab}
+        >
+          <Ionicons name={open ? "close" : "chatbubble-ellipses"} size={26} color={Colores.onPrimario} />
+        </TouchableOpacity>
+      )}
       {open && (
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           keyboardVerticalOffset={80}
           style={styles.popupWrapper}
         >
-          <View style={styles.popup}>
+          <View style={[styles.popup, { width: esPantallaPequeña ? "100%" : 360 }]}>
             <View style={styles.header}>
               <Text style={styles.headerTitle}>{title}</Text>
               <TouchableOpacity onPress={() => setOpen(false)}>
@@ -154,7 +147,7 @@ const ChatbotWidget: React.FC<{
                 disabled={loading || !input.trim()}
                 style={[styles.sendBtn, (loading || !input.trim()) && { opacity: 0.5 }]}
               >
-                <Ionicons name="send" size={18} color="#fff" />
+                <Ionicons name="send" size={18} color={Colores.onPrimario} />
               </TouchableOpacity>
             </View>
           </View>
@@ -181,7 +174,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colores.textoInfo ?? "#6b4ad8",
+    backgroundColor: Colores.primario,
     justifyContent: "center",
     alignItems: "center",
     ...Platform.select({
@@ -191,16 +184,15 @@ const styles = StyleSheet.create({
   },
   popupWrapper: {
     position: Platform.select({ web: "fixed" as any, default: "absolute" }),
-    right: 24,
-    bottom: 90,
+    right: 20,
+    bottom: 20,
     ...Platform.select({ web: { zIndex: 9999 }, default: { zIndex: 999 } }),
   },
   popup: {
-    width: 360,
-    maxHeight: 520,
-    backgroundColor: Colores.fondo ?? "#fff",
+    maxHeight: 500,
+    backgroundColor: Colores.fondo,
     borderWidth: 1,
-    borderColor: Colores.borde ?? "#e5e7eb",
+    borderColor: Colores.borde,
     borderRadius: 12,
     overflow: "hidden",
     ...Platform.select({
@@ -212,8 +204,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: Colores.borde ?? "#e5e7eb",
-    backgroundColor: Colores.fondo ?? "#fff",
+    borderBottomColor: Colores.borde,
+    backgroundColor: Colores.fondo,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -221,7 +213,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: (Fuentes?.subtitulo as number) ?? 16,
     fontWeight: "700",
-    color: Colores.textoPrincipal ?? "#111827",
+    color: Colores.textoPrincipal,
   },
   body: {
     padding: 12,
@@ -257,27 +249,27 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 10,
     borderTopWidth: 1,
-    borderTopColor: Colores.borde ?? "#e5e7eb",
-    backgroundColor: Colores.fondo ?? "#fff",
+    borderTopColor: Colores.borde,
+    backgroundColor: Colores.fondo,
   },
   textInput: {
     flex: 1,
     minHeight: 40,
-    maxHeight: 110,
+    maxHeight: 40,
     borderWidth: 1,
-    borderColor: Colores.borde ?? "#e5e7eb",
+    borderColor: Colores.borde,
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    color: Colores.textoPrincipal ?? "#111827",
-    backgroundColor: "#fff",
+    color: Colores.textoPrincipal,
+    backgroundColor: Colores.fondo,
     ...Platform.select({ web: { outlineStyle: "none" as any } }),
   },
   sendBtn: {
     height: 40,
-    paddingHorizontal: 14,
+    width: 40,
     borderRadius: 8,
-    backgroundColor: Colores.textoInfo ?? "#6b4ad8",
+    backgroundColor: Colores.primario,
     justifyContent: "center",
     alignItems: "center",
   },

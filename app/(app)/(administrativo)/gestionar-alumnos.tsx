@@ -255,6 +255,18 @@ export default function GestionAlumnos() {
         handleSubmitCargar(() => subirArchivo(archivoSeleccionado))();
     };
 
+    useEffect(() => {
+        if (Object.keys(errorsAgregar).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errorsAgregar]);
+
+    useEffect(() => {
+        if (Object.keys(errorsEditar).length > 0) {
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+        }
+    }, [errorsEditar]);
+
     // --- Render de modales ---
     const renderModalDetalle = () => {
         if (!alumnoSeleccionado) return null;
@@ -263,50 +275,50 @@ export default function GestionAlumnos() {
             estado, cp } = alumnoSeleccionado;
 
         return (
-            <Modal visible={modalDetalle} onClose={() => { setAlumnoSeleccionado(null); setModalDetalle(false); }} titulo="Datos del Alumno" maxWidth={750}>
+            <Modal visible={modalDetalle} onClose={() => { setAlumnoSeleccionado(null); setModalDetalle(false); }} titulo="Datos del alumno" maxWidth={750}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
-                    <View style={{ marginTop: 5, marginBottom: 15, pointerEvents: "none" }} >
+                    <View style={{ marginTop: 5, marginBottom: 15 }} >
                         <Entrada label="Nombre" value={nombre || ""} editable={false} />
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Apellido Paterno" value={apellido_paterno || ""} editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Apellido Materno" value={apellido_materno || ""} editable={false} />
                         </View>
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="CURP" value={curp || ""} editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="RFC" value={rfc || ""} editable={false} />
                         </View>
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Boleta" value={boleta || ""} keyboardType="numeric" editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Carrera" value={carrera.NOMBRE || ""} editable={false} />
                         </View>
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Generación" value={generacion || ""} editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Promedio" value={promedio || ""} keyboardType="decimal-pad" editable={false} />
                         </View>
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada
                                 label="Correo Electrónico Institucional"
                                 value={correo || ""}
@@ -314,34 +326,34 @@ export default function GestionAlumnos() {
                                 editable={false}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Estatus" value={estatus.DESCRIPCION || ""} editable={false} />
                         </View>
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Calle y Número" value={calle_y_numero || ""} editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Colonia" value={colonia || ""} editable={false} />
                         </View>
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Delegación / Municipio" value={delegacion || ""} editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Estado de Procedencia" value={estado || ""} editable={false} />
                         </View>
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Código Postal" value={cp || ""} keyboardType="numeric" editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Selector
                                 label="Sexo"
                                 selectedValue={sexo === "F" ? "Femenino" : sexo === "M" ? "Masculino" : ""}
@@ -355,10 +367,10 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Teléfono Celular" value={telcelular || ""} keyboardType="phone-pad" editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15, pointerEvents: "none" }}>
+                        <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Teléfono Local" value={tellocal || ""} keyboardType="phone-pad" editable={false} />
                         </View>
                     </View>
@@ -371,7 +383,7 @@ export default function GestionAlumnos() {
         return (
             <Modal
                 visible={modalAgregar} onClose={() => { setModalAgregar(false); resetAgregar(); }}
-                titulo="Agregar Alumno" maxWidth={700} cancelar deshabilitado={isSubmittingAgregar}
+                titulo="Agregar alumno" maxWidth={700} cancelar deshabilitado={isSubmittingAgregar}
                 textoAceptar={isSubmittingAgregar ? "Agregando…" : "Agregar alumno"} onAceptar={handleSubmitAgregar(onSubmitAgregar)}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
                     <View style={{ marginTop: 5, marginBottom: 15 }}>
@@ -531,10 +543,10 @@ export default function GestionAlumnos() {
             promedio, curp } = alumnoSeleccionado;
 
         return (
-            <Modal visible={modalEditar} titulo="Editar Alumno" maxWidth={750}
+            <Modal visible={modalEditar} titulo="Editar alumno" maxWidth={750}
                 onClose={() => { setAlumnoSeleccionado(null); setModalEditar(false); resetEditar(); }}
                 cancelar deshabilitado={isSubmittingEditar}
-                textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar Cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
+                textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
             >
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
                     <View style={{ marginTop: 10, marginBottom: 15 }} >
@@ -579,7 +591,7 @@ export default function GestionAlumnos() {
                         </View>
                     </View>
 
-                    <View style={{ flex: 1, pointerEvents: "none", marginBottom: 15 }}>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
                         <Controller
                             control={controlEditar}
                             name="curp"
@@ -596,7 +608,7 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, pointerEvents: "none", marginBottom: esPantallaPequeña && errorsEditar.carrera ? 5 : 15 }}>
+                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.carrera ? 5 : 15 }}>
                             <Controller
                                 control={controlEditar}
                                 name="boleta"
@@ -716,7 +728,7 @@ export default function GestionAlumnos() {
         if (!modalDarBaja) return null;
 
         return (
-            <Modal visible={modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de Baja Alumno" maxWidth={500}
+            <Modal visible={modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de baja alumno" maxWidth={500}
                 cancelar deshabilitado={isSubmittingDarBaja}
                 textoAceptar={isSubmittingDarBaja ? "Enviando…" : "Dar de baja"} onAceptar={() => { handleSubmitDarBaja(() => darBajaAlumno(modalDarBaja.boleta))(); }}>
                 <Text style={{ marginBottom: 20 }}>
@@ -729,7 +741,7 @@ export default function GestionAlumnos() {
 
     const renderModalCargarAlumnos = () => {
         return (
-            <Modal visible={modalCargar} titulo="Cargar Alumnos" maxWidth={600}
+            <Modal visible={modalCargar} titulo="Cargar alumnos" maxWidth={600}
                 onClose={() => { setModalCargar(false); setArchivoSeleccionado(null); }}
                 textoAceptar={isSubmittingCargar ? "Cargando…" : "Cargar archivo"}
                 cancelar onAceptar={handleSubirArchivo} deshabilitado={isSubmittingCargar}>
@@ -760,7 +772,7 @@ export default function GestionAlumnos() {
                 onAceptar={() => setDetalleVisible(false)}
             >
                 <View style={{ marginBottom: 12 }}>
-                    <View style={{ marginBottom: 6, flexDirection:"row", justifyContent: "space-between" }}>
+                    <View style={{ marginBottom: 6, flexDirection: "row", justifyContent: "space-between" }}>
                         <Text>Alumnos procesados: <Text style={{ fontWeight: "700" }}>{detalleTotales.total}</Text></Text>
                         <Text>Alumnos registrados: <Text style={{ fontWeight: "700", color: Colores.textoExito }}>{detalleTotales.exitos}</Text></Text>
                         <Text>Errores: <Text style={{ fontWeight: "700", color: Colores.textoError }}>{detalleTotales.errores}</Text></Text>
@@ -770,7 +782,7 @@ export default function GestionAlumnos() {
                 <Tabla
                     columnas={[
                         { key: "boleta", titulo: "Boleta", ancho: 150 },
-                        
+
                         { key: "error", titulo: "Error" },
                     ]}
                     datos={detalleFilas.map((f) => ({
@@ -785,7 +797,7 @@ export default function GestionAlumnos() {
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                <Text style={styles.titulo}>Gestionar Alumnos</Text>
+                <Text style={styles.titulo}>Gestionar alumnos</Text>
                 {sesion?.perfil === 2 && (
                     <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
                         <View>
@@ -917,14 +929,24 @@ export default function GestionAlumnos() {
                     />
                 </ScrollView>
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row", marginVertical: 15, gap: 6 }}>
+                <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
                         <Paginacion
                             paginaActual={paginaActual}
                             totalPaginas={totalPaginas}
                             setPaginaActual={setPaginaActual}
                         />
                     </View>
+
+                    <Text
+                        style={{
+                            color: Colores.textoClaro,
+                            fontSize: Fuentes.caption,
+                            marginTop: 15,
+                        }}
+                    >
+                        {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
+                    </Text>
                 </View>
 
             </View>

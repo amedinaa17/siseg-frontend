@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 12,
     padding: 6,
+    top: 7
   },
   errorTexto: {
     color: Colores.textoError,
