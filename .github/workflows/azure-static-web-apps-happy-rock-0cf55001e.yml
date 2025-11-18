@@ -19,10 +19,26 @@ jobs:
         with:
           submodules: true
           lfs: false
+          
+      # Establecer variables de entorno
       - name: Set environment variables
         run: |
           echo "API_URL=${{ secrets.API_URL }}" >> $GITHUB_ENV
-      - name: Build And Deploy
+
+      # Instalar dependencias
+      - name: Install dependencies
+        run: npm install
+
+      # Construir la aplicación
+      - name: Build the app
+        run: npx expo export -p web
+
+      # Copiar el archivo de configuración de Azure al directorio dist
+      - name: Copy SWA config to dist
+        run: cp staticwebapp.config.json dist/
+
+      # Desplegar a Azure Static Web Apps
+      - name: Build and Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -30,7 +46,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "/" # App source code path
           api_location: "" # Api source code path - optional
           output_location: "dist" # Built app content directory - optional

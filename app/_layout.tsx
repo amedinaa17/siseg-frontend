@@ -27,8 +27,8 @@ function AuthGate() {
     console.log(segmentos);
 
     // 404
-    if (grupo === "+not-found") {
-      router.replace("/+not-found");
+    if (grupo === "[...404]") {
+      router.replace("/[...404]");
       return;
     }
 

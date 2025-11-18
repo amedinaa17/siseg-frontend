@@ -1,14 +1,17 @@
 {
   "responseOverrides": {
     "404": {
-      "rewrite": "/+not-found",
+      "rewrite": "/[...404]",
       "statusCode": 404
     }
   },
-  "routes": [
-    {
-      "route": "/+not-found",
-      "statusCode": 404
-    }
-  ]
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/assets/*",
+      "/static/*",
+      "/_expo/*",
+      "/_framework/*"
+    ]
+  }
 }
