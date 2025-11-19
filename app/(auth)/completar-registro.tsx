@@ -54,9 +54,9 @@ export default function CompletarRegistro() {
             }));
           } else {
             if (response.message.includes("expirado"))
-              setError("Parece que el enlace ha caducado. Registra tu correo electrónico institucional nuevamente para recibir otro.");
+              setError("El enlace ha caducado. Registra tu correo electrónico institucional nuevamente para recibir otro.");
             else if (response.message.includes("inválido"))
-              setError("Parece que el enlace no es válido. Verifica que el enlace sea el correcto o registra tu correo electrónico institucional nuevamente para recibir otro.");
+              setError("El enlace no es válido. Verifica que el enlace sea el correcto o registra tu correo electrónico institucional nuevamente para recibir otro.");
             else
               setError("Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
           }
@@ -64,7 +64,7 @@ export default function CompletarRegistro() {
           setError("Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
       } else {
-        setError("Parece que el enlace no contiene un token válido. Verifica que el enlace sea el correcto o registra tu correo electrónico institucional nuevamente para recibir otro.");
+        setError("El enlace no contiene un token válido. Verifica que el enlace sea el correcto o registra tu correo electrónico institucional nuevamente para recibir otro.");
       }
     };
 

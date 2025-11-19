@@ -86,7 +86,7 @@ export const login = async (boleta: string, password: string) => {
         }
     } catch (error: any) {
         if (error.message === "1") {
-            throw new Error("Boleta o contraseña incorrectos.");
+            throw new Error("Boleta o contraseña incorrectos");
         } else {
             throw new Error("Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }

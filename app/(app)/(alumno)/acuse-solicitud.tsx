@@ -194,7 +194,7 @@ export default function AcuseSolicitud() {
       }
     } catch (e: any) {
       console.error(e);
-      modalAPI.current?.show(false, "Hubo un problema al generar el PDF. Inténtalo de nuevo más tarde.");
+      modalAPI.current?.show(false, "Hubo un problema al generar el acuse. Inténtalo de nuevo más tarde.");
     } finally {
       setCargando(false);
     }

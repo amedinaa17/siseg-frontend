@@ -196,7 +196,7 @@ export default function MiPerfil() {
                     )}
                     {vista === 2 && (
                         <>
-                            <Text style={styles.titulo}>Modificar Datos</Text>
+                            <Text style={styles.titulo}>Modificar datos</Text>
                             <View style={{ marginBottom: 15 }}>
                                 <Controller
                                     control={controlPerfil}
@@ -265,7 +265,7 @@ export default function MiPerfil() {
                     )}
                     {vista === 3 && (
                         <>
-                            <Text style={styles.titulo}>Cambiar Contraseña</Text>
+                            <Text style={styles.titulo}>Cambiar contraseña</Text>
 
                             <View style={{ marginBottom: 15 }}>
                                 <Controller

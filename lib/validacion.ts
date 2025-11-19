@@ -24,7 +24,7 @@ export const boletaEsquema = z
 // Validación para contraseña
 export const contraseñaEsquema = z
   .string()
-  .nonempty("Este campo es obligatorio")
+  .nonempty("La contraseña es obligatoria")
 
 // Esquema para inicio de sesión
 export const iniciarSesionEsquema = z.object({
@@ -103,7 +103,7 @@ export type RegistroFormulario = z.infer<typeof registroEsquema>;
 // Esquema de validación para cambiar la contraseña
 export const cambiarContraseñaEsquema = z
   .object({
-    contraseña: contraseñaEsquema
+    contraseña: z.string()
       .min(8, "La contraseña debe tener al menos 8 caracteres")
       .regex(/[a-z]/, "La contraseña debe tener al menos una letra minúscula")
       .regex(/[A-Z]/, "La contraseña debe tener al menos una letra mayúscula")

@@ -18,7 +18,6 @@ export default function NuevaContraseña() {
   const modalAPI = useRef<ModalAPIRef>(null);
 
   const [token, setToken] = useState<any>(null);
-  const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -28,7 +27,7 @@ export default function NuevaContraseña() {
       setToken(token)
 
       if (!token) {
-        setError("Parece que el enlace no contiene un token válido. Verifica que el enlace sea el correcto o solicita restablecer tu contraseña nuevamente.");
+        setError("El enlace no contiene un token válido. Verifica que el enlace sea el correcto o solicita restablecer tu contraseña nuevamente.");
       }
     };
 
@@ -58,9 +57,9 @@ export default function NuevaContraseña() {
           () => { router.replace("/"); });
       } else {
         if (response.message.includes("expirado"))
-          setError("Parece que el enlace ha caducado. Solicita nuevamente el restablecimiento de tu contraseña.");
+          setError("El enlace ha caducado. Solicita nuevamente el restablecimiento de tu contraseña.");
         else if (response.message.includes("inválido"))
-          setError("Parece que el enlace no es válido. Verifica que el enlace sea el correcto o solicita nuevamente el restablecimiento de tu contraseña.");
+          setError("El enlace no es válido. Verifica que el enlace sea el correcto o solicita nuevamente el restablecimiento de tu contraseña.");
         else
           modalAPI.current?.show(false, "Hubo un problema al cambiar tu contraseña. Inténtalo de nuevo más tarde.",
             () => { router.replace("/"); });
