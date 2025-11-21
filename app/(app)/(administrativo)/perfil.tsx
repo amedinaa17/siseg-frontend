@@ -140,7 +140,7 @@ export default function MiPerfil() {
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0 }}>
-                                    <Entrada label="CURP" value={datosAdministrativo?.curp || ""} editable={false} />
+                                    <Entrada label="CURP" value={datosAdministrativo?.curp || ""} maxLength={18} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 0 }}>
                                     <Selector
@@ -175,10 +175,10 @@ export default function MiPerfil() {
 
                             <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                                 <View style={{ flex: 1, marginBottom: 0 }}>
-                                    <Entrada label="Teléfono Celular" value={datosAdministrativo?.telcelular || ""} keyboardType="phone-pad" editable={false} />
+                                    <Entrada label="Teléfono Celular" value={datosAdministrativo?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 25 }}>
-                                    <Entrada label="Teléfono Local" value={datosAdministrativo?.tellocal || ""} keyboardType="phone-pad" editable={false} />
+                                    <Entrada label="Teléfono Local" value={datosAdministrativo?.tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                                 </View>
                             </View>
 
@@ -226,6 +226,7 @@ export default function MiPerfil() {
                                             <Entrada
                                                 label="Teléfono Celular"
                                                 keyboardType="phone-pad"
+                                                maxLength={10}
                                                 {...field}
                                                 error={errorsPerfil.telcelular?.message}
                                             />
@@ -241,6 +242,7 @@ export default function MiPerfil() {
                                             <Entrada
                                                 label="Teléfono Local"
                                                 keyboardType="phone-pad"
+                                                maxLength={10}
                                                 {...field}
                                                 error={errorsPerfil.tellocal?.message}
                                             />

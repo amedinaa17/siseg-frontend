@@ -74,7 +74,7 @@ export default function RevisarExpediente() {
         setObservacion("");
         setEstatus(null);
         obtenerDocumentos();
-        modalAPI.current?.show(true, `Documento ${estatus?.toLowerCase()} correctamente.`);
+        modalAPI.current?.show(true, `El documento ha sido ${estatus?.toLowerCase()} correctamente.`);
       } else {
         modalAPI.current?.show(false, "Hubo un problema al validar el documento. Inténtalo de nuevo más tarde.");
       }

@@ -93,10 +93,10 @@ export default function EncuestaSatisfaccion() {
             });
 
             if (resp?.error === 0) {
-                modalRef.current?.show(true, "¡Gracias! Tu encuesta fue enviada.");
+                modalRef.current?.show(true, "Encuesta enviada correctamente");
                 setAnswers({});
             } else {
-                modalRef.current?.show(false, "Hubo un problema al enviar tus respuestas. Inténtalo de nuevo más tarde.");
+                modalRef.current?.show(false, "Hubo un problema al enviar tu encuesta. Inténtalo de nuevo más tarde.");
             }
         } catch (e) {
             console.error(e);

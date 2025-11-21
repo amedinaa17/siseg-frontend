@@ -292,7 +292,7 @@ export default function GestionAlumnos() {
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                         <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="CURP" value={curp || ""} editable={false} />
+                            <Entrada label="CURP" value={curp || ""} maxLength={18} editable={false} />
                         </View>
                         <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="RFC" value={rfc || ""} editable={false} />
@@ -301,7 +301,7 @@ export default function GestionAlumnos() {
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                         <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Boleta" value={boleta || ""} keyboardType="numeric" editable={false} />
+                            <Entrada label="Boleta" value={boleta || ""} keyboardType="numeric" maxLength={10} editable={false} />
                         </View>
                         <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Carrera" value={carrera.NOMBRE || ""} editable={false} />
@@ -368,10 +368,10 @@ export default function GestionAlumnos() {
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                         <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Teléfono Celular" value={telcelular || ""} keyboardType="phone-pad" editable={false} />
+                            <Entrada label="Teléfono Celular" value={telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                         </View>
                         <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Teléfono Local" value={tellocal || ""} keyboardType="phone-pad" editable={false} />
+                            <Entrada label="Teléfono Local" value={tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                         </View>
                     </View>
                 </KeyboardAvoidingView>
@@ -428,6 +428,7 @@ export default function GestionAlumnos() {
                                 <Entrada
                                     label="CURP"
                                     value={value}
+                                    maxLength={18}
                                     onBlur={onBlur}
                                     onChangeText={(text) => onChange(text.toUpperCase())}
                                     error={errorsAgregar.curp?.message}
@@ -445,7 +446,7 @@ export default function GestionAlumnos() {
                                 name="boleta"
                                 defaultValue=""
                                 render={({ field }) => (
-                                    <Entrada label="Boleta" keyboardType="numeric" {...field} error={errorsAgregar.boleta?.message} />
+                                    <Entrada label="Boleta" keyboardType="numeric" maxLength={10} {...field} error={errorsAgregar.boleta?.message} />
                                 )}
                             />
                         </View>
@@ -599,6 +600,7 @@ export default function GestionAlumnos() {
                             render={({ field }) => (
                                 <Entrada
                                     label="CURP"
+                                    maxLength={18}
                                     {...field}
                                     error={errorsEditar.curp?.message}
                                     editable={false}
@@ -617,6 +619,7 @@ export default function GestionAlumnos() {
                                     <Entrada
                                         label="Boleta"
                                         keyboardType="numeric"
+                                        maxLength={10}
                                         {...field}
                                         error={errorsEditar.boleta?.message}
                                         editable={false}

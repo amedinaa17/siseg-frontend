@@ -190,7 +190,7 @@ export default function AcuseSolicitud() {
       if (puedeCompartir) {
         await Sharing.shareAsync(nuevoNombre, { mimeType: "application/pdf" });
       } else {
-        modalAPI.current?.show(true, `Archivo PDF descargado en:\n${nuevoNombre}`);
+        modalAPI.current?.show(true, `El acuse de solicitud se ha descargado en:\n${nuevoNombre}`);
       }
     } catch (e: any) {
       console.error(e);

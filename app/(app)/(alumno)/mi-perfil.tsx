@@ -152,7 +152,7 @@ export default function MiPerfil() {
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                                 <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="CURP" value={datosAlumno?.curp || ""} editable={false} />
+                                    <Entrada label="CURP" maxLength={18} value={datosAlumno?.curp || ""} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="RFC" value={datosAlumno?.rfc || ""} editable={false} />
@@ -161,7 +161,7 @@ export default function MiPerfil() {
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                                 <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Boleta" value={datosAlumno?.boleta || ""} keyboardType="numeric" editable={false} />
+                                    <Entrada label="Boleta" value={datosAlumno?.boleta || ""} keyboardType="numeric" maxLength={10} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Carrera" value={datosAlumno?.carrera || ""} editable={false} />
@@ -223,10 +223,10 @@ export default function MiPerfil() {
 
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                                 <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular || ""} keyboardType="phone-pad" editable={false} />
+                                    <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 25 }}>
-                                    <Entrada label="Teléfono Local" value={datosAlumno?.tellocal || ""} keyboardType="phone-pad" editable={false} />
+                                    <Entrada label="Teléfono Local" value={datosAlumno?.tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                                 </View>
                             </View>
                             {datosAlumno &&
@@ -355,6 +355,7 @@ export default function MiPerfil() {
                                             <Entrada
                                                 label="Teléfono Celular"
                                                 keyboardType="phone-pad"
+                                                maxLength={10}
                                                 {...field}
                                                 error={errorsPerfil.telcelular?.message}
                                             />
@@ -370,6 +371,7 @@ export default function MiPerfil() {
                                             <Entrada
                                                 label="Teléfono Local"
                                                 keyboardType="phone-pad"
+                                                maxLength={10}
                                                 {...field}
                                                 error={errorsPerfil.tellocal?.message}
                                             />

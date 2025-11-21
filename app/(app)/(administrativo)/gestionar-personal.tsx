@@ -206,7 +206,7 @@ export default function GestionPersonalAdministrativo() {
 
                         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                             <View style={{ flex: 1, marginBottom: 15 }}>
-                                <Entrada label="CURP" value={persona.curp || ""} editable={false} />
+                                <Entrada label="CURP" value={persona.curp || ""} maxLength={18} editable={false} />
                             </View>
                             <View style={{ flex: 1, marginBottom: 15 }}>
                                 <Selector
@@ -240,10 +240,10 @@ export default function GestionPersonalAdministrativo() {
 
                         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                             <View style={{ flex: 1, marginBottom: 15 }}>
-                                <Entrada label="Teléfono Celular" value={persona.telefonoMovil || ""} keyboardType="phone-pad" editable={false} />
+                                <Entrada label="Teléfono Celular" value={persona.telefonoMovil || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                             </View>
                             <View style={{ flex: 1, marginBottom: 25 }}>
-                                <Entrada label="Teléfono Local" value={persona.telefonoFijo || ""} keyboardType="phone-pad" editable={false} />
+                                <Entrada label="Teléfono Local" value={persona.telefonoFijo || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                             </View>
                         </View>
                     </ScrollView>
@@ -301,6 +301,7 @@ export default function GestionPersonalAdministrativo() {
                                     <Entrada
                                         label="CURP"
                                         value={value}
+                                        maxLength={18}
                                         onBlur={onBlur}
                                         onChangeText={(text) => onChange(text.toUpperCase())}
                                         error={errorsAgregar.curp?.message}
@@ -399,7 +400,7 @@ export default function GestionPersonalAdministrativo() {
                                 name="telcelular"
                                 defaultValue=""
                                 render={({ field }) => (
-                                    <Entrada label="Teléfono Celular" keyboardType="phone-pad" {...field} error={errorsAgregar.telcelular?.message} />
+                                    <Entrada label="Teléfono Celular" keyboardType="phone-pad" maxLength={10} {...field} error={errorsAgregar.telcelular?.message} />
                                 )}
                             />
                         </View>
@@ -409,7 +410,7 @@ export default function GestionPersonalAdministrativo() {
                                 name="tellocal"
                                 defaultValue=""
                                 render={({ field }) => (
-                                    <Entrada label="Teléfono Local" keyboardType="phone-pad" {...field} error={errorsAgregar.tellocal?.message} />
+                                    <Entrada label="Teléfono Local" keyboardType="phone-pad" maxLength={10} {...field} error={errorsAgregar.tellocal?.message} />
                                 )}
                             />
                         </View>
@@ -481,6 +482,7 @@ export default function GestionPersonalAdministrativo() {
                                 render={({ field }) => (
                                     <Entrada
                                         label="CURP"
+                                        maxLength={18}
                                         {...field}
                                         error={errorsEditar.curp?.message}
                                         editable={false}
@@ -592,6 +594,7 @@ export default function GestionPersonalAdministrativo() {
                                     <Entrada
                                         label="Teléfono Celular"
                                         keyboardType="phone-pad"
+                                        maxLength={10}
                                         {...field}
                                         error={errorsEditar.telcelular?.message}
                                         style={{ flex: 1 }}
@@ -608,6 +611,7 @@ export default function GestionPersonalAdministrativo() {
                                     <Entrada
                                         label="Teléfono Local"
                                         keyboardType="phone-pad"
+                                        maxLength={10}
                                         {...field}
                                         error={errorsEditar.tellocal?.message}
                                         style={{ flex: 1 }}

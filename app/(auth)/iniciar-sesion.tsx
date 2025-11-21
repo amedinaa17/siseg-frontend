@@ -71,6 +71,7 @@ export default function IniciarSesion() {
                     onChangeText={onChange}
                     autoCapitalize="none"
                     keyboardType="numeric"
+                    maxLength={10}
                     error={errors.boleta?.message}
                   />
                 )}

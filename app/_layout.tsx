@@ -24,8 +24,6 @@ function AuthGate() {
     const enGrupoAuth = grupo === "(auth)";
     const enGrupoApp = grupo === "(app)";
 
-    console.log(segmentos);
-
     // 404
     if (grupo === "[...404]") {
       router.replace("/[...404]");

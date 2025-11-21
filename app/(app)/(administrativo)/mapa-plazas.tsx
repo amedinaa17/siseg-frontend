@@ -143,16 +143,16 @@ function useMapaPlazas() {
       ]);
 
       if (rPlazas.error === 0) setPlazas(rPlazas.plazas ?? rPlazas.data ?? []);
-      else throw new Error(rPlazas.message || "Error al obtener plazas");
+      else throw new Error("Hubo un problema al obtener las plazas del servidor. Inténtalo de nuevo más tarde.");
 
       if (rMapa.error === 0) setMapaData(rMapa.data ?? []);
-      else throw new Error(rMapa.message || "Error al obtener datos del mapa");
+      else throw new Error("Hubo un problema al cargar el mapa. Inténtalo de nuevo más tarde.");
 
       if (rAlumnos.error === 0)
         setAlumnos(rAlumnos.data ?? rAlumnos.alumnos ?? []);
-      else throw new Error(rAlumnos.message || "Error al obtener alumnos");
+      else throw new Error("Hubo un problema al obtener los datos de los alumnos del servidor. Inténtalo de nuevo más tarde.");
     } catch (e: any) {
-      setErrorMsg(e?.message || "Error al cargar datos");
+      setErrorMsg("Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
     } finally {
       setLoading(false);
     }
@@ -280,7 +280,7 @@ export default function MapaPlazas() {
     if (sedeJump) {
       const p = puntos.find((x) => x.sede === sedeJump);
       if (p && (!p.latitude || !p.longitude)) {
-        modalAPI.current?.show(false, "Esta sede aún no tiene coordenadas geocodificadas.");
+        modalAPI.current?.show(false, "Esta sede aún no tiene coordenadas geo codificadas.");
       }
     }
   }, [sedeJump, puntos]);
@@ -332,10 +332,10 @@ export default function MapaPlazas() {
         setAlumnoDetalles(resp.data as DetallesAlumno);
         setModalAlumnoVisible(true);
       } else {
-        modalAPI.current?.show(false, resp?.message || "No se pudo obtener el alumno.");
+        modalAPI.current?.show(false, "Hubo un problema al obtener los datos del alumno. Inténtalo de nuevo más tarde.");
       }
     } catch (e) {
-      modalAPI.current?.show(false, "Error al conectar con el servidor.");
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
     } finally {
       setLoadingAlumno(false);
     }
@@ -519,9 +519,9 @@ export default function MapaPlazas() {
                 <Entrada label="Nombre" value={alumnoDetalles?.nombre ?? ""} editable={false} />
                 <Entrada label="Apellido Paterno" value={alumnoDetalles?.apellido_paterno ?? ""} editable={false} />
                 <Entrada label="Apellido Materno" value={alumnoDetalles?.apellido_materno ?? ""} editable={false} />
-                <Entrada label="CURP" value={alumnoDetalles?.curp ?? ""} editable={false} />
+                <Entrada label="CURP" value={alumnoDetalles?.curp ?? ""} maxLength={18} editable={false} />
                 <Entrada label="RFC" value={alumnoDetalles?.rfc ?? ""} editable={false} />
-                <Entrada label="Boleta" value={alumnoDetalles?.boleta ?? ""} editable={false} />
+                <Entrada label="Boleta" value={alumnoDetalles?.boleta ?? ""} editable={false} maxLength={10} />
                 <Entrada label="Carrera" value={alumnoDetalles?.carrera ?? ""} editable={false} />
                 <Entrada label="Generación" value={String(alumnoDetalles?.generacion ?? "")} editable={false} />
                 <Entrada label="Promedio" value={String(alumnoDetalles?.promedio ?? "")} editable={false} />
@@ -531,8 +531,8 @@ export default function MapaPlazas() {
                 <Entrada label="Estado" value={alumnoDetalles?.estado ?? ""} editable={false} />
                 <Entrada label="Código Postal" value={alumnoDetalles?.cp ?? ""} editable={false} />
                 <Entrada label="Sexo" value={alumnoDetalles?.sexo ?? ""} editable={false} />
-                <Entrada label="Teléfono Celular" value={alumnoDetalles?.telcelular ?? ""} editable={false} />
-                <Entrada label="Teléfono Local" value={alumnoDetalles?.tellocal ?? ""} editable={false} />
+                <Entrada label="Teléfono Celular" value={alumnoDetalles?.telcelular ?? ""} maxLength={10} editable={false} />
+                <Entrada label="Teléfono Local" value={alumnoDetalles?.tellocal ?? ""} maxLength={10} editable={false} />
                 <Entrada label="Sede" value={alumnoDetalles?.sede ?? modalSede} editable={false} />
               </View>
             </View>

@@ -143,6 +143,7 @@ export default function CompletarRegistro() {
                   <View style={{ marginBottom: 15 }} >
                     <Entrada
                       label="CURP"
+                      maxLength={18}
                       value={alumno?.curp || ""}
                       editable={false}
                     />
@@ -152,6 +153,8 @@ export default function CompletarRegistro() {
                     <View style={{ flex: 1, marginBottom: 15 }}>
                       <Entrada
                         label="Boleta"
+                        keyboardType="numeric"
+                        maxLength={10}
                         value={alumno?.boleta || ""}
                         editable={false}
                       />
@@ -325,6 +328,7 @@ export default function CompletarRegistro() {
                           <Entrada
                             label="Teléfono Celular"
                             keyboardType="phone-pad"
+                            maxLength={10}
                             {...field}
                             error={errors.telcelular?.message}
                           />
@@ -340,6 +344,7 @@ export default function CompletarRegistro() {
                           <Entrada
                             label="Teléfono Local"
                             keyboardType="phone-pad"
+                            maxLength={10}
                             {...field}
                             error={errors.tellocal?.message}
                           />

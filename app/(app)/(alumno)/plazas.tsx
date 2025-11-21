@@ -66,7 +66,7 @@ export default function CatalogoPlazas() {
           `plaza/obtenerPlazas?tk=${encodeURIComponent(sesion.token)}`
         );
         if (res?.error === 0 && Array.isArray(res.plazas)) setPlazas(res.plazas);
-        else modalAPI.current?.show(false, res?.message || "Error al obtener las plazas disponibles.");
+        else modalAPI.current?.show(false, "Hubo un problema al obtener las plazas. Inténtalo de nuevo más tarde.");
       } catch (e) {
         console.error("[Plazas] Error de red", e);
         modalAPI.current?.show(false, "Error al conectar con el servidor al obtener las plazas.");

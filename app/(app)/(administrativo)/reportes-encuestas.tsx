@@ -168,7 +168,7 @@ export default function EncuestasAdmin() {
         setEncuestas(listaEnc);
       }
     } catch (e) {
-      modalAPI.current?.show(false, "Error al cargar información.");
+      modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
     } finally {
       setPaginaActual(1);
     }
@@ -348,7 +348,6 @@ export default function EncuestasAdmin() {
         onClose={() => setModalOpen(false)}
         titulo="Encuesta de satisfacción mensual"
         maxWidth={900}
-        cancelar
       >
         <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 15, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Período: </Text> {modalFecha}</Text>
         <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{modalAlumno}</Text>

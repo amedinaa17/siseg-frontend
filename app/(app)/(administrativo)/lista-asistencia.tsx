@@ -39,17 +39,18 @@ export default function CursoInduccion() {
     const getBoletaFromQR = (raw: string) => String(raw || "").trim();
 
     const registrarAsistencia = async (boleta: string) => {
+        detenerEscaneo();
         verificarToken();
 
         try {
-
             const response = await postData("qr/registrarQR", {
                 tk: sesion?.token,
                 boleta: boleta,
             });
-
             if (response.error === 0) {
-                modalAPI.current?.show(true, `Asistencia registrada correctamente para el alumno ${boleta}`);
+                modalAPI.current?.show(true, `La asistencia ha sido registrada correctamente para el alumno ${boleta}`);
+            } else if (response.message.includes("confirmar usuario")) {
+                modalAPI.current?.show(false, "El código QR no es válido.");
             } else {
                 modalAPI.current?.show(false, "Hubo un problema al registrar la asistencia del alumno. Inténtalo de nuevo más tarde.");
             }
@@ -85,11 +86,11 @@ export default function CursoInduccion() {
                     esPantallaPequeña && { maxWidth: "95%" },
                 ]}
             >
-                <Text style={styles.titulo}>Asistencia al curso de inducción por QR</Text>
+                <Text style={styles.titulo}>Registrar asistencia al curso de inducción</Text>
                 <Text style={styles.subtitulo}>
                     Escanea el código QR del alumno para registrar su asistencia al curso de inducción.
                 </Text>
-                <Text style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, marginBottom: 20, textAlign: "center"}}>Nota: Habilita el acceso a la cámara de tu dispositivo.</Text>
+                <Text style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, marginBottom: 20, textAlign: "center" }}>Nota: Habilita el acceso a la cámara de tu dispositivo.</Text>
 
                 <View style={styles.marcoEscaneo}>
                     {escaneando ? (

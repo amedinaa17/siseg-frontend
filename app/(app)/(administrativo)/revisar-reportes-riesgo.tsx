@@ -50,7 +50,7 @@ export default function ReportesRiesgo() {
             if (response.error === 0) {
                 setReportes(response.fullreportes);
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
             modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
@@ -87,7 +87,7 @@ export default function ReportesRiesgo() {
                 setModalDetalle(false);
                 setEstatus(undefined);
                 obtenerReportes();
-                modalAPI.current?.show(true, "Se ha actualizado el estatus del reporte correctamente.");
+                modalAPI.current?.show(true, "El estatus ha sido actualizado correctamente.");
             } else {
                 modalAPI.current?.show(false, "Hubo un problema al cambiar el estatus del reporte. Inténtalo de nuevo más tarde.");
             }
@@ -111,7 +111,7 @@ export default function ReportesRiesgo() {
                 setModalAgregarObservacion(false);
                 reset();
                 obtenerReportes();
-                modalAPI.current?.show(true, "Se ha agregado la observación correctamente.");
+                modalAPI.current?.show(true, "La observación ha sido agregada correctamente.");
             } else {
                 modalAPI.current?.show(false, "Hubo un problema al agregar la observación. Inténtalo de nuevo más tarde.");
             }
@@ -133,7 +133,7 @@ export default function ReportesRiesgo() {
             <Modal
                 visible={modalDetalle} cancelar
                 onClose={() => { setReporteSeleccionado(null); setModalDetalle(false); }}
-                deshabilitado={isSubmittingEstatus} textoAceptar={isSubmittingEstatus ? "Actualizando…" : undefined}
+                deshabilitado={isSubmittingEstatus} textoAceptar={isSubmittingEstatus ? "Actualizando…" : reporteSeleccionado.estatus != estatus ? "Guardar estatus" : undefined}
                 onAceptar={reporteSeleccionado.estatus != estatus ? handleSubmitEstatus(cambiarEstatusReporte) : () => { setReporteSeleccionado(null); setModalDetalle(false); }}
                 titulo={"Detalles del reporte"}
                 maxWidth={700}
@@ -173,7 +173,7 @@ export default function ReportesRiesgo() {
                             />
                         </View>
                         <View style={{ flex: 1, marginBottom: 0 }}>
-                            <Entrada label="Boleta" value={reporteSeleccionado.alumnoBoleta} editable={false} />
+                            <Entrada label="Boleta" value={reporteSeleccionado.alumnoBoleta} maxLength={10} editable={false} />
                         </View>
                     </View>
 
@@ -301,7 +301,7 @@ export default function ReportesRiesgo() {
                     )}
                     {reporteSeleccionado.estatus != 3 && (
                         <View style={{ alignItems: "flex-start", marginTop: 20 }}>
-                            <Boton title="Agregar Observación" onPress={() => { setModalObservaciones(false); setModalAgregarObservacion(true); }} />
+                            <Boton title="Agregar observación" onPress={() => { setModalObservaciones(false); setModalAgregarObservacion(true); }} />
                         </View>
                     )}
                 </KeyboardAvoidingView>

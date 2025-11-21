@@ -3,10 +3,13 @@ import Entrada from "@/componentes/ui/Entrada";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function PlazaAsignada() {
+    const router = useRouter();
+
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
 
@@ -14,32 +17,27 @@ export default function PlazaAsignada() {
     const { sesion } = useAuth();
 
     const [datosAlumno, setDatosAlumno] = useState<any>(null);
-    const [cargando, setCargando] = useState(false);
 
     useEffect(() => {
         const obtenerDatos = async () => {
             if (!sesion?.token) return;
 
             try {
-                setCargando(true);
                 const response = await fetchData(`users/obtenerPlazaAsignada?tk=${encodeURIComponent(sesion.token)}`);
-                
                 if (response?.error === 0) {
-                    if (response?.plaza) {
+                    if (response.plaza.sede) {
                         setDatosAlumno(response.plaza);
                     } else {
-                        modalAPI.current?.show(false, "No tienes plaza asignada todavía.");
+                        modalAPI.current?.show(false, "Aún no tienes una plaza asignada.", () => { router.replace("/"); });
                         setDatosAlumno(null);
                     }
                 } else {
-                    modalAPI.current?.show(false, response?.message ?? "No se pudo obtener tu plaza.");
+                    modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
                     setDatosAlumno(null);
                 }
             } catch (error) {
                 console.error(error);
                 modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
-            } finally {
-                setCargando(false);
             }
         };
 
@@ -78,12 +76,6 @@ export default function PlazaAsignada() {
                 <View style={{ marginBottom: 15 }}>
                     <Entrada label="Ubicación" value={datosAlumno?.ubicacion ?? ""} editable={false} />
                 </View>
-
-                {cargando && (
-                    <Text style={{ textAlign: "center", marginTop: 8 }}>
-                        Cargando información...
-                    </Text>
-                )}
             </View>
 
             {/* Monta el modal para poder usar modalAPI.current?.show(...) */}

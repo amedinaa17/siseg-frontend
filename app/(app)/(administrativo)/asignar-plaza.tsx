@@ -149,12 +149,14 @@ export default function AsignarPlaza() {
             };
             const resp = await postData(`plaza/asignarPlaza`, payload);
             if (resp.error === 0) {
-                modalAPI.current?.show(true, "Plaza asignada correctamente.");
+                modalAPI.current?.show(true, "La plaza ha sido asignada correctamente.");
                 setModalAsignar(false);
                 setProgramaSeleccionado("");
                 setPlazaSeleccionadaId("");
                 setPlazaSeleccionadaLabel("");
                 await obtenerAlumnos();
+            } else if (resp.message.includes("")) {
+                modalAPI.current?.show(false, "La plaza seleccionada ya no tiene tarjetas disponibles.");
             } else {
                 modalAPI.current?.show(false, "Hubo un problema al asignar la plaza. Inténtalo de nuevo más tarde.");
             }
@@ -205,7 +207,7 @@ export default function AsignarPlaza() {
                     <ModalBody>
                         <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{alumnoSeleccionado.nombre} {alumnoSeleccionado.apellido_materno} {alumnoSeleccionado.apellido_paterno}</Text>
                         <View style={{ marginTop: 5, marginBottom: 15 }}>
-                            <Entrada label="Boleta" value={`${alumnoSeleccionado.boleta}`} editable={false} />
+                            <Entrada label="Boleta" value={`${alumnoSeleccionado.boleta}`} keyboardType="numeric" maxLength={10} editable={false} />
                         </View>
 
                         <View style={{ marginBottom: 15 }}>
