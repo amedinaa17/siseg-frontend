@@ -10,12 +10,16 @@ import { completarDocumentos } from "@/lib/documentosHelper";
 import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Linking, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Linking, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function ExpedienteDigital() {
     const { sesion, verificarToken } = useAuth();
+    const router = useRouter();
+
+    const [cargando, setCargando] = useState(false);
 
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
@@ -30,16 +34,19 @@ export default function ExpedienteDigital() {
         verificarToken();
 
         try {
+            setCargando(true);
             const response = await fetchData(`users/expedienteDigital?boleta=${sesion.boleta}&tk=${sesion.token}`);
 
             if (response.error === 0) {
                 const docsBackend = response.documents;
                 setDocumentos(completarDocumentos(docsBackend));
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
+                modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+        } finally {
+            setCargando(false);
         }
     };
 
@@ -146,6 +153,7 @@ export default function ExpedienteDigital() {
                             <EntradaMultilinea
                                 label="Observaciones"
                                 value={observacion}
+                                editable={false}
                             />
                         </View>
                     </>
@@ -173,6 +181,7 @@ export default function ExpedienteDigital() {
                             <EntradaMultilinea
                                 label="Observaciones"
                                 value={observacion}
+                                editable={false}
                             />
                         </View>
                     </>
@@ -200,6 +209,7 @@ export default function ExpedienteDigital() {
                             <EntradaMultilinea
                                 label="Observaciones"
                                 value={observacion}
+                                editable={false}
                             />
                         </View>
                     </>
@@ -209,67 +219,74 @@ export default function ExpedienteDigital() {
     };
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                <Text style={styles.titulo}>Expediente digital</Text>
-                <Text style={styles.subtitulo}>Registro al servicio social</Text>
-                <ScrollView horizontal={esPantallaPequeña}>
-                    <Tabla
-                        columnas={[
-                            { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
-                            {
-                                key: "estatus",
-                                titulo: "Estatus",
-                                render: (valor, fila) => (
-                                    <Text style={[styles.texto, { color: fila.color }]}>
-                                        {valor}
-                                    </Text>
-                                ),
-                                ...(esPantallaPequeña && { ancho: 150 })
-                            },
-                            { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
-                        ]}
-                        datos={documentos
-                            .filter((d) => d.tipo === 1)
-                            .map((fila) => ({
-                                ...fila,
-                                observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
-                                onPress: () => setDocSeleccionado(fila),
-                            }))}
-                    />
-                </ScrollView>
+        <>
+            {cargando && (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+                    <ActivityIndicator size="large" color="#5a0839" />
+                </View>
+            )}
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                    <Text style={styles.titulo}>Expediente digital</Text>
+                    <Text style={styles.subtitulo}>Registro al servicio social</Text>
+                    <ScrollView horizontal={esPantallaPequeña}>
+                        <Tabla
+                            columnas={[
+                                { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
+                                {
+                                    key: "estatus",
+                                    titulo: "Estatus",
+                                    render: (valor, fila) => (
+                                        <Text style={[styles.texto, { color: fila.color }]}>
+                                            {valor}
+                                        </Text>
+                                    ),
+                                    ...(esPantallaPequeña && { ancho: 150 })
+                                },
+                                { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
+                            ]}
+                            datos={documentos
+                                .filter((d) => d.tipo === 1)
+                                .map((fila) => ({
+                                    ...fila,
+                                    observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
+                                    onPress: () => setDocSeleccionado(fila),
+                                }))}
+                        />
+                    </ScrollView>
 
-                <Text style={styles.subtitulo}>Término del servicio social</Text>
+                    <Text style={styles.subtitulo}>Término del servicio social</Text>
 
-                <ScrollView horizontal={esPantallaPequeña}>
-                    <Tabla
-                        columnas={[
-                            { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
-                            {
-                                key: "estatus",
-                                titulo: "Estatus",
-                                render: (valor, fila) => (
-                                    <Text style={[styles.texto, { color: fila.color }]}>
-                                        {valor}
-                                    </Text>
-                                ),
-                                ...(esPantallaPequeña && { ancho: 150 })
-                            },
-                            { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
-                        ]}
-                        datos={documentos
-                            .filter((d) => d.tipo === 2)
-                            .map((fila) => ({
-                                ...fila,
-                                observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
-                                onPress: () => setDocSeleccionado(fila),
-                            }))}
-                    />
-                </ScrollView>
-            </View>
-            {renderModal()}
-            <ModalAPI ref={modalAPI} />
-        </ScrollView >
+                    <ScrollView horizontal={esPantallaPequeña}>
+                        <Tabla
+                            columnas={[
+                                { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
+                                {
+                                    key: "estatus",
+                                    titulo: "Estatus",
+                                    render: (valor, fila) => (
+                                        <Text style={[styles.texto, { color: fila.color }]}>
+                                            {valor}
+                                        </Text>
+                                    ),
+                                    ...(esPantallaPequeña && { ancho: 150 })
+                                },
+                                { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
+                            ]}
+                            datos={documentos
+                                .filter((d) => d.tipo === 2)
+                                .map((fila) => ({
+                                    ...fila,
+                                    observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
+                                    onPress: () => setDocSeleccionado(fila),
+                                }))}
+                        />
+                    </ScrollView>
+                </View>
+                {renderModal()}
+                <ModalAPI ref={modalAPI} />
+            </ScrollView >
+        </>
     );
 }
 

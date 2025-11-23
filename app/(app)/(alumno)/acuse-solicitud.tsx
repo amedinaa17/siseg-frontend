@@ -4,6 +4,7 @@ import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import * as FS from "expo-file-system/legacy";
 import * as Print from "expo-print";
+import { useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -19,35 +20,43 @@ import {
 import { WebView } from "react-native-webview";
 
 export default function AcuseSolicitud() {
+  const { sesion, verificarToken } = useAuth();
+  const router = useRouter();
+
+  const [cargando, setCargando] = useState(false);
+
   const { width } = useWindowDimensions();
   const esPantallaPequeña = width < 790;
+
   const webViewRef = useRef<any>(null);
-  const { sesion } = useAuth();
   const modalAPI = useRef<ModalAPIRef>(null);
 
   const [datosAlumno, setDatosAlumno] = useState<any>(null);
-  const [cargando, setCargando] = useState(false);
+
+
+  const obtenerDatos = async () => {
+    verificarToken();
+
+    try {
+      setCargando(true);
+
+      const response = await fetchData(`users/obtenerTodosDatosAlumno?tk=${sesion.token}`);
+
+      if (response.error === 0) {
+        setDatosAlumno(response.data);
+      } else {
+        modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+      }
+    } catch (error) {
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+    } finally {
+      setCargando(false);
+    }
+  };
 
   useEffect(() => {
-    const obtenerDatos = async () => {
-      if (!sesion?.token) return;
-      try {
-        setCargando(true);
-        const response = await fetchData(`users/obtenerTodosDatosAlumno?tk=${sesion.token}`);
-        if (response.error === 0) {
-          setDatosAlumno(response.data);
-        } else {
-          console.error(response.message);
-          modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
-        }
-      } catch (error) {
-        modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
-      } finally {
-        setCargando(false);
-      }
-    };
     obtenerDatos();
-  }, [sesion]);
+  }, []);
 
   const generarHTML = useCallback(
     (includePrintButton: boolean) => `
@@ -171,7 +180,6 @@ export default function AcuseSolicitud() {
         modalAPI.current?.show(false, "Aún no se cargan los datos del alumno.");
         return;
       }
-      setCargando(true);
 
       const html = generarHTML(false);
       const { uri } = await Print.printToFileAsync({ html });
@@ -194,73 +202,72 @@ export default function AcuseSolicitud() {
       }
     } catch (e: any) {
       console.error(e);
-      modalAPI.current?.show(false, "Hubo un problema al generar el acuse. Inténtalo de nuevo más tarde.");
-    } finally {
-      setCargando(false);
+      modalAPI.current?.show(false, "Hubo un problema al generar el acuse. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
     }
   }, [datosAlumno, generarHTML]);
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View
-        style={[
-          styles.contenedorFormulario,
-          esPantallaPequeña && { maxWidth: "95%" },
-        ]}
-      >
-        <Text style={styles.titulo}>
-          Acuse de solicitud de registro al servicio social
-        </Text>
-
-        <Text style={styles.subtitulo}>
-          Descarga e imprime tu Acuse de Solicitud de Registro al Servicio Social. Deberás pegar en el lado superior izquierdo una fotografía tamaño infantil actual a color y firmarlo.
-        </Text>
-
-        <Text style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>Importante: Verifica que tu información sea correcta antes de imprimir o descargar el acuse.</Text>
-
-
-        {Platform.OS !== "web" && (
-          <View style={{ alignItems: "center", marginTop: 12 }}>
-            <TouchableOpacity
-              onPress={onDescargarPDF}
-              style={styles.botonPrimario}
-              disabled={cargando}
-            >
-              {cargando ? (
-                <ActivityIndicator />
-              ) : (
-                <Text style={styles.botonPrimarioTexto}>Descargar</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        )}
-
-        <View style={{ marginTop: 30, flex: 1, minHeight: 600 }}>
-          {Platform.OS === "web" ? (
-            <iframe
-              srcDoc={generarHTML(true)}
-              style={{
-                width: "100%",
-                height: "100%",
-                border: "1px solid #ccc",
-                borderRadius: 8,
-              }}
-            />
-          ) : (
-            <WebView
-              ref={webViewRef}
-              originWhitelist={["*"]}
-              source={{ html: generarHTML(false) }}
-              style={{ flex: 1, borderRadius: 8 }}
-              scalesPageToFit={true}
-              automaticallyAdjustContentInsets={false}
-            />
-          )}
+    <>
+      {cargando && (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+          <ActivityIndicator size="large" color="#5a0839" />
         </View>
-      </View>
+      )}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View
+          style={[
+            styles.contenedorFormulario,
+            esPantallaPequeña && { maxWidth: "95%" },
+          ]}
+        >
+          <Text style={styles.titulo}>
+            Acuse de solicitud de registro al servicio social
+          </Text>
 
-      <ModalAPI ref={modalAPI} />
-    </ScrollView>
+          <Text style={styles.subtitulo}>
+            Descarga e imprime tu Acuse de Solicitud de Registro al Servicio Social. Deberás pegar en el lado superior izquierdo una fotografía tamaño infantil actual a color y firmarlo.
+          </Text>
+
+          <Text style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>Importante: Verifica que tu información sea correcta antes de imprimir o descargar el acuse.</Text>
+
+
+          {Platform.OS !== "web" && (
+            <View style={{ alignItems: "center", marginTop: 12 }}>
+              <TouchableOpacity
+                onPress={onDescargarPDF}
+                style={styles.botonPrimario}
+              >
+                <Text style={styles.botonPrimarioTexto}>Descargar</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <View style={{ marginTop: 30, flex: 1, minHeight: 600 }}>
+            {Platform.OS === "web" ? (
+              <iframe
+                srcDoc={generarHTML(true)}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  border: "1px solid #ccc",
+                  borderRadius: 8,
+                }}
+              />
+            ) : (
+              <WebView
+                ref={webViewRef}
+                originWhitelist={["*"]}
+                source={{ html: generarHTML(false) }}
+                style={{ flex: 1, borderRadius: 8 }}
+                scalesPageToFit={true}
+                automaticallyAdjustContentInsets={false}
+              />
+            )}
+          </View>
+        </View>
+        <ModalAPI ref={modalAPI} />
+      </ScrollView>
+    </>
   );
 }
 

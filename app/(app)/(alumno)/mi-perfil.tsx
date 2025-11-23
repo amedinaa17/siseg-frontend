@@ -10,12 +10,17 @@ import {
 import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function MiPerfil() {
     const { sesion, verificarToken } = useAuth();
+    const router = useRouter();
+
+    const [cargando, setCargando] = useState(false);
+
     const [datosAlumno, setDatosAlumno] = useState<any>(null);
 
     const modalAPI = useRef<ModalAPIRef>(null);
@@ -30,14 +35,18 @@ export default function MiPerfil() {
 
             if (sesion?.token) {
                 try {
+                    setCargando(true);
+                    
                     const response = await fetchData(`users/obtenerTodosDatosAlumno?tk=${sesion.token}`);
                     if (response.error === 0) {
                         setDatosAlumno(response.data);
                     } else {
-                        modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
+                        modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
                     }
                 } catch (error) {
-                    modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+                    modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+                } finally {
+                    setCargando(false);
                 }
             }
         };
@@ -124,333 +133,341 @@ export default function MiPerfil() {
     }, [errorsContraseña]);
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View
-                    style={[
-                        styles.contenedorFormulario,
-                        esPantallaPequeña && { maxWidth: "95%" },
-                        vista === 3 && { marginTop: 100 }
-                    ]}
-                >
-                    {vista === 1 && (
-                        <>
-                            <Text style={styles.titulo}>Mi perfil</Text>
+        <>
+            {cargando && (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+                    <ActivityIndicator size="large" color="#5a0839" />
+                </View>
+            )}
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <View
+                        style={[
+                            styles.contenedorFormulario,
+                            esPantallaPequeña && { maxWidth: "95%" },
+                            vista === 3 && { marginTop: 100 }
+                        ]}
+                    >
+                        {vista === 1 && (
+                            <>
+                                <Text style={styles.titulo}>Mi perfil</Text>
 
-                            <View style={{ marginBottom: 15 }} >
-                                <Entrada label="Nombre" value={datosAlumno?.nombre || ""} editable={false} />
-                            </View>
+                                <View style={{ marginBottom: 15 }} >
+                                    <Entrada label="Nombre" value={datosAlumno?.nombre || ""} editable={false} />
+                                </View>
 
-                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Apellido Paterno" value={datosAlumno?.apellido_paterno || ""} editable={false} />
+                                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Apellido Paterno" value={datosAlumno?.apellido_paterno || ""} editable={false} />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Apellido Materno" value={datosAlumno?.apellido_materno || ""} editable={false} />
+                                    </View>
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Apellido Materno" value={datosAlumno?.apellido_materno || ""} editable={false} />
-                                </View>
-                            </View>
 
-                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="CURP" maxLength={18} value={datosAlumno?.curp || ""} editable={false} />
+                                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="CURP" maxLength={18} value={datosAlumno?.curp || ""} editable={false} />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="RFC" value={datosAlumno?.rfc || ""} editable={false} />
+                                    </View>
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="RFC" value={datosAlumno?.rfc || ""} editable={false} />
-                                </View>
-                            </View>
 
-                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Boleta" value={datosAlumno?.boleta || ""} keyboardType="numeric" maxLength={10} editable={false} />
+                                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Boleta" value={datosAlumno?.boleta || ""} keyboardType="numeric" maxLength={10} editable={false} />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Carrera" value={datosAlumno?.carrera || ""} editable={false} />
+                                    </View>
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Carrera" value={datosAlumno?.carrera || ""} editable={false} />
-                                </View>
-                            </View>
 
-                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Generación" value={datosAlumno?.generacion || ""} editable={false} />
+                                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Generación" value={datosAlumno?.generacion || ""} editable={false} />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Promedio" value={datosAlumno?.promedio || ""} keyboardType="decimal-pad" editable={false} />
+                                    </View>
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Promedio" value={datosAlumno?.promedio || ""} keyboardType="decimal-pad" editable={false} />
-                                </View>
-                            </View>
 
-                            <View style={{ marginBottom: 15 }}>
-                                <Entrada
-                                    label="Correo Electrónico Institucional"
-                                    value={datosAlumno?.correo || ""}
-                                    keyboardType="email-address"
-                                    editable={false}
-                                />
-                            </View>
-
-                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Calle y Número" value={datosAlumno?.calle_y_numero || ""} editable={false} />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Colonia" value={datosAlumno?.colonia || ""} editable={false} />
-                                </View>
-                            </View>
-
-                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Delegación / Municipio" value={datosAlumno?.delegacion || ""} editable={false} />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Estado de Procedencia" value={datosAlumno?.estado || ""} editable={false} />
-                                </View>
-                            </View>
-
-                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Código Postal" value={datosAlumno?.cp || ""} keyboardType="numeric" editable={false} />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Selector
-                                        label="Sexo"
-                                        selectedValue={datosAlumno ? (datosAlumno.sexo === "F" ? "Femenino" : "Masculino") : ""}
-                                        items={[
-                                            { label: "Masculino", value: "M" },
-                                            { label: "Femenino", value: "F" },
-                                        ]}
-                                        onValueChange={() => { }}
+                                <View style={{ marginBottom: 15 }}>
+                                    <Entrada
+                                        label="Correo Electrónico Institucional"
+                                        value={datosAlumno?.correo || ""}
+                                        keyboardType="email-address"
+                                        editable={false}
                                     />
                                 </View>
-                            </View>
 
-                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+                                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Calle y Número" value={datosAlumno?.calle_y_numero || ""} editable={false} />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Colonia" value={datosAlumno?.colonia || ""} editable={false} />
+                                    </View>
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 25 }}>
-                                    <Entrada label="Teléfono Local" value={datosAlumno?.tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+
+                                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Delegación / Municipio" value={datosAlumno?.delegacion || ""} editable={false} />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Estado de Procedencia" value={datosAlumno?.estado || ""} editable={false} />
+                                    </View>
                                 </View>
-                            </View>
-                            {datosAlumno &&
+
+                                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Código Postal" value={datosAlumno?.cp || ""} keyboardType="numeric" editable={false} />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Selector
+                                            label="Sexo"
+                                            selectedValue={datosAlumno ? (datosAlumno.sexo === "F" ? "Femenino" : "Masculino") : ""}
+                                            items={[
+                                                { label: "Masculino", value: "M" },
+                                                { label: "Femenino", value: "F" },
+                                            ]}
+                                            onValueChange={() => { }}
+                                            editable={false}
+                                        />
+                                    </View>
+                                </View>
+
+                                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                    <View style={{ flex: 1, marginBottom: 15 }}>
+                                        <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: 25 }}>
+                                        <Entrada label="Teléfono Local" value={datosAlumno?.tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+                                    </View>
+                                </View>
+                                {datosAlumno &&
+                                    <View style={{ flexDirection: "row", gap: 12 }}>
+                                        <View style={{ flex: 1 }}>
+                                            <Boton title="Modificar datos" onPress={() => setVista(2)} />
+                                        </View>
+                                        <View style={{ flex: 1 }}>
+                                            <Boton title="Cambiar contraseña" onPress={() => setVista(3)} />
+                                        </View>
+                                    </View>
+                                }
+                            </>
+                        )}
+                        {vista === 2 && (
+                            <>
+                                <Text style={styles.titulo}>Modificar datos</Text>
+
+                                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.calle && !errorsPerfil.colonia ? 30 : 15 }}>
+                                        <Controller
+                                            control={controlPerfil}
+                                            name="calle"
+                                            defaultValue={datosAlumno?.calle_y_numero || ""}
+                                            render={({ field }) => (
+                                                <Entrada
+                                                    label="Calle y Número"
+                                                    {...field}
+                                                    error={errorsPerfil.calle?.message}
+                                                />
+                                            )}
+                                        />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.colonia && !errorsPerfil.delegacion ? 30 : 15 }}>
+                                        <Controller
+                                            control={controlPerfil}
+                                            name="colonia"
+                                            defaultValue={datosAlumno?.colonia || ""}
+                                            render={({ field }) => (
+                                                <Entrada
+                                                    label="Colonia"
+                                                    {...field}
+                                                    error={errorsPerfil.colonia?.message}
+                                                />
+                                            )}
+                                        />
+                                    </View>
+                                </View>
+                                <View
+                                    style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}
+                                >
+                                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.delegacion && !errorsPerfil.estado ? 30 : 15 }}>
+                                        <Controller
+                                            control={controlPerfil}
+                                            name="delegacion"
+                                            defaultValue={datosAlumno?.delegacion || ""}
+                                            render={({ field }) => (
+                                                <Entrada
+                                                    label="Delegación / Municipio"
+                                                    {...field}
+                                                    error={errorsPerfil.delegacion?.message}
+                                                />
+                                            )}
+                                        />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.estado && !errorsPerfil.cp ? 30 : 15 }}>
+                                        <Controller
+                                            control={controlPerfil}
+                                            name="estado"
+                                            defaultValue={datosAlumno?.estado || ""}
+                                            render={({ field }) => (
+                                                <Entrada
+                                                    label="Estado de Procedencia"
+                                                    {...field}
+                                                    error={errorsPerfil.estado?.message}
+                                                />
+                                            )}
+                                        />
+                                    </View>
+                                </View>
+                                <View
+                                    style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}
+                                >
+                                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.cp ? 30 : 15 }}>
+                                        <Controller
+                                            control={controlPerfil}
+                                            name="cp"
+                                            defaultValue={datosAlumno?.cp || ""}
+                                            render={({ field }) => (
+                                                <Entrada
+                                                    label="Código Postal"
+                                                    keyboardType="numeric"
+                                                    {...field}
+                                                    error={errorsPerfil.cp?.message}
+                                                />
+                                            )}
+                                        />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && !errorsPerfil.telcelular ? 15 : 20 }}>
+                                        <Controller
+                                            control={controlPerfil}
+                                            name="sexo"
+                                            defaultValue={datosAlumno?.sexo || ""}
+                                            render={({ field: { onChange, value } }) => (
+                                                <Selector
+                                                    label="Sexo"
+                                                    selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
+                                                    onValueChange={(val) => onChange(val)}
+                                                    items={[
+                                                        { label: "Masculino", value: "M" },
+                                                        { label: "Femenino", value: "F" },
+                                                    ]}
+                                                    error={errorsPerfil.sexo?.message}
+                                                />
+                                            )}
+                                        />
+                                    </View>
+                                </View>
+                                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.telcelular && !errorsPerfil.tellocal ? 30 : 15 }}>
+                                        <Controller
+                                            control={controlPerfil}
+                                            name="telcelular"
+                                            defaultValue={datosAlumno?.telcelular || ""}
+                                            render={({ field }) => (
+                                                <Entrada
+                                                    label="Teléfono Celular"
+                                                    keyboardType="phone-pad"
+                                                    maxLength={10}
+                                                    {...field}
+                                                    error={errorsPerfil.telcelular?.message}
+                                                />
+                                            )}
+                                        />
+                                    </View>
+                                    <View style={{ flex: 1, marginBottom: 30 }}>
+                                        <Controller
+                                            control={controlPerfil}
+                                            name="tellocal"
+                                            defaultValue={datosAlumno?.tellocal || ""}
+                                            render={({ field }) => (
+                                                <Entrada
+                                                    label="Teléfono Local"
+                                                    keyboardType="phone-pad"
+                                                    maxLength={10}
+                                                    {...field}
+                                                    error={errorsPerfil.tellocal?.message}
+                                                />
+                                            )}
+                                        />
+                                    </View>
+                                </View>
+
                                 <View style={{ flexDirection: "row", gap: 12 }}>
                                     <View style={{ flex: 1 }}>
-                                        <Boton title="Modificar datos" onPress={() => setVista(2)} />
+                                        <Boton title="Regresar" onPress={() => { resetPerfil(); setVista(1) }} disabled={enviandoPerfil} />
                                     </View>
                                     <View style={{ flex: 1 }}>
-                                        <Boton title="Cambiar contraseña" onPress={() => setVista(3)} />
+                                        <Boton
+                                            title={enviandoPerfil ? "Guardando…" : "Guardar cambios"}
+                                            onPress={handlePerfil(onSubmitPerfil)}
+                                            disabled={enviandoPerfil}
+                                        />
                                     </View>
                                 </View>
-                            }
-                        </>
-                    )}
-                    {vista === 2 && (
-                        <>
-                            <Text style={styles.titulo}>Modificar datos</Text>
+                            </>
+                        )}
 
-                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.calle && !errorsPerfil.colonia ? 30 : 15 }}>
+                        {vista === 3 && (
+                            <>
+                                <Text style={styles.titulo}>Cambiar contraseña</Text>
+
+                                <View style={{ marginBottom: 15 }}>
                                     <Controller
-                                        control={controlPerfil}
-                                        name="calle"
-                                        defaultValue={datosAlumno?.calle_y_numero || ""}
-                                        render={({ field }) => (
-                                            <Entrada
-                                                label="Calle y Número"
-                                                {...field}
-                                                error={errorsPerfil.calle?.message}
-                                            />
-                                        )}
-                                    />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.colonia && !errorsPerfil.delegacion ? 30 : 15 }}>
-                                    <Controller
-                                        control={controlPerfil}
-                                        name="colonia"
-                                        defaultValue={datosAlumno?.colonia || ""}
-                                        render={({ field }) => (
-                                            <Entrada
-                                                label="Colonia"
-                                                {...field}
-                                                error={errorsPerfil.colonia?.message}
-                                            />
-                                        )}
-                                    />
-                                </View>
-                            </View>
-                            <View
-                                style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}
-                            >
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.delegacion && !errorsPerfil.estado ? 30 : 15 }}>
-                                    <Controller
-                                        control={controlPerfil}
-                                        name="delegacion"
-                                        defaultValue={datosAlumno?.delegacion || ""}
-                                        render={({ field }) => (
-                                            <Entrada
-                                                label="Delegación / Municipio"
-                                                {...field}
-                                                error={errorsPerfil.delegacion?.message}
-                                            />
-                                        )}
-                                    />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.estado && !errorsPerfil.cp ? 30 : 15 }}>
-                                    <Controller
-                                        control={controlPerfil}
-                                        name="estado"
-                                        defaultValue={datosAlumno?.estado || ""}
-                                        render={({ field }) => (
-                                            <Entrada
-                                                label="Estado de Procedencia"
-                                                {...field}
-                                                error={errorsPerfil.estado?.message}
-                                            />
-                                        )}
-                                    />
-                                </View>
-                            </View>
-                            <View
-                                style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}
-                            >
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.cp ? 30 : 15 }}>
-                                    <Controller
-                                        control={controlPerfil}
-                                        name="cp"
-                                        defaultValue={datosAlumno?.cp || ""}
-                                        render={({ field }) => (
-                                            <Entrada
-                                                label="Código Postal"
-                                                keyboardType="numeric"
-                                                {...field}
-                                                error={errorsPerfil.cp?.message}
-                                            />
-                                        )}
-                                    />
-                                </View>
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && !errorsPerfil.telcelular ? 15 : 20 }}>
-                                    <Controller
-                                        control={controlPerfil}
-                                        name="sexo"
-                                        defaultValue={datosAlumno?.sexo || ""}
+                                        control={controlContraseña}
+                                        name="contraseña"
+                                        defaultValue=""
                                         render={({ field: { onChange, value } }) => (
-                                            <Selector
-                                                label="Sexo"
-                                                selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
-                                                onValueChange={(val) => onChange(val)}
-                                                items={[
-                                                    { label: "Masculino", value: "M" },
-                                                    { label: "Femenino", value: "F" },
-                                                ]}
-                                                error={errorsPerfil.sexo?.message}
-                                            />
-                                        )}
-                                    />
-                                </View>
-                            </View>
-                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsPerfil.telcelular && !errorsPerfil.tellocal ? 30 : 15  }}>
-                                    <Controller
-                                        control={controlPerfil}
-                                        name="telcelular"
-                                        defaultValue={datosAlumno?.telcelular || ""}
-                                        render={({ field }) => (
                                             <Entrada
-                                                label="Teléfono Celular"
-                                                keyboardType="phone-pad"
-                                                maxLength={10}
-                                                {...field}
-                                                error={errorsPerfil.telcelular?.message}
+                                                label="Nueva Contraseña"
+                                                secureTextEntry
+                                                value={value}
+                                                onChangeText={onChange}
+                                                error={errorsContraseña.contraseña?.message}
                                             />
                                         )}
                                     />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 30 }}>
+
+                                <View style={{ marginBottom: 25 }}>
                                     <Controller
-                                        control={controlPerfil}
-                                        name="tellocal"
-                                        defaultValue={datosAlumno?.tellocal || ""}
-                                        render={({ field }) => (
+                                        control={controlContraseña}
+                                        name="confirmarContraseña"
+                                        defaultValue=""
+                                        render={({ field: { onChange, value } }) => (
                                             <Entrada
-                                                label="Teléfono Local"
-                                                keyboardType="phone-pad"
-                                                maxLength={10}
-                                                {...field}
-                                                error={errorsPerfil.tellocal?.message}
+                                                label="Confirmar Contraseña"
+                                                secureTextEntry
+                                                value={value}
+                                                onChangeText={onChange}
+                                                error={errorsContraseña.confirmarContraseña?.message}
                                             />
                                         )}
                                     />
                                 </View>
-                            </View>
 
-                            <View style={{ flexDirection: "row", gap: 12 }}>
-                                <View style={{ flex: 1 }}>
-                                    <Boton title="Regresar" onPress={() => { resetPerfil(); setVista(1) }} disabled={enviandoPerfil} />
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Boton
-                                        title={enviandoPerfil ? "Guardando…" : "Guardar cambios"}
-                                        onPress={handlePerfil(onSubmitPerfil)}
-                                        disabled={enviandoPerfil}
-                                    />
-                                </View>
-                            </View>
-                        </>
-                    )}
-
-                    {vista === 3 && (
-                        <>
-                            <Text style={styles.titulo}>Cambiar contraseña</Text>
-
-                            <View style={{ marginBottom: 15 }}>
-                                <Controller
-                                    control={controlContraseña}
-                                    name="contraseña"
-                                    defaultValue=""
-                                    render={({ field: { onChange, value } }) => (
-                                        <Entrada
-                                            label="Nueva Contraseña"
-                                            secureTextEntry
-                                            value={value}
-                                            onChangeText={onChange}
-                                            error={errorsContraseña.contraseña?.message}
+                                <View style={{ flexDirection: "row", gap: 12 }}>
+                                    <View style={{ flex: 1 }}>
+                                        <Boton title="Regresar" onPress={() => { resetContraseña(); setVista(1) }} disabled={enviandoContraseña} />
+                                    </View>
+                                    <View style={{ flex: 1 }}>
+                                        <Boton
+                                            title={enviandoContraseña ? "Guardando…" : "Guardar contraseña"}
+                                            onPress={handleContraseña(onSubmitContraseña)}
+                                            disabled={enviandoContraseña}
                                         />
-                                    )}
-                                />
-                            </View>
-
-                            <View style={{ marginBottom: 25 }}>
-                                <Controller
-                                    control={controlContraseña}
-                                    name="confirmarContraseña"
-                                    defaultValue=""
-                                    render={({ field: { onChange, value } }) => (
-                                        <Entrada
-                                            label="Confirmar Contraseña"
-                                            secureTextEntry
-                                            value={value}
-                                            onChangeText={onChange}
-                                            error={errorsContraseña.confirmarContraseña?.message}
-                                        />
-                                    )}
-                                />
-                            </View>
-
-                            <View style={{ flexDirection: "row", gap: 12 }}>
-                                <View style={{ flex: 1 }}>
-                                    <Boton title="Regresar" onPress={() => { resetContraseña(); setVista(1) }} disabled={enviandoContraseña} />
+                                    </View>
                                 </View>
-                                <View style={{ flex: 1 }}>
-                                    <Boton
-                                        title={enviandoContraseña ? "Guardando…" : "Guardar contraseña"}
-                                        onPress={handleContraseña(onSubmitContraseña)}
-                                        disabled={enviandoContraseña}
-                                    />
-                                </View>
-                            </View>
-                        </>
-                    )}
-                    <ModalAPI ref={modalAPI} />
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+                            </>
+                        )}
+                        <ModalAPI ref={modalAPI} />
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </>
     );
 }
 

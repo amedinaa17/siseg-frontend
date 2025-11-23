@@ -4,18 +4,21 @@ import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
 import { Link } from 'expo-router';
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function InicioPersonalAdministrativo() {
   const { sesion, verificarToken } = useAuth();
+
+  const [cargando, setCargando] = useState(false);
+
   const esMovil = Platform.OS === "ios" || Platform.OS === "android";
 
   const modalAPI = useRef<ModalAPIRef>(null);
 
   const [kpis, setKpis] = useState({
-    alumnosRegistrados: 0,
-    alumnosRealizandoSS: 0,
-    reportesdeIncidencias: 0,
+    alumnosRegistrados: "-",
+    alumnosRealizandoSS: "-",
+    reportesdeIncidencias: "-",
   });
 
   useEffect(() => {
@@ -23,6 +26,7 @@ export default function InicioPersonalAdministrativo() {
       verificarToken();
 
       try {
+        setCargando(true);
         const response = await fetchData(`users/obtenerkpis?tk=${sesion.token}`);
         const data = await response;
 
@@ -37,6 +41,8 @@ export default function InicioPersonalAdministrativo() {
         }
       } catch (error) {
         modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+      } finally {
+        setCargando(false);
       }
     };
 
@@ -44,56 +50,63 @@ export default function InicioPersonalAdministrativo() {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colores.background }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={styles.contenedorFormulario}>
-          <View style={styles.encabezado}>
-            <Text style={styles.sisegTexto}>SISEG</Text>
-            {!esMovil && (
-              <Text style={styles.sisegDescripcion}>
-                Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
-              </Text>
-            )}
-          </View>
+    <>
+      {cargando && (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+          <ActivityIndicator size="large" color="#5a0839" />
+        </View>
+      )}
+      <View style={{ flex: 1, backgroundColor: Colores.background }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={styles.contenedorFormulario}>
+            <View style={styles.encabezado}>
+              <Text style={styles.sisegTexto}>SISEG</Text>
+              {!esMovil && (
+                <Text style={styles.sisegDescripcion}>
+                  Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
+                </Text>
+              )}
+            </View>
 
-          <Text style={styles.titulo}>Bienvenido</Text>
-          <Text style={styles.nombrePersonalAdministrativo}>{sesion?.nombre || "Personal Administrativo"}</Text>
-          <Text style={styles.idPersonalAdministrativo}>{sesion?.boleta || ""}</Text>
+            <Text style={styles.titulo}>Bienvenido</Text>
+            <Text style={styles.nombrePersonalAdministrativo}>{sesion?.nombre || "Personal Administrativo"}</Text>
+            <Text style={styles.idPersonalAdministrativo}>{sesion?.boleta || ""}</Text>
 
-          <View style={[styles.tarjetaContenedor, { flexDirection: esMovil ? "column" : "row" }]}>
-            <Link href="/(app)/(administrativo)/gestionar-alumnos" style={ esMovil && { minWidth: "100%", marginBottom: 15}}>
-              <View style={[styles.tarjeta, esMovil && { width: "100%"}]}>
-                <Text style={styles.tarjetaTitulo}>Alumnos registrados</Text>
-                <Text style={styles.tarjetaValor}>{kpis.alumnosRegistrados}</Text>
-              </View>
-            </Link>
-            <Link href="/(app)/(administrativo)/gestionar-alumnos" style={ esMovil && { minWidth: "100%", marginBottom: 15}}>
-              <View style={[styles.tarjeta, esMovil && { width: "100%"}]}>
-                <Text style={styles.tarjetaTitulo}>Alumnos realizando su servicio social</Text>
-                <Text style={styles.tarjetaValor}>{kpis.alumnosRealizandoSS}</Text>
-              </View>
-            </Link>
-            <Link href="/(app)/(administrativo)/revisar-reportes-riesgo">
-              <View style={[styles.tarjeta, esMovil && { width: "100%"}]}>
-                <Text style={styles.tarjetaTitulo}>Reportes de incidencia nuevos</Text>
-                <Text style={styles.tarjetaValor}>{kpis.reportesdeIncidencias}</Text>
-              </View>
-            </Link>
-          </View>
+            <View style={[styles.tarjetaContenedor, { flexDirection: esMovil ? "column" : "row" }]}>
+              <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { minWidth: "100%", marginBottom: 15 }}>
+                <View style={[styles.tarjeta, esMovil && { width: "100%" }]}>
+                  <Text style={styles.tarjetaTitulo}>Alumnos registrados</Text>
+                  <Text style={styles.tarjetaValor}>{kpis.alumnosRegistrados}</Text>
+                </View>
+              </Link>
+              <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { minWidth: "100%", marginBottom: 15 }}>
+                <View style={[styles.tarjeta, esMovil && { width: "100%" }]}>
+                  <Text style={styles.tarjetaTitulo}>Alumnos realizando su servicio social</Text>
+                  <Text style={styles.tarjetaValor}>{kpis.alumnosRealizandoSS}</Text>
+                </View>
+              </Link>
+              <Link href="/(app)/(administrativo)/revisar-reportes-riesgo">
+                <View style={[styles.tarjeta, esMovil && { width: "100%" }]}>
+                  <Text style={styles.tarjetaTitulo}>Reportes de incidencia nuevos</Text>
+                  <Text style={styles.tarjetaValor}>{kpis.reportesdeIncidencias}</Text>
+                </View>
+              </Link>
+            </View>
 
-          <View style={styles.piePagina}>
-            <View style={styles.avisoContainer}>
-              <Text style={styles.avisoTexto}>AVISO</Text>
-              <View style={styles.separacion} />
-              <Text style={styles.piePaginaTexto}>
-                Tus datos personales son protegidos conforme a lo establecido por la Ley General de Protección de Datos Personales en Posesión de los Particulares.
-              </Text>
+            <View style={styles.piePagina}>
+              <View style={styles.avisoContainer}>
+                <Text style={styles.avisoTexto}>AVISO</Text>
+                <View style={styles.separacion} />
+                <Text style={styles.piePaginaTexto}>
+                  Tus datos personales son protegidos conforme a lo establecido por la Ley General de Protección de Datos Personales en Posesión de los Particulares.
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-        <ModalAPI ref={modalAPI} />
-      </ScrollView>
-    </View>
+          <ModalAPI ref={modalAPI} />
+        </ScrollView>
+      </View>
+    </>
   );
 }
 

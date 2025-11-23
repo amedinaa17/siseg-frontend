@@ -159,8 +159,8 @@ const styles = StyleSheet.create({
     },
     marcoEscaneo: {
         alignSelf: "center",
-        width: 350,
-        height: 350,
+        width: 300,
+        height: 300,
         borderRadius: 12,
         borderWidth: 1.5,
         borderColor: Colores.borde,

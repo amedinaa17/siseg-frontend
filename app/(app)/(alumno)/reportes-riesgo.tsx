@@ -13,9 +13,10 @@ import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as DocumentPicker from "expo-document-picker";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 type ArchivoInfo = {
     name: string;
@@ -27,6 +28,9 @@ type ArchivoInfo = {
 
 export default function ReportesRiesgo() {
     const { sesion, verificarToken } = useAuth();
+    const router = useRouter();
+
+    const [cargando, setCargando] = useState(false);
 
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
@@ -42,7 +46,6 @@ export default function ReportesRiesgo() {
     const [paginaActual, setPaginaActual] = useState(1);
     const [filasPorPagina, setFilasPorPagina] = useState(5);
 
-
     const [descripcionNueva, setDescripcionNueva] = useState("");
     const [evidenciasNueva, setEvidenciasNueva] = useState<any[]>([]);
     const [errorEvidenciaNueva, setErrorEvidenciaNueva] = useState<string>("");
@@ -51,15 +54,18 @@ export default function ReportesRiesgo() {
         verificarToken();
 
         try {
+            setCargando(true);
             const response = await fetchData(`reportes/obtenerReportesAlumno?tk=${sesion.token}`);
 
             if (response.error === 0) {
                 setReportes(response.fullreportes);
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
+                modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+        } finally {
+            setCargando(false);
         }
     };
 
@@ -324,6 +330,7 @@ export default function ReportesRiesgo() {
                     <EntradaMultilinea
                         label="Descripción"
                         value={descripcion}
+                        editable={false}
                     />
                 </View>
 
@@ -380,122 +387,129 @@ export default function ReportesRiesgo() {
     };
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View
-                style={[
-                    styles.contenedorFormulario,
-                    esPantallaPequeña && { maxWidth: "95%" },
-                ]}
-            >
-                <Text style={styles.titulo}>Reportes de situación de riesgo</Text>
-
-                <View style={{ marginBottom: 15, alignItems: "flex-start" }}>
-                    <Boton title="Agregar reporte" onPress={() => setModalAgregar(true)} />
+        <>
+            {cargando && (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+                    <ActivityIndicator size="large" color="#5a0839" />
                 </View>
-                <View style={styles.controlesSuperiores}>
-                    <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 15, width: "100%" }]}>
-                        <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                            <Selector
-                                label=""
-                                selectedValue={String(filasPorPagina)}
-                                onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                items={[
-                                    { label: "5", value: "5" },
-                                    { label: "10", value: "10" },
-                                    { label: "20", value: "20" },
-                                ]}
-                            />
+            )}
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View
+                    style={[
+                        styles.contenedorFormulario,
+                        esPantallaPequeña && { maxWidth: "95%" },
+                    ]}
+                >
+                    <Text style={styles.titulo}>Reportes de situación de riesgo</Text>
+
+                    <View style={{ marginBottom: 15, alignItems: "flex-start" }}>
+                        <Boton title="Agregar reporte" onPress={() => setModalAgregar(true)} />
+                    </View>
+                    <View style={styles.controlesSuperiores}>
+                        <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 15, width: "100%" }]}>
+                            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                                <Selector
+                                    label=""
+                                    selectedValue={String(filasPorPagina)}
+                                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                                    items={[
+                                        { label: "5", value: "5" },
+                                        { label: "10", value: "10" },
+                                        { label: "20", value: "20" },
+                                    ]}
+                                />
+                            </View>
+                            <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
                         </View>
-                        <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+
+                        <View style={[{ flexDirection: "row", gap: 8, justifyContent: "space-between" }, esPantallaPequeña ? { width: "100%" } : { width: "40%" }]}>
+                            <View style={[esPantallaPequeña ? { width: "60%", marginBottom: 15 } : { width: "60%" }]}>
+                                <Entrada
+                                    label="Buscar"
+                                    value={busqueda}
+                                    onChangeText={(text) => { setBusqueda(text); setPaginaActual(1); }}
+                                />
+                            </View>
+                            <View style={[esPantallaPequeña ? { width: "40%" } : { width: "40%" }]}>
+                                <Selector
+                                    label="Estatus"
+                                    selectedValue={filtroEstatus}
+                                    onValueChange={setFiltroEstatus}
+                                    items={[
+                                        { label: "Todos", value: "Todos" },
+                                        { label: "Pendiente", value: "Pendiente" },
+                                        { label: "En revisión", value: "En revisión" },
+                                        { label: "Finalizado", value: "Finalizado" },
+                                    ]}
+                                />
+                            </View>
+                        </View>
                     </View>
 
-                    <View style={[{ flexDirection: "row", gap: 8, justifyContent: "space-between" }, esPantallaPequeña ? { width: "100%" } : { width: "40%" }]}>
-                        <View style={[esPantallaPequeña ? { width: "60%", marginBottom: 15 } : { width: "60%" }]}>
-                            <Entrada
-                                label="Buscar"
-                                value={busqueda}
-                                onChangeText={(text) => { setBusqueda(text); setPaginaActual(1); }}
-                            />
-                        </View>
-                        <View style={[esPantallaPequeña ? { width: "40%" } : { width: "40%" }]}>
-                            <Selector
-                                label="Estatus"
-                                selectedValue={filtroEstatus}
-                                onValueChange={setFiltroEstatus}
-                                items={[
-                                    { label: "Todos", value: "Todos" },
-                                    { label: "Pendiente", value: "Pendiente" },
-                                    { label: "En revisión", value: "En revisión" },
-                                    { label: "Finalizado", value: "Finalizado" },
-                                ]}
-                            />
-                        </View>
-                    </View>
-                </View>
-
-                <ScrollView horizontal={esPantallaPequeña}>
-                    <Tabla
-                        columnas={[
-                            { key: "descripcion", titulo: "Descripción", ...(esPantallaPequeña && { ancho: 250 }) },
-                            { key: "fecha", titulo: "Fecha de envío", ancho: 150 },
-                            {
-                                key: "estatus",
-                                titulo: "Estatus",
-                                ancho: 150,
-                                render: (valor) => (
-                                    <Text
-                                        style={[
-                                            styles.texto,
-                                            valor === 2 && { color: Colores.textoInfo },
-                                            valor === 1 && { color: Colores.textoAdvertencia },
-                                            valor === 3 && { color: Colores.textoExito },
-                                        ]}
-                                    >
-                                        {valor === 1 ? "Pendiente" : valor === 2 ? "En revisión" : "Finalizado"}
-                                    </Text>
-                                ),
-                            },
-                            {
-                                key: "observacion",
-                                titulo: "Observaciones",
-                                ...(esPantallaPequeña && { ancho: 250 }),
-                            }
-                        ]}
-                        datos={reportesMostrados.map((fila) => {
-                            const observacion = Array.isArray(fila.observaciones) && fila.observaciones.length > 0 ? fila.observaciones.sort((a: any, b: any) => new Date(b.FECHA_DATETIME).getTime() - new Date(a.FECHA_DATETIME).getTime())[0] : null
-                            return {
-                                ...fila,
-                                fecha: new Date(fila.fechaRegistro).toLocaleDateString(),
-                                observacion: observacion?.DESCRIPCION ? observacion.DESCRIPCION : "En espera de revisión.",
-                                onPress: () => setReporteSeleccionado(fila),
-                            };
-                        })}
-                    />
-                </ScrollView>
-                <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                        <Paginacion
-                            paginaActual={paginaActual}
-                            totalPaginas={totalPaginas}
-                            setPaginaActual={setPaginaActual}
+                    <ScrollView horizontal={esPantallaPequeña}>
+                        <Tabla
+                            columnas={[
+                                { key: "descripcion", titulo: "Descripción", ...(esPantallaPequeña && { ancho: 250 }) },
+                                { key: "fecha", titulo: "Fecha de envío", ancho: 150 },
+                                {
+                                    key: "estatus",
+                                    titulo: "Estatus",
+                                    ancho: 150,
+                                    render: (valor) => (
+                                        <Text
+                                            style={[
+                                                styles.texto,
+                                                valor === 2 && { color: Colores.textoInfo },
+                                                valor === 1 && { color: Colores.textoAdvertencia },
+                                                valor === 3 && { color: Colores.textoExito },
+                                            ]}
+                                        >
+                                            {valor === 1 ? "Pendiente" : valor === 2 ? "En revisión" : "Finalizado"}
+                                        </Text>
+                                    ),
+                                },
+                                {
+                                    key: "observacion",
+                                    titulo: "Observaciones",
+                                    ...(esPantallaPequeña && { ancho: 250 }),
+                                }
+                            ]}
+                            datos={reportesMostrados.map((fila) => {
+                                const observacion = Array.isArray(fila.observaciones) && fila.observaciones.length > 0 ? fila.observaciones.sort((a: any, b: any) => new Date(b.FECHA_DATETIME).getTime() - new Date(a.FECHA_DATETIME).getTime())[0] : null
+                                return {
+                                    ...fila,
+                                    fecha: new Date(fila.fechaRegistro).toLocaleDateString(),
+                                    observacion: observacion?.DESCRIPCION ? observacion.DESCRIPCION : "En espera de revisión.",
+                                    onPress: () => setReporteSeleccionado(fila),
+                                };
+                            })}
                         />
-                    </View>
+                    </ScrollView>
+                    <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                            <Paginacion
+                                paginaActual={paginaActual}
+                                totalPaginas={totalPaginas}
+                                setPaginaActual={setPaginaActual}
+                            />
+                        </View>
 
-                    <Text
-                        style={{
-                            color: Colores.textoClaro,
-                            fontSize: Fuentes.caption,
-                            marginTop: 15,
-                        }}
-                    >
-                        {`Mostrando ${reportesMostrados.length} de ${reportesFiltrados.length} resultados`}
-                    </Text>
+                        <Text
+                            style={{
+                                color: Colores.textoClaro,
+                                fontSize: Fuentes.caption,
+                                marginTop: 15,
+                            }}
+                        >
+                            {`Mostrando ${reportesMostrados.length} de ${reportesFiltrados.length} resultados`}
+                        </Text>
+                    </View>
                 </View>
-            </View>
-            {renderModalAgregar()}
-            {renderModalDetalle()}
-            <ModalAPI ref={modalAPI} />
-        </ScrollView>
+                {renderModalAgregar()}
+                {renderModalDetalle()}
+                <ModalAPI ref={modalAPI} />
+            </ScrollView>
+        </>
     );
 }
 

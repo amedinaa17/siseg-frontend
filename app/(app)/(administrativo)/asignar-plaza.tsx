@@ -6,110 +6,140 @@ import Paginacion from "@/componentes/ui/Paginacion";
 import Selector from "@/componentes/ui/Selector";
 import Tabla from "@/componentes/ui/Tabla";
 import { useAuth } from "@/context/AuthProvider";
+import { asignarPlazaEsquema, AsignarPlazaFormulario } from "@/lib/validacion";
 import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 export default function AsignarPlaza() {
     const { sesion, verificarToken } = useAuth();
+    const router = useRouter();
+
+    const [cargando, setCargando] = useState(false);
+
     const modalAPI = useRef<ModalAPIRef>(null);
     const [alumnos, setAlumnos] = useState<any[]>([]);
     const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any | null>(null);
-    const [modalAsignar, setModalAsignar] = useState(false);
     const [plazas, setPlazas] = useState<any[]>([]);
-    const [programaSeleccionado, setProgramaSeleccionado] = useState<string>("");
-    const [plazaSeleccionadaId, setPlazaSeleccionadaId] = useState<string>("");
-    const [plazaSeleccionadaLabel, setPlazaSeleccionadaLabel] = useState<string>("");
-    const [isSubmittingAsignar, setIsSubmittingAsignar] = useState(false);
+
+    const [modalAsignar, setModalAsignar] = useState(false);
+    const [plazaSeleccionada, setPlazaSeleccionada] = useState<any | null>(null);
+
+    const { width } = useWindowDimensions();
+    const esPantallaPequeña = width < 790;
+
     const [busqueda, setBusqueda] = useState("");
     const [filtroCarrera, setFiltroCarrera] = useState("Todos");
     const [filtroEstatus, setFiltroEstatus] = useState("Sin asignar");
     const [paginaActual, setPaginaActual] = useState(1);
     const [filasPorPagina, setFilasPorPagina] = useState(5);
-    const { width } = useWindowDimensions();
-    const esPantallaPequeña = width < 790;
-
-    const getPlazaId = (p: any) => String(p.ID);
-    const getPlazaSede = (p: any) => String(p.sede);
-    const getPlazaPrograma = (p: any) => String(p.PROGRAMA);
-    const getPlazaTarjeta = (p: any) => String(p.tarjetaDisponible ?? "");
-
-    const usedPlazaIds = useMemo(() => {
-        const s = new Set<string>();
-        for (const a of alumnos) {
-            if (a?.sede) s.add(String(a.sede));
-        }
-        return s;
-    }, [alumnos]);
-
-    const programasOpts = useMemo(() => {
-        const uniques = new Map<string, string>();
-        for (const p of plazas) {
-            const prog = getPlazaPrograma(p);
-            if (prog) uniques.set(prog, prog);
-        }
-        return Array.from(uniques.values()).map((prog) => ({ label: prog, value: prog }));
-    }, [plazas]);
-
-    const plazasDisponibles = useMemo(() => {
-        return plazas.filter((p) => {
-            const id = getPlazaId(p);
-            if (!id || usedPlazaIds.has(id)) return false;
-            if (programaSeleccionado) return getPlazaPrograma(p) === programaSeleccionado;
-            return true;
-        });
-    }, [plazas, usedPlazaIds, programaSeleccionado]);
-
-    const plazaOptions = useMemo(
-        () =>
-            plazasDisponibles.map((p) => ({
-                value: getPlazaId(p),
-                label: getPlazaSede(p),
-            })),
-        [plazasDisponibles]
-    );
-
-    const labelToId = useMemo(() => {
-        const m = new Map<string, string>();
-        plazaOptions.forEach((o) => m.set(o.label, o.value));
-        return m;
-    }, [plazaOptions]);
-
-    const plazaSeleccionada = useMemo(() => {
-        const id = Platform.OS === "web"
-            ? plazaSeleccionadaId
-            : (plazaSeleccionadaId || (plazaSeleccionadaLabel ? labelToId.get(plazaSeleccionadaLabel) || "" : ""));
-        return plazas.find((p) => getPlazaId(p) === id);
-    }, [plazas, plazaSeleccionadaId, plazaSeleccionadaLabel, labelToId]);
 
     const obtenerAlumnos = async () => {
         verificarToken();
-        try {
-            const response = await fetchData(`users/obtenerTodosAlumnos?tk=${sesion.token}`);
-            if (response.error === 0) setAlumnos(response.data);
-            else modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
-        } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
-        }
-    };
 
-    const obtenerPlazas = async () => {
-        verificarToken();
         try {
-            const response = await fetchData(`plaza/obtenerPlazas?tk=${sesion.token}`);
-            if (response.error === 0) setPlazas(response.plazas ?? response.data ?? []);
-            else modalAPI.current?.show(false, "Hubo un problema al obtener las plazas del servidor. Inténtalo de nuevo más tarde.");
+            setCargando(true);
+
+            const response = await fetchData(`users/obtenerTodosAlumnos?tk=${sesion.token}`);
+            if (response.error === 0) {
+                setAlumnos(response.data);
+            }
+            else {
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+            }
         } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+        } finally {
+            setCargando(false);
         }
     };
 
     useEffect(() => {
         obtenerAlumnos();
+    }, []);
+
+    const obtenerPlazas = async () => {
+        verificarToken();
+
+        try {
+            const response = await fetchData(`plaza/obtenerPlazas?tk=${sesion.token}`);
+            if (response.error === 0) {
+                setPlazas(response.plazas.filter((plaza) => plaza.estatus == 1 && plaza.tarjetaDisponible > 0));
+            }
+            else {
+                modalAPI.current?.show(false, "Hubo un problema al obtener las plazas del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+            }
+        } catch {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+        }
+    };
+
+    useEffect(() => {
         obtenerPlazas();
     }, []);
+
+    const {
+        control, watch, handleSubmit, reset, formState: { errors, isSubmitting },
+    } = useForm<AsignarPlazaFormulario>({
+        resolver: zodResolver(asignarPlazaEsquema),
+        defaultValues: {
+            programa: "",
+            plaza: "",
+        }
+    });
+
+    const programaValue = watch("programa");
+
+    const asignarPlaza = async () => {
+        verificarToken();
+
+        try {
+            const payload = {
+                idPlaza: plazaSeleccionada.ID,
+                idUsuario: alumnoSeleccionado.boleta,
+                tk: sesion.token,
+            };
+            const resp = await postData(`plaza/asignarPlaza`, payload);
+            if (resp.error === 0) {
+                modalAPI.current?.show(true, "La plaza ha sido asignada correctamente.");
+                cerrarModalAsignar();
+                await obtenerAlumnos();
+            } else if (resp.message.includes("No hay tarjeta")) {
+                modalAPI.current?.show(false, "La plaza seleccionada ya no tiene tarjetas disponibles.");
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al asignar la plaza. Inténtalo de nuevo más tarde.");
+            }
+        } catch {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+        }
+    };
+
+    const programasOpts = React.useMemo(() => {
+        if (alumnoSeleccionado && plazas) {
+            return plazas
+                .filter((plaza) => plaza.carrera === (alumnoSeleccionado.carrera === "Médico Cirujano y Homeópata" ? 1 : 2))
+                .map((plaza) => ({ label: plaza.PROGRAMA, value: plaza.PROGRAMA }))
+                .filter((value, index, self) => self.findIndex(t => t.value === value.value) === index);
+        }
+        return [];
+    }, [alumnoSeleccionado, plazas]);
+
+    const plazasDisponibles = React.useMemo(() => {
+        if (programaValue && alumnoSeleccionado && plazas && plazas.length > 0) {
+            return plazas
+                .filter((plaza) => plaza.PROGRAMA === programaValue && plaza.carrera === (alumnoSeleccionado.carrera === "Médico Cirujano y Homeópata" ? 1 : 2))
+                .map((plaza) => ({
+                    value: plaza.ID,
+                    label: plaza.sede
+                }));
+        }
+        return [];
+    }, [programaValue, alumnoSeleccionado, plazas]);
 
     const alumnosFiltrados = alumnos.filter(alumno => (
         `${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}`
@@ -127,264 +157,249 @@ export default function AsignarPlaza() {
         paginaActual * filasPorPagina
     );
 
-    const asignarPlaza = async () => {
-        if (!alumnoSeleccionado) return;
-
-        const idReal =
-            Platform.OS === "web"
-                ? plazaSeleccionadaId
-                : (plazaSeleccionadaId ||
-                    (plazaSeleccionadaLabel ? labelToId.get(plazaSeleccionadaLabel) || "" : ""));
-
-        if (!idReal) {
-            return modalAPI.current?.show(false, "Selecciona una plaza.");
-        }
-
-        try {
-            setIsSubmittingAsignar(true);
-            const payload = {
-                idPlaza: idReal,
-                idUsuario: alumnoSeleccionado.boleta,
-                tk: sesion.token,
-            };
-            const resp = await postData(`plaza/asignarPlaza`, payload);
-            if (resp.error === 0) {
-                modalAPI.current?.show(true, "La plaza ha sido asignada correctamente.");
-                setModalAsignar(false);
-                setProgramaSeleccionado("");
-                setPlazaSeleccionadaId("");
-                setPlazaSeleccionadaLabel("");
-                await obtenerAlumnos();
-            } else if (resp.message.includes("")) {
-                modalAPI.current?.show(false, "La plaza seleccionada ya no tiene tarjetas disponibles.");
-            } else {
-                modalAPI.current?.show(false, "Hubo un problema al asignar la plaza. Inténtalo de nuevo más tarde.");
-            }
-        } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
-        } finally {
-            setIsSubmittingAsignar(false);
-        }
+    const abrirModalAsignar = (fila: any) => {
+        setAlumnoSeleccionado(fila);
+        setPlazaSeleccionada(null);
+        setModalAsignar(true);
+        reset({ programa: "", plaza: "" });
     };
 
-    const abrirModalAsignar = async (fila: any) => {
-        setAlumnoSeleccionado(fila);
-        setProgramaSeleccionado("");
-        setPlazaSeleccionadaId("");
-        setPlazaSeleccionadaLabel("");
-        await obtenerPlazas();
-        setModalAsignar(true);
+    const cerrarModalAsignar = () => {
+        setAlumnoSeleccionado(null);
+        setPlazaSeleccionada(null);
+        setModalAsignar(false);
+        reset({ programa: "", plaza: "" });
     };
 
     const renderModalAsignar = () => {
         if (!alumnoSeleccionado) return null;
 
-        const tarjetaSel = plazaSeleccionada ? getPlazaTarjeta(plazaSeleccionada) : "";
-        const ModalBody: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-            Platform.OS === "web" ? (
-                <View style={{ maxHeight: 520, overflow: "auto" as any }}>{children}</View>
-            ) : (
-                <ScrollView style={{ maxHeight: 520 }}>{children}</ScrollView>
-            )
-        );
-
         return (
             <Modal
                 visible={modalAsignar}
-                onClose={() => setModalAsignar(false)}
+                onClose={() => cerrarModalAsignar()}
                 titulo={`Asignar plaza`}
                 maxWidth={700}
                 cancelar
-                textoAceptar={isSubmittingAsignar ? "Asignando…" : "Asignar"}
-                onAceptar={asignarPlaza}
-                deshabilitado={isSubmittingAsignar || (!plazaSeleccionadaId && !plazaSeleccionadaLabel)}
+                textoAceptar={isSubmitting ? "Asignando…" : "Asignar"}
+                onAceptar={handleSubmit(asignarPlaza)}
+                deshabilitado={isSubmitting}
             >
                 <KeyboardAvoidingView
                     style={{ flex: 1 }}
                     behavior={Platform.OS === "web" ? undefined : "padding"}
                     keyboardVerticalOffset={80}
                 >
-                    <ModalBody>
-                        <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{alumnoSeleccionado.nombre} {alumnoSeleccionado.apellido_materno} {alumnoSeleccionado.apellido_paterno}</Text>
-                        <View style={{ marginTop: 5, marginBottom: 15 }}>
-                            <Entrada label="Boleta" value={`${alumnoSeleccionado.boleta}`} keyboardType="numeric" maxLength={10} editable={false} />
-                        </View>
+                    <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{alumnoSeleccionado?.nombre} {alumnoSeleccionado?.apellido_materno} {alumnoSeleccionado?.apellido_paterno}</Text>
+                    <View style={{ marginTop: 5, marginBottom: 15 }}>
+                        <Entrada label="Boleta" value={`${alumnoSeleccionado?.boleta || ""}`} keyboardType="numeric" maxLength={10} editable={false} />
+                    </View>
 
-                        <View style={{ marginBottom: 15 }}>
-                            <Selector
-                                label="Programa"
-                                items={programasOpts}
-                                selectedValue={programaSeleccionado}
-                                onValueChange={(v) => {
-                                    setProgramaSeleccionado(v as string);
-                                    setPlazaSeleccionadaId("");
-                                    setPlazaSeleccionadaLabel("");
-                                }}
-                            />
-                        </View>
-
-                        <View style={{ marginBottom: 15 }}>
-                            <Selector
-                                label="Plaza"
-                                items={plazaOptions.map(o => ({ label: o.label, value: o.label }))}
-                                selectedValue={plazaSeleccionadaLabel}
-                                onValueChange={(lbl) => {
-                                    const label = String(lbl || "");
-                                    setPlazaSeleccionadaLabel(label);
-                                    setPlazaSeleccionadaId(label ? (labelToId.get(label) || "") : "");
-                                }}
-                            />
-                        </View>
-
-                        <View style={{ marginTop: 2, marginBottom: 10 }}>
-                            <Entrada label="Número de tarjeta" value={tarjetaSel} editable={false} />
-                        </View>
-                    </ModalBody>
+                    <View style={{ marginBottom: 15 }}>
+                        <Controller
+                            control={control}
+                            name="programa"
+                            render={({ field: { onChange, value } }) => (
+                                <Selector
+                                    label="Programa"
+                                    items={programasOpts}
+                                    selectedValue={value}
+                                    onValueChange={(val) => {
+                                        onChange(val)
+                                        setPlazaSeleccionada(null);
+                                        reset({ programa: val, plaza: "" });
+                                    }}
+                                    error={errors.programa?.message}
+                                />
+                            )}
+                        />
+                    </View>
+                    {
+                        !!programaValue && (
+                            <View style={{ marginBottom: 15 }}>
+                                <Controller
+                                    control={control}
+                                    name="plaza"
+                                    render={({ field: { onChange, value } }) => (
+                                        <Selector
+                                            label="Plaza"
+                                            items={plazasDisponibles}
+                                            selectedValue={plazaSeleccionada?.sede ?? ""}
+                                            onValueChange={(val) => {
+                                                onChange(String(val));
+                                                setPlazaSeleccionada(
+                                                    plazas.find(p => String(p.ID) === String(val))
+                                                );
+                                            }}
+                                            error={errors.plaza?.message}
+                                        />
+                                    )}
+                                />
+                            </View>
+                        )
+                    }
+                    {
+                        plazaSeleccionada && (
+                            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
+                                    <Entrada label="Número de tarjeta" value={String(plazaSeleccionada?.tarjetaDisponible) || ""} editable={false} />
+                                </View>
+                                <View style={{ flex: 1, marginBottom: 15 }}>
+                                    <Entrada label="Beca" value={plazaSeleccionada?.tipoBeca || ""} editable={false} />
+                                </View>
+                            </View>
+                        )
+                    }
                 </KeyboardAvoidingView>
             </Modal>
         );
     };
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                <Text style={styles.titulo}>Asignar plaza</Text>
-
-                <View style={styles.controlesSuperiores}>
-                    <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                        <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                            <Selector
-                                label=""
-                                selectedValue={String(filasPorPagina)}
-                                onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                items={[
-                                    { label: "5", value: "5" },
-                                    { label: "10", value: "10" },
-                                    { label: "20", value: "20" },
-                                ]}
-                            />
-                        </View>
-                        <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
-                    </View>
-
-                    <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
-                        <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
-                            <Entrada
-                                label="Buscar"
-                                value={busqueda}
-                                onChangeText={setBusqueda}
-                            />
-                        </View>
-
-                        <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
-                            <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
-                                <Selector
-                                    label="Carrera"
-                                    selectedValue={filtroCarrera}
-                                    onValueChange={setFiltroCarrera}
-                                    items={[
-                                        { label: "Todos", value: "Todos" },
-                                        { label: "Médico Cirujano y Partero", value: "Partero" },
-                                        { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
-                                    ]}
-                                />
-                            </View>
-                            <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
-                                <Selector
-                                    label="Estatus"
-                                    selectedValue={filtroEstatus}
-                                    onValueChange={setFiltroEstatus}
-                                    items={[
-                                        { label: "Todos", value: "Todos" },
-                                        { label: "Asignado", value: "Asignado" },
-                                        { label: "Sin asignar", value: "Sin asignar" },
-                                    ]}
-                                />
-                            </View>
-                        </View>
-                    </View>
+        <>
+            {cargando && (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+                    <ActivityIndicator size="large" color="#5a0839" />
                 </View>
+            )}
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                    <Text style={styles.titulo}>Asignar plaza</Text>
 
-                <ScrollView horizontal={esPantallaPequeña}>
-                    <Tabla
-                        columnas={[
-                            { key: "boleta", titulo: "Boleta", ancho: 130 },
-                            { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
-                            { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
-                            { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 350 }) },
-                            {
-                                key: "estatusAsignacion",
-                                titulo: "Estatus",
-                                ancho: 150,
-                                render: (valor) => (
-                                    <Text
-                                        style={[
-                                            styles.texto,
-                                            valor === "Asignado" ? { color: Colores.textoExito } : { color: Colores.textoError },
+                    <View style={styles.controlesSuperiores}>
+                        <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+                            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                                <Selector
+                                    label=""
+                                    selectedValue={String(filasPorPagina)}
+                                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                                    items={[
+                                        { label: "5", value: "5" },
+                                        { label: "10", value: "10" },
+                                        { label: "20", value: "20" },
+                                    ]}
+                                />
+                            </View>
+                            <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+                        </View>
+
+                        <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
+                            <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
+                                <Entrada
+                                    label="Buscar"
+                                    value={busqueda}
+                                    onChangeText={setBusqueda}
+                                />
+                            </View>
+
+                            <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
+                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                                    <Selector
+                                        label="Carrera"
+                                        selectedValue={filtroCarrera}
+                                        onValueChange={setFiltroCarrera}
+                                        items={[
+                                            { label: "Todos", value: "Todos" },
+                                            { label: "Médico Cirujano y Partero", value: "Partero" },
+                                            { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
                                         ]}
-                                    >
-                                        {valor}
-                                    </Text>
-                                ),
-                            },
-                            {
-                                key: "acciones",
-                                titulo: "Acciones",
-                                ancho: 110,
-                                render: (_valor, fila) => {
-                                    const asignado = !!Number(fila.sede);
-                                    return (
-                                        <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
-                                            <Boton
-                                                onPress={async () => {
-                                                    await abrirModalAsignar(fila);
-                                                }}
-                                                icon={<Ionicons name="add-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                color={Colores.textoInfo}
-                                                disabled={asignado}
-                                            />
-                                        </View>
-                                    );
+                                    />
+                                </View>
+                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
+                                    <Selector
+                                        label="Estatus"
+                                        selectedValue={filtroEstatus}
+                                        onValueChange={setFiltroEstatus}
+                                        items={[
+                                            { label: "Todos", value: "Todos" },
+                                            { label: "Asignado", value: "Asignado" },
+                                            { label: "Sin asignar", value: "Sin asignar" },
+                                        ]}
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+
+                    <ScrollView horizontal={esPantallaPequeña}>
+                        <Tabla
+                            columnas={[
+                                { key: "boleta", titulo: "Boleta", ancho: 130 },
+                                { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
+                                { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
+                                { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 350 }) },
+                                {
+                                    key: "estatusAsignacion",
+                                    titulo: "Estatus",
+                                    ancho: 150,
+                                    render: (valor) => (
+                                        <Text
+                                            style={[
+                                                styles.texto,
+                                                valor === "Asignado" ? { color: Colores.textoExito } : { color: Colores.textoError },
+                                            ]}
+                                        >
+                                            {valor}
+                                        </Text>
+                                    ),
                                 },
-                            },
-                        ]}
-                        datos={alumnosMostrados.map((fila) => {
-                            const plazaObj = plazas.find((p) => getPlazaId(p) === String(fila.sede));
-                            return {
+                                {
+                                    key: "acciones",
+                                    titulo: "Acciones",
+                                    ancho: 110,
+                                    render: (_valor, fila) => {
+                                        const asignado = !!Number(fila.sede);
+                                        return (
+                                            <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                                                <Boton
+                                                    onPress={async () => {
+                                                        await abrirModalAsignar(fila);
+                                                    }}
+                                                    icon={<Ionicons name="add-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                    color={Colores.textoInfo}
+                                                    disabled={asignado}
+                                                />
+                                            </View>
+                                        );
+                                    },
+                                },
+                            ]}
+                            datos={alumnosMostrados.map(fila => ({
                                 ...fila,
                                 nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
                                 carrera: fila.carrera?.NOMBRE ?? "",
-                                sede: plazaObj ? getPlazaSede(plazaObj) : "-",
+                                sede: plazas?.find((p) => p.ID === fila.sede)?.sede || "-",
                                 estatusAsignacion: fila.sede ? "Asignado" : "Sin asignar"
-                            }
-                        })}
-                    />
-                </ScrollView>
 
-                <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                        <Paginacion
-                            paginaActual={paginaActual}
-                            totalPaginas={totalPaginas}
-                            setPaginaActual={setPaginaActual}
+                            }))}
                         />
+                    </ScrollView>
+
+                    <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                            <Paginacion
+                                paginaActual={paginaActual}
+                                totalPaginas={totalPaginas}
+                                setPaginaActual={setPaginaActual}
+                            />
+                        </View>
+
+                        <Text
+                            style={{
+                                color: Colores.textoClaro,
+                                fontSize: Fuentes.caption,
+                                marginTop: 15,
+                            }}
+                        >
+                            {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
+                        </Text>
                     </View>
-
-                    <Text
-                        style={{
-                            color: Colores.textoClaro,
-                            fontSize: Fuentes.caption,
-                            marginTop: 15,
-                        }}
-                    >
-                        {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
-                    </Text>
                 </View>
-            </View>
 
-            {renderModalAsignar()}
-            <ModalAPI ref={modalAPI} />
-        </ScrollView>
+                {renderModalAsignar()}
+                <ModalAPI ref={modalAPI} />
+            </ScrollView>
+        </>
     );
 }
 

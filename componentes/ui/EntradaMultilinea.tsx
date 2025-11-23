@@ -30,6 +30,7 @@ export default function EntradaMultilinea({
 
   const estiloEtiqueta = {
     position: "absolute" as const,
+    zIndex: 100,
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),

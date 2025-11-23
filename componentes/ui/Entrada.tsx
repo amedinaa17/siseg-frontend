@@ -1,7 +1,7 @@
 import { Colores, Fuentes } from '@/temas/colores';
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Animated, Platform, Pressable, StyleSheet, Text, TextInput, TextInputProps, View, } from "react-native";
+import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TextInputProps, View } from "react-native";
 
 type Propiedades = TextInputProps & {
   label: string;
@@ -33,6 +33,7 @@ export default function Entrada({
 
   const estiloEtiqueta = {
     position: "absolute" as const,
+    zIndex: 100,
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
@@ -52,34 +53,38 @@ export default function Entrada({
               : focused && editable
                 ? Colores.textoInfo
                 : Colores.borde,
-            paddingTop: secureTextEntry ? 0 : 10
           },
         ]}
       >
         <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
-        <TextInput
-          {...props}
-          editable={editable}
-          value={value}
-          secureTextEntry={secureTextEntry && !mostrarContraseña}
-          onFocus={(e) => {
-            setFocused(true);
-            onFocus?.(e);
-          }}
-          onBlur={(e) => {
-            setFocused(false);
-            onBlur?.(e);
-          }}
-          style={[
-            styles.entrada,
-            style,
-            { height: secureTextEntry ? 48 : 38},
-            Platform.OS === "web"
-              ? ({ outlineStyle: "none" } as any)
-              : null,
-          ]}
-          multiline={secureTextEntry ? false : true}
-        />
+        <ScrollView
+          horizontal
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+        >
+          <TextInput
+            {...props}
+            editable={editable}
+            value={value}
+            secureTextEntry={secureTextEntry && !mostrarContraseña}
+            onFocus={(e) => {
+              setFocused(true);
+              onFocus?.(e);
+            }}
+            onBlur={(e) => {
+              setFocused(false);
+              onBlur?.(e);
+            }}
+            style={[
+              styles.entrada,
+              style,
+              Platform.OS === "web"
+                ? ({ outlineStyle: "none" } as any)
+                : null,
+            ]}
+          /></ScrollView>
 
         {secureTextEntry && (
           <Pressable
@@ -114,9 +119,10 @@ const styles = StyleSheet.create({
   },
   entrada: {
     flex: 1,
+    height: 48,
     fontSize: 15,
     paddingHorizontal: 12,
-    paddingTop: 5,
+    paddingTop: 10,
     paddingBottom: 6,
     color: Colores.textoPrincipal,
   },
@@ -124,7 +130,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 12,
     padding: 6,
-    top: 7
   },
   errorTexto: {
     color: Colores.textoError,

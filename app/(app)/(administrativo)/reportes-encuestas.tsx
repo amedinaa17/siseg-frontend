@@ -7,8 +7,9 @@ import Tabla from "@/componentes/ui/Tabla";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
+import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 type Alumno = {
   boleta: string;
@@ -114,6 +115,10 @@ function colorRespuesta(valor: number) {
 
 export default function EncuestasAdmin() {
   const { sesion, verificarToken } = useAuth();
+  const router = useRouter();
+
+  const [cargando, setCargando] = useState(false);
+
   const modalAPI = useRef<ModalAPIRef>(null);
 
   const { width } = useWindowDimensions();
@@ -134,9 +139,11 @@ export default function EncuestasAdmin() {
 
   const [modalValores, setModalValores] = useState<number[]>([]);
 
-  const cargar = async () => {
+  const obtenerDatos = async () => {
+    verificarToken();
     try {
-      await verificarToken();
+      setCargando(true);
+
       const tk = encodeURIComponent(sesion?.token ?? "");
 
       const [rAlu, rEnc] = await Promise.all([
@@ -168,14 +175,15 @@ export default function EncuestasAdmin() {
         setEncuestas(listaEnc);
       }
     } catch (e) {
-      modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
+      modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
     } finally {
       setPaginaActual(1);
+      setCargando(false);
     }
   };
 
   useEffect(() => {
-    cargar();
+    obtenerDatos();
   }, []);
 
   const alumnosByBoleta = useMemo(() => {
@@ -244,146 +252,153 @@ export default function EncuestasAdmin() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-        <Text style={styles.titulo}>Encuestas de satisfacción</Text>
-
-        <View style={styles.controlesSuperiores}>
-          <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-              <Selector
-                label=""
-                selectedValue={String(filasPorPagina)}
-                onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                items={[
-                  { label: "5", value: "5" },
-                  { label: "10", value: "10" },
-                  { label: "20", value: "20" },
-                ]}
-              />
-            </View>
-            <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
-          </View>
-
-          <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "50%" }]}>
-            <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "70%" }]}>
-              <Entrada
-                label="Buscar"
-                value={busqueda}
-                onChangeText={setBusqueda}
-              />
-            </View>
-
-            <View style={[esPantallaPequeña ? { width: "100%" } : { width: "30%" }]}>
-              <Selector
-                label="Carrera"
-                selectedValue={filtroCarrera}
-                onValueChange={setFiltroCarrera}
-                items={[
-                  { label: "Todos", value: "Todos" },
-                  ...Array.from(new Set(alumnos.map((a) => carreraTexto(a.carrera)))).map((c) => ({
-                    label: c,
-                    value: c,
-                  })),
-                ]}
-              />
-            </View>
-          </View>
+    <>
+      {cargando && (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+          <ActivityIndicator size="large" color="#5a0839" />
         </View>
+      )}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+          <Text style={styles.titulo}>Encuestas de satisfacción</Text>
 
-        <ScrollView horizontal={esPantallaPequeña}>
-          <Tabla
-            columnas={[
-              { key: "boleta", titulo: "Boleta", ancho: 150 },
-              { key: "nombre", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
-              { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
-              { key: "fechaUltima", titulo: "Período", ancho: 200 },
-              {
-                key: "estatus",
-                titulo: "Estatus",
-                ancho: 140,
-                render: (valor) => (
-                  <Text
-                    style={[
-                      styles.texto,
-                      valor === "Completada" && { color: Colores.textoExito },
-                      valor === "Pendiente" && { color: Colores.textoAdvertencia },
-                    ]}
-                  >
-                    {valor}
-                  </Text>
-                ),
-              },
-            ]}
-            datos={filasPaginadas.map((f) => ({
-              ...f,
-              onPress: () => abrirDetalle(f),
-            }))}
-          />
-        </ScrollView>
+          <View style={styles.controlesSuperiores}>
+            <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+              <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                <Selector
+                  label=""
+                  selectedValue={String(filasPorPagina)}
+                  onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                  items={[
+                    { label: "5", value: "5" },
+                    { label: "10", value: "10" },
+                    { label: "20", value: "20" },
+                  ]}
+                />
+              </View>
+              <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+            </View>
 
-        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-          <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-            <Paginacion
-              paginaActual={paginaActual}
-              totalPaginas={totalPaginas}
-              setPaginaActual={setPaginaActual}
-            />
+            <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "50%" }]}>
+              <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "70%" }]}>
+                <Entrada
+                  label="Buscar"
+                  value={busqueda}
+                  onChangeText={setBusqueda}
+                />
+              </View>
+
+              <View style={[esPantallaPequeña ? { width: "100%" } : { width: "30%" }]}>
+                <Selector
+                  label="Carrera"
+                  selectedValue={filtroCarrera}
+                  onValueChange={setFiltroCarrera}
+                  items={[
+                    { label: "Todos", value: "Todos" },
+                    ...Array.from(new Set(alumnos.map((a) => carreraTexto(a.carrera)))).map((c) => ({
+                      label: c,
+                      value: c,
+                    })),
+                  ]}
+                />
+              </View>
+            </View>
           </View>
 
-          <Text
-            style={{
-              color: Colores.textoClaro,
-              fontSize: Fuentes.caption,
-              marginTop: 15,
-            }}
-          >
-            {`Mostrando ${filasPaginadas.length} de ${filas.length} resultados`}
-          </Text>
-        </View>
-      </View>
-
-      <Modal
-        visible={modalOpen}
-        onClose={() => setModalOpen(false)}
-        titulo="Encuesta de satisfacción mensual"
-        maxWidth={900}
-      >
-        <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 15, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Período: </Text> {modalFecha}</Text>
-        <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{modalAlumno}</Text>
-        <Text style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, fontWeight: "600", marginBottom: 20 }}>{modalBoleta}</Text>
-        <ScrollView horizontal={esPantallaPequeña}>
-          <Tabla
-            columnas={[
-              { key: "pregunta", titulo: "Pregunta", ...(esPantallaPequeña && { ancho: 600 }) },
-              {
-                key: "respuesta",
-                titulo: "Respuesta",
-                ancho: 200,
-                render: (_, fila) => {
-                  const index = fila.pregunta.split(".")[0];
-                  const q = QUESTIONS.find((x) => String(x.index) === index);
-                  const valor = modalValores[q!.index - 1] ?? 0;
-
-                  return (
-                    <Text style={[styles.texto, colorRespuesta(valor)]}>
-                      {valueToLabel(q!, valor)}
+          <ScrollView horizontal={esPantallaPequeña}>
+            <Tabla
+              columnas={[
+                { key: "boleta", titulo: "Boleta", ancho: 150 },
+                { key: "nombre", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
+                { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
+                { key: "fechaUltima", titulo: "Período", ancho: 200 },
+                {
+                  key: "estatus",
+                  titulo: "Estatus",
+                  ancho: 140,
+                  render: (valor) => (
+                    <Text
+                      style={[
+                        styles.texto,
+                        valor === "Completada" && { color: Colores.textoExito },
+                        valor === "Pendiente" && { color: Colores.textoAdvertencia },
+                      ]}
+                    >
+                      {valor}
                     </Text>
-                  );
+                  ),
                 },
-              },
-            ]}
-            datos={QUESTIONS.map((q, i) => ({
-              pregunta: `${q.index}. ${q.text}`,
-              respuesta: valueToLabel(q, modalValores[i] ?? 0),
-            }))}
-          />
-        </ScrollView>
-      </Modal>
+              ]}
+              datos={filasPaginadas.map((f) => ({
+                ...f,
+                onPress: () => abrirDetalle(f),
+              }))}
+            />
+          </ScrollView>
+
+          <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+              <Paginacion
+                paginaActual={paginaActual}
+                totalPaginas={totalPaginas}
+                setPaginaActual={setPaginaActual}
+              />
+            </View>
+
+            <Text
+              style={{
+                color: Colores.textoClaro,
+                fontSize: Fuentes.caption,
+                marginTop: 15,
+              }}
+            >
+              {`Mostrando ${filasPaginadas.length} de ${filas.length} resultados`}
+            </Text>
+          </View>
+        </View>
+
+        <Modal
+          visible={modalOpen}
+          onClose={() => setModalOpen(false)}
+          titulo="Encuesta de satisfacción mensual"
+          maxWidth={900}
+        >
+          <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 15, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Período: </Text> {modalFecha}</Text>
+          <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{modalAlumno}</Text>
+          <Text style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, fontWeight: "600", marginBottom: 20 }}>{modalBoleta}</Text>
+          <ScrollView horizontal={esPantallaPequeña}>
+            <Tabla
+              columnas={[
+                { key: "pregunta", titulo: "Pregunta", ...(esPantallaPequeña && { ancho: 600 }) },
+                {
+                  key: "respuesta",
+                  titulo: "Respuesta",
+                  ancho: 200,
+                  render: (_, fila) => {
+                    const index = fila.pregunta.split(".")[0];
+                    const q = QUESTIONS.find((x) => String(x.index) === index);
+                    const valor = modalValores[q!.index - 1] ?? 0;
+
+                    return (
+                      <Text style={[styles.texto, colorRespuesta(valor)]}>
+                        {valueToLabel(q!, valor)}
+                      </Text>
+                    );
+                  },
+                },
+              ]}
+              datos={QUESTIONS.map((q, i) => ({
+                pregunta: `${q.index}. ${q.text}`,
+                respuesta: valueToLabel(q, modalValores[i] ?? 0),
+              }))}
+            />
+          </ScrollView>
+        </Modal>
 
 
-      <ModalAPI ref={modalAPI} />
-    </ScrollView>
+        <ModalAPI ref={modalAPI} />
+      </ScrollView>
+    </>
   );
 }
 

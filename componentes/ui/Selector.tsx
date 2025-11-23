@@ -10,6 +10,7 @@ type Propiedades = {
   onValueChange: (value: string) => void;
   items: Item[];
   error?: string;
+  editable?: boolean;
 };
 
 export default function Selector({
@@ -18,6 +19,7 @@ export default function Selector({
   onValueChange,
   items,
   error,
+  editable = true,
   ...props
 }: Propiedades) {
   const [focused, setFocused] = useState(false);
@@ -48,7 +50,8 @@ export default function Selector({
   return (
     <View>
       <Pressable
-        onPress={() => setModalVisible(true)}
+        disabled={!editable}
+        onPress={() => editable && setModalVisible(true)}
         style={[
           styles.contenedor,
           {
@@ -59,50 +62,73 @@ export default function Selector({
         ]}
       >
         <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
-        <Text
-          style={[
-            styles.valorTexto,
-            { color: selectedValue ? Colores.texto : Colores.textoClaro },
-          ]}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ flex: 1 }}
         >
-          {selectedValue || ""}
-        </Text>
+          <Text
+            style={[
+              styles.valorTexto,
+              { color: selectedValue ? Colores.texto : Colores.textoClaro },
+            ]}
+            numberOfLines={1}
+          >
+            {selectedValue || ""}
+          </Text>
+        </ScrollView>
+
       </Pressable>
 
       {error && <Text style={styles.errorTexto}>{error}</Text>}
 
-      <Modal visible={modalVisible} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-            {/* Agregado ScrollView para habilitar el desplazamiento */}
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              style={{ maxHeight: 300 }} // Limita la altura del contenido
-            >
-              {items.map((item) => (
-                <Pressable
-                  key={item.value}
-                  onPress={() => {
-                    onValueChange(item.value);
-                    setModalVisible(false);
-                    setFocused(true);
-                  }}
-                  style={styles.opcion}
-                >
-                  <Text style={styles.textoOpcion}>{item.label}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
+      {editable && (
+        <Modal visible={modalVisible} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={{ maxHeight: 300 }}
+              >
+                {items.map((item) => {
+                  const seleccionado = item.value === selectedValue || item.label === selectedValue;
 
-            <Pressable
-              onPress={() => setModalVisible(false)}
-              style={[styles.opcion, styles.cancelarOpcion]}
-            >
-              <Text style={styles.cancelarTexto}>Cancelar</Text>
-            </Pressable>
+                  return (
+                    <Pressable
+                      key={item.value}
+                      onPress={() => {
+                        onValueChange(item.value);
+                        setModalVisible(false);
+                        setFocused(true);
+                      }}
+                      style={[
+                        styles.opcion,
+                        seleccionado && styles.opcionSeleccionada
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.textoOpcion,
+                          seleccionado && styles.textoSeleccionado
+                        ]}
+                      >
+                        {item.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+
+              <Pressable
+                onPress={() => setModalVisible(false)}
+                style={[styles.opcion, styles.cancelarOpcion]}
+              >
+                <Text style={styles.cancelarTexto}>Cancelar</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      )}
     </View>
   );
 }
@@ -160,4 +186,14 @@ const styles = StyleSheet.create({
     color: Colores.textoError,
     textAlign: "center",
   },
+  opcionSeleccionada: {
+    backgroundColor: Colores.primario + "22",
+    borderLeftWidth: 4,
+    borderLeftColor: Colores.primario,
+  },
+  textoSeleccionado: {
+    color: Colores.primario,
+    fontWeight: "600",
+  },
+
 });

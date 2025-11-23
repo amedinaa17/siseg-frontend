@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 import {
   registroEsquema,
@@ -20,6 +20,9 @@ import {
 
 export default function CompletarRegistro() {
   const router = useRouter();
+
+  const [cargando, setCargando] = useState(false);
+
   const modalAPI = useRef<ModalAPIRef>(null);
 
   const { width } = useWindowDimensions();
@@ -46,6 +49,8 @@ export default function CompletarRegistro() {
 
       if (token) {
         try {
+          setCargando(true);
+
           const response = await fetchData(`users/getValidarDatos?tk=${token}`);
           if (response.error === 0) {
             setAlumno(prevState => ({
@@ -62,6 +67,8 @@ export default function CompletarRegistro() {
           }
         } catch (error) {
           setError("Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+        } finally {
+          setCargando(false);
         }
       } else {
         setError("El enlace no contiene un token válido. Verifica que el enlace sea el correcto o registra tu correo electrónico institucional nuevamente para recibir otro.");
@@ -86,10 +93,10 @@ export default function CompletarRegistro() {
         modalAPI.current?.show(true, "Tu registro se ha completado correctamente. Hemos enviado a tu correo electrónico tu usuario y contraseña para iniciar sesión en el sistema.",
           () => { router.replace("/"); });
       } else {
-        modalAPI.current?.show(false, "Hubo un problema al completar tu registro. Inténtalo de nuevo más tarde.");
+        modalAPI.current?.show(false, "Hubo un problema al completar tu registro. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
       }
     } catch (error) {
-      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
     }
   };
 
@@ -100,280 +107,287 @@ export default function CompletarRegistro() {
   }, [errors]);
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <Encabezado />
-        {error ? (
-          <View style={[styles.contenedorError]}>
-            <Ionicons name="sad-outline" size={65} color={Colores.textoClaro} />
-            <Text style={styles.error}>¡Oops! Algo salió mal</Text>
-            <Text style={styles.mensaje}>{error}</Text>
-            <Boton title="Volver a intentarlo" onPress={() => router.replace("/registrar-cuenta")} />
-          </View>
-        ) : (
-          <>
-            <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-              <Text style={styles.titulo}>
-                {step === 1 ? "Validar datos" : "Completar registro"}
-              </Text>
+    <>
+      {cargando && (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+          <ActivityIndicator size="large" color="#5a0839" />
+        </View>
+      )}
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <Encabezado />
+          {error ? (
+            <View style={[styles.contenedorError]}>
+              <Ionicons name="sad-outline" size={65} color={Colores.textoClaro} />
+              <Text style={styles.error}>¡Oops! Algo salió mal</Text>
+              <Text style={styles.mensaje}>{error}</Text>
+              <Boton title="Volver a intentarlo" onPress={() => router.replace("/registrar-cuenta")} />
+            </View>
+          ) : (
+            <>
+              <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                <Text style={styles.titulo}>
+                  {step === 1 ? "Validar datos" : "Completar registro"}
+                </Text>
 
-              {step === 1 && (
-                <>
-                  <View style={{ marginBottom: 15 }} >
-                    <Entrada label="Nombre" value={alumno?.nombre || ""} editable={false} />
-                  </View>
-
-                  <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
-                      <Entrada
-                        label="Apellido Paterno"
-                        value={alumno?.apellido_paterno || ""}
-                        editable={false}
-                      />
+                {step === 1 && (
+                  <>
+                    <View style={{ marginBottom: 15 }} >
+                      <Entrada label="Nombre" value={alumno?.nombre || ""} editable={false} />
                     </View>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
-                      <Entrada
-                        label="Apellido Materno"
-                        value={alumno?.apellido_materno || ""}
-                        editable={false}
-                      />
-                    </View>
-                  </View>
 
-                  <View style={{ marginBottom: 15 }} >
-                    <Entrada
-                      label="CURP"
-                      maxLength={18}
-                      value={alumno?.curp || ""}
-                      editable={false}
-                    />
-                  </View>
-
-                  <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
-                      <Entrada
-                        label="Boleta"
-                        keyboardType="numeric"
-                        maxLength={10}
-                        value={alumno?.boleta || ""}
-                        editable={false}
-                      />
-                    </View>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
-                      <Entrada
-                        label="Carrera"
-                        value={alumno?.carrera || ""}
-                        editable={false}
-                      />
-                    </View>
-                  </View>
-
-                  <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
-                      <Entrada
-                        label="Generación"
-                        value={alumno?.generacion || ""}
-                        editable={false}
-                      />
-                    </View>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
-                      <Entrada
-                        label="Promedio"
-                        value={alumno?.promedio || ""}
-                        editable={false}
-                      />
-                    </View>
-                  </View>
-
-                  <View style={{ marginBottom: 25 }} >
-                    <Entrada
-                      label="Correo Electrónico Institucional"
-                      value={alumno?.correo || ""}
-                      editable={false}
-                    />
-                  </View>
-
-                  <View style={{ flexDirection: "row", gap: 12 }}>
-                    <View style={{ flex: 1 }} />
-                    <View style={{ flex: 1 }}>
-                      <Boton title="Siguiente" onPress={handleNext} />
-                    </View>
-                  </View>
-                </>
-              )}
-
-              {step === 2 && (
-                <>
-                  <View style={{ marginBottom: 15 }}>
-                    <Controller
-                      control={control}
-                      name="rfc"
-                      defaultValue=""
-                      render={({ field: { onChange, value } }) => (
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                      <View style={{ flex: 1, marginBottom: 15 }}>
                         <Entrada
-                          label="RFC"
-                          value={value}
-                          onChangeText={onChange}
-                          error={errors.rfc?.message}
+                          label="Apellido Paterno"
+                          value={alumno?.apellido_paterno || ""}
+                          editable={false}
                         />
-                      )}
-                    />
-                  </View>
+                      </View>
+                      <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada
+                          label="Apellido Materno"
+                          value={alumno?.apellido_materno || ""}
+                          editable={false}
+                        />
+                      </View>
+                    </View>
 
-                  <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.calle && !errors.colonia ? 30 : 15 }}>
-                      <Controller
-                        control={control}
-                        name="calle"
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Entrada
-                            label="Calle y Número"
-                            {...field}
-                            error={errors.calle?.message}
-                          />
-                        )}
+                    <View style={{ marginBottom: 15 }} >
+                      <Entrada
+                        label="CURP"
+                        maxLength={18}
+                        value={alumno?.curp || ""}
+                        editable={false}
                       />
                     </View>
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.colonia && !errors.delegacion ? 30 : 15 }}>
-                      <Controller
-                        control={control}
-                        name="colonia"
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Entrada
-                            label="Colonia"
-                            {...field}
-                            error={errors.colonia?.message}
-                          />
-                        )}
-                      />
-                    </View>
-                  </View>
-                  <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]} >
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.delegacion && !errors.estado ? 30 : 15 }}>
-                      <Controller
-                        control={control}
-                        name="delegacion"
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Entrada
-                            label="Delegación / Municipio"
-                            {...field}
-                            error={errors.delegacion?.message}
-                          />
-                        )}
-                      />
-                    </View>
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.estado && !errors.cp ? 30 : 15 }}>
-                      <Controller
-                        control={control}
-                        name="estado"
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Entrada
-                            label="Estado de Procedencia"
-                            {...field}
-                            error={errors.estado?.message}
-                          />
-                        )}
-                      />
-                    </View>
-                  </View>
 
-                  <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]} >
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.cp ? 30 : 15 }}>
-                      <Controller
-                        control={control}
-                        name="cp"
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Entrada
-                            label="Código Postal"
-                            keyboardType="numeric"
-                            {...field}
-                            error={errors.cp?.message}
-                          />
-                        )}
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                      <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada
+                          label="Boleta"
+                          keyboardType="numeric"
+                          maxLength={10}
+                          value={alumno?.boleta || ""}
+                          editable={false}
+                        />
+                      </View>
+                      <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada
+                          label="Carrera"
+                          value={alumno?.carrera || ""}
+                          editable={false}
+                        />
+                      </View>
+                    </View>
+
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                      <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada
+                          label="Generación"
+                          value={alumno?.generacion || ""}
+                          editable={false}
+                        />
+                      </View>
+                      <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada
+                          label="Promedio"
+                          value={alumno?.promedio || ""}
+                          editable={false}
+                        />
+                      </View>
+                    </View>
+
+                    <View style={{ marginBottom: 25 }} >
+                      <Entrada
+                        label="Correo Electrónico Institucional"
+                        value={alumno?.correo || ""}
+                        editable={false}
                       />
                     </View>
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && !errors.telcelular ? 15 : 20 }}>
+
+                    <View style={{ flexDirection: "row", gap: 12 }}>
+                      <View style={{ flex: 1 }} />
+                      <View style={{ flex: 1 }}>
+                        <Boton title="Siguiente" onPress={handleNext} />
+                      </View>
+                    </View>
+                  </>
+                )}
+
+                {step === 2 && (
+                  <>
+                    <View style={{ marginBottom: 15 }}>
                       <Controller
                         control={control}
-                        name="sexo"
+                        name="rfc"
                         defaultValue=""
                         render={({ field: { onChange, value } }) => (
-                          <Selector
-                            label="Sexo"
-                            selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
-                            onValueChange={(val) => onChange(val)}
-                            items={[
-                              { label: "Masculino", value: "M" },
-                              { label: "Femenino", value: "F" },
-                            ]}
-                            error={errors.sexo?.message}
-                          />
-                        )}
-                      />
-                    </View>
-                  </View>
-
-                  <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.telcelular && !errors.tellocal ? 30 : 15 }}>
-                      <Controller
-                        control={control}
-                        name="telcelular"
-                        defaultValue=""
-                        render={({ field }) => (
                           <Entrada
-                            label="Teléfono Celular"
-                            keyboardType="phone-pad"
-                            maxLength={10}
-                            {...field}
-                            error={errors.telcelular?.message}
+                            label="RFC"
+                            value={value}
+                            onChangeText={onChange}
+                            error={errors.rfc?.message}
                           />
                         )}
                       />
                     </View>
-                    <View style={{ flex: 1, marginBottom: 30 }}>
-                      <Controller
-                        control={control}
-                        name="tellocal"
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Entrada
-                            label="Teléfono Local"
-                            keyboardType="phone-pad"
-                            maxLength={10}
-                            {...field}
-                            error={errors.tellocal?.message}
-                          />
-                        )}
-                      />
-                    </View>
-                  </View>
 
-                  <View style={{ flexDirection: "row", gap: 12 }}>
-                    <View style={{ flex: 1 }}>
-                      <Boton title="Regresar" onPress={handleBack} />
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                      <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.calle && !errors.colonia ? 30 : 15 }}>
+                        <Controller
+                          control={control}
+                          name="calle"
+                          defaultValue=""
+                          render={({ field }) => (
+                            <Entrada
+                              label="Calle y Número"
+                              {...field}
+                              error={errors.calle?.message}
+                            />
+                          )}
+                        />
+                      </View>
+                      <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.colonia && !errors.delegacion ? 30 : 15 }}>
+                        <Controller
+                          control={control}
+                          name="colonia"
+                          defaultValue=""
+                          render={({ field }) => (
+                            <Entrada
+                              label="Colonia"
+                              {...field}
+                              error={errors.colonia?.message}
+                            />
+                          )}
+                        />
+                      </View>
                     </View>
-                    <View style={{ flex: 1 }}>
-                      <Boton
-                        title={isSubmitting ? "Guardando…" : "Guardar datos"}
-                        onPress={handleSubmit(onSubmit)}
-                        disabled={isSubmitting}
-                      />
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]} >
+                      <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.delegacion && !errors.estado ? 30 : 15 }}>
+                        <Controller
+                          control={control}
+                          name="delegacion"
+                          defaultValue=""
+                          render={({ field }) => (
+                            <Entrada
+                              label="Delegación / Municipio"
+                              {...field}
+                              error={errors.delegacion?.message}
+                            />
+                          )}
+                        />
+                      </View>
+                      <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.estado && !errors.cp ? 30 : 15 }}>
+                        <Controller
+                          control={control}
+                          name="estado"
+                          defaultValue=""
+                          render={({ field }) => (
+                            <Entrada
+                              label="Estado de Procedencia"
+                              {...field}
+                              error={errors.estado?.message}
+                            />
+                          )}
+                        />
+                      </View>
                     </View>
-                  </View>
-                </>
-              )}
-            </View>
-          </>
-        )}
-        <ModalAPI ref={modalAPI} />
-        <PiePagina />
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]} >
+                      <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.cp ? 30 : 15 }}>
+                        <Controller
+                          control={control}
+                          name="cp"
+                          defaultValue=""
+                          render={({ field }) => (
+                            <Entrada
+                              label="Código Postal"
+                              keyboardType="numeric"
+                              {...field}
+                              error={errors.cp?.message}
+                            />
+                          )}
+                        />
+                      </View>
+                      <View style={{ flex: 1, marginBottom: esPantallaPequeña && !errors.telcelular ? 15 : 20 }}>
+                        <Controller
+                          control={control}
+                          name="sexo"
+                          defaultValue=""
+                          render={({ field: { onChange, value } }) => (
+                            <Selector
+                              label="Sexo"
+                              selectedValue={value === "F" ? "Femenino" : value === "M" ? "Masculino" : ""}
+                              onValueChange={(val) => onChange(val)}
+                              items={[
+                                { label: "Masculino", value: "M" },
+                                { label: "Femenino", value: "F" },
+                              ]}
+                              error={errors.sexo?.message}
+                            />
+                          )}
+                        />
+                      </View>
+                    </View>
+
+                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                      <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.telcelular && !errors.tellocal ? 30 : 15 }}>
+                        <Controller
+                          control={control}
+                          name="telcelular"
+                          defaultValue=""
+                          render={({ field }) => (
+                            <Entrada
+                              label="Teléfono Celular"
+                              keyboardType="phone-pad"
+                              maxLength={10}
+                              {...field}
+                              error={errors.telcelular?.message}
+                            />
+                          )}
+                        />
+                      </View>
+                      <View style={{ flex: 1, marginBottom: 30 }}>
+                        <Controller
+                          control={control}
+                          name="tellocal"
+                          defaultValue=""
+                          render={({ field }) => (
+                            <Entrada
+                              label="Teléfono Local"
+                              keyboardType="phone-pad"
+                              maxLength={10}
+                              {...field}
+                              error={errors.tellocal?.message}
+                            />
+                          )}
+                        />
+                      </View>
+                    </View>
+
+                    <View style={{ flexDirection: "row", gap: 12 }}>
+                      <View style={{ flex: 1 }}>
+                        <Boton title="Regresar" onPress={handleBack} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Boton
+                          title={isSubmitting ? "Guardando…" : "Guardar datos"}
+                          onPress={handleSubmit(onSubmit)}
+                          disabled={isSubmitting}
+                        />
+                      </View>
+                    </View>
+                  </>
+                )}
+              </View>
+            </>
+          )}
+          <ModalAPI ref={modalAPI} />
+          <PiePagina />
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </>
   );
 }
 

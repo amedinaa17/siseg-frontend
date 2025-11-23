@@ -11,12 +11,16 @@ import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function GestionPersonalAdministrativo() {
     const { sesion, verificarToken } = useAuth();
+    const router = useRouter();
+
+    const [cargando, setCargando] = useState(false);
 
     const modalAPI = useRef<ModalAPIRef>(null);
     const [personal, setPersonal] = useState<any[]>([]);
@@ -42,14 +46,18 @@ export default function GestionPersonalAdministrativo() {
         verificarToken();
 
         try {
+            setCargando(true);
+
             const response = await fetchData(`users/obtenerTodosAdmins?tk=${sesion.token}`);
             if (response.error === 0) {
                 setPersonal(response.admins);
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.");
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+        } finally {
+            setCargando(false);
         }
     };
 
@@ -217,6 +225,7 @@ export default function GestionPersonalAdministrativo() {
                                         { label: "Femenino", value: "F" },
                                     ]}
                                     onValueChange={() => { }}
+                                    editable={false}
                                 />
                             </View>
                         </View>
@@ -641,154 +650,161 @@ export default function GestionPersonalAdministrativo() {
     };
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                <Text style={styles.titulo}>Gestionar personal administrativo</Text>
-                {sesion?.perfil === 2 && (
-                    <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
-                        <View>
-                            <Boton title="Agregar personal" onPress={() => { setModalAgregar(true) }} />
-                        </View>
-                    </View>
-                )}
-
-                <View style={styles.controlesSuperiores}>
-                    <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                        <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                            <Selector
-                                label=""
-                                selectedValue={String(filasPorPagina)}
-                                onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                items={[
-                                    { label: "5", value: "5" },
-                                    { label: "10", value: "10" },
-                                    { label: "20", value: "20" },
-                                ]}
-                            />
-                        </View>
-                        <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
-                    </View>
-
-                    <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
-                        <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
-                            <Entrada
-                                label="Buscar"
-                                value={busqueda}
-                                onChangeText={setBusqueda}
-                            />
-                        </View>
-
-                        <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
-                            <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
-                                <Selector
-                                    label="Perfil"
-                                    selectedValue={filtroPerfil}
-                                    onValueChange={setFiltroPerfil}
-                                    items={[
-                                        { label: "Todos", value: "Todos" },
-                                        { label: "Administrador general", value: "general" },
-                                        { label: "Administrador de seguimiento", value: "de seguimiento" },
-                                    ]}
-                                />
-                            </View>
-
-                            <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
-                                <Selector
-                                    label="Estatus"
-                                    selectedValue={filtroEstatus}
-                                    onValueChange={setFiltroEstatus}
-                                    items={[
-                                        { label: "Todos", value: "Todos" },
-                                        { label: "Activo", value: "Activo" },
-                                        { label: "Inactivo", value: "Inactivo" },
-                                    ]}
-                                />
-                            </View>
-                        </View>
-                    </View>
+        <>
+            {cargando && (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+                    <ActivityIndicator size="large" color="#5a0839" />
                 </View>
+            )}
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                    <Text style={styles.titulo}>Gestionar personal administrativo</Text>
+                    {sesion?.perfil === 2 && (
+                        <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
+                            <View>
+                                <Boton title="Agregar personal" onPress={() => { setModalAgregar(true) }} />
+                            </View>
+                        </View>
+                    )}
 
-                <ScrollView horizontal={esPantallaPequeña}>
-                    <Tabla
-                        columnas={[
-                            { key: "boleta", titulo: "No. Empleado", ancho: 150 },
-                            { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
-                            { key: "perfil", titulo: "Perfil", ...(esPantallaPequeña && { ancho: 250 }) },
-                            {
-                                key: "estatus", titulo: "Estatus",
-                                render: (valor) => (
-                                    <Text
-                                        style={[
-                                            styles.texto,
-                                            valor === "Inactivo" && { color: Colores.textoError },
-                                            valor === "Activo" && { color: Colores.textoInfo },
+                    <View style={styles.controlesSuperiores}>
+                        <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+                            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                                <Selector
+                                    label=""
+                                    selectedValue={String(filasPorPagina)}
+                                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                                    items={[
+                                        { label: "5", value: "5" },
+                                        { label: "10", value: "10" },
+                                        { label: "20", value: "20" },
+                                    ]}
+                                />
+                            </View>
+                            <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+                        </View>
+
+                        <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
+                            <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
+                                <Entrada
+                                    label="Buscar"
+                                    value={busqueda}
+                                    onChangeText={setBusqueda}
+                                />
+                            </View>
+
+                            <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
+                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                                    <Selector
+                                        label="Perfil"
+                                        selectedValue={filtroPerfil}
+                                        onValueChange={setFiltroPerfil}
+                                        items={[
+                                            { label: "Todos", value: "Todos" },
+                                            { label: "Administrador general", value: "general" },
+                                            { label: "Administrador de seguimiento", value: "de seguimiento" },
                                         ]}
-                                    >
-                                        {valor}
-                                    </Text>
-                                ), ...(esPantallaPequeña && { ancho: 150 })
-                            },
-                            ...(sesion?.perfil === 2
-                                ? [
-                                    {
-                                        key: "acciones",
-                                        titulo: "Acciones",
-                                        ancho: 110,
-                                        render: (_, fila) => (
-                                            <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
-                                                <Boton
-                                                    onPress={() => { setPersonalSeleccionado(fila); setModalEditar(true); }}
-                                                    icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                    color={Colores.textoInfo}
-                                                />
-                                                <Boton
-                                                    onPress={() => { setModalDarBaja(fila) }}
-                                                    icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                    color={Colores.textoError}
-                                                    disabled={fila.estatus === "Baja" ? true : false}
-                                                />
-                                            </View>
-                                        ),
-                                    },
-                                ]
-                                : []),
-                        ]}
-                        datos={personalMostrados.map((fila) => ({
-                            ...fila,
-                            boleta: fila.persona.boleta,
-                            nombre_completo: `${fila.persona.nombre} ${fila.persona.APELLIDO_PATERNO} ${fila.persona.APELLIDO_MATERNO}`,
-                            estatus: fila.estatus.DESCRIPCION,
-                            onPress: () => { setPersonalSeleccionado(fila); setModalDetalle(true); },
-                        }))}
-                    />
-                </ScrollView>
+                                    />
+                                </View>
 
-                <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                        <Paginacion
-                            paginaActual={paginaActual}
-                            totalPaginas={totalPaginas}
-                            setPaginaActual={setPaginaActual}
-                        />
+                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
+                                    <Selector
+                                        label="Estatus"
+                                        selectedValue={filtroEstatus}
+                                        onValueChange={setFiltroEstatus}
+                                        items={[
+                                            { label: "Todos", value: "Todos" },
+                                            { label: "Activo", value: "Activo" },
+                                            { label: "Inactivo", value: "Inactivo" },
+                                        ]}
+                                    />
+                                </View>
+                            </View>
+                        </View>
                     </View>
 
-                    <Text
-                        style={{
-                            color: Colores.textoClaro,
-                            fontSize: Fuentes.caption,
-                            marginTop: 15,
-                        }}
-                    >
-                        {`Mostrando ${personalMostrados.length} de ${personalFiltrados.length} resultados`}
-                    </Text>
+                    <ScrollView horizontal={esPantallaPequeña}>
+                        <Tabla
+                            columnas={[
+                                { key: "boleta", titulo: "No. Empleado", ancho: 150 },
+                                { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
+                                { key: "perfil", titulo: "Perfil", ...(esPantallaPequeña && { ancho: 250 }) },
+                                {
+                                    key: "estatus", titulo: "Estatus",
+                                    render: (valor) => (
+                                        <Text
+                                            style={[
+                                                styles.texto,
+                                                valor === "Inactivo" && { color: Colores.textoError },
+                                                valor === "Activo" && { color: Colores.textoInfo },
+                                            ]}
+                                        >
+                                            {valor}
+                                        </Text>
+                                    ), ...(esPantallaPequeña && { ancho: 150 })
+                                },
+                                ...(sesion?.perfil === 2
+                                    ? [
+                                        {
+                                            key: "acciones",
+                                            titulo: "Acciones",
+                                            ancho: 110,
+                                            render: (_, fila) => (
+                                                <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                                                    <Boton
+                                                        onPress={() => { setPersonalSeleccionado(fila); setModalEditar(true); }}
+                                                        icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                        color={Colores.textoInfo}
+                                                    />
+                                                    <Boton
+                                                        onPress={() => { setModalDarBaja(fila) }}
+                                                        icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                        color={Colores.textoError}
+                                                        disabled={fila.estatus === "Baja" ? true : false}
+                                                    />
+                                                </View>
+                                            ),
+                                        },
+                                    ]
+                                    : []),
+                            ]}
+                            datos={personalMostrados.map((fila) => ({
+                                ...fila,
+                                boleta: fila.persona.boleta,
+                                nombre_completo: `${fila.persona.nombre} ${fila.persona.APELLIDO_PATERNO} ${fila.persona.APELLIDO_MATERNO}`,
+                                estatus: fila.estatus.DESCRIPCION,
+                                onPress: () => { setPersonalSeleccionado(fila); setModalDetalle(true); },
+                            }))}
+                        />
+                    </ScrollView>
+
+                    <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                            <Paginacion
+                                paginaActual={paginaActual}
+                                totalPaginas={totalPaginas}
+                                setPaginaActual={setPaginaActual}
+                            />
+                        </View>
+
+                        <Text
+                            style={{
+                                color: Colores.textoClaro,
+                                fontSize: Fuentes.caption,
+                                marginTop: 15,
+                            }}
+                        >
+                            {`Mostrando ${personalMostrados.length} de ${personalFiltrados.length} resultados`}
+                        </Text>
+                    </View>
                 </View>
-            </View>
-            {renderModalDetalle()}
-            {renderModalAgregar()}
-            {renderModalEditar()}
-            {renderModalDarBaja()}
-            <ModalAPI ref={modalAPI} />
-        </ScrollView >
+                {renderModalDetalle()}
+                {renderModalAgregar()}
+                {renderModalEditar()}
+                {renderModalDarBaja()}
+                <ModalAPI ref={modalAPI} />
+            </ScrollView >
+        </>
     );
 }
 

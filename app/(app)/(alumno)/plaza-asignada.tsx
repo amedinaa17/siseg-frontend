@@ -5,82 +5,95 @@ import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function PlazaAsignada() {
+    const { sesion, verificarToken } = useAuth();
     const router = useRouter();
+
+    const [cargando, setCargando] = useState(false);
 
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
 
     const modalAPI = useRef<ModalAPIRef>(null);
-    const { sesion } = useAuth();
 
     const [datosAlumno, setDatosAlumno] = useState<any>(null);
 
-    useEffect(() => {
-        const obtenerDatos = async () => {
-            if (!sesion?.token) return;
+    const obtenerDatos = async () => {
+        verificarToken();
 
-            try {
-                const response = await fetchData(`users/obtenerPlazaAsignada?tk=${encodeURIComponent(sesion.token)}`);
-                if (response?.error === 0) {
-                    if (response.plaza.sede) {
-                        setDatosAlumno(response.plaza);
-                    } else {
-                        modalAPI.current?.show(false, "Aún no tienes una plaza asignada.", () => { router.replace("/"); });
-                        setDatosAlumno(null);
-                    }
+        try {
+            setCargando(true);
+
+            const response = await fetchData(`users/obtenerPlazaAsignada?tk=${encodeURIComponent(sesion.token)}`);
+            if (response?.error === 0) {
+                if (response.plaza.sede) {
+                    setDatosAlumno(response.plaza);
                 } else {
-                    modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+                    modalAPI.current?.show(false, "Aún no tienes una plaza asignada.", () => { router.replace("/"); });
                     setDatosAlumno(null);
                 }
-            } catch (error) {
-                console.error(error);
-                modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+                setDatosAlumno(null);
             }
-        };
+        } catch (error) {
+            console.error(error);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+        } finally {
+            setCargando(false);
+        }
+    };
 
+    useEffect(() => {
         obtenerDatos();
-    }, [sesion]);
+    }, []);
 
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                <Text style={styles.titulo}>Plaza asignada</Text>
+        <>
+            {cargando && (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+                    <ActivityIndicator size="large" color="#5a0839" />
+                </View>
+            )}
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                    <Text style={styles.titulo}>Plaza asignada</Text>
 
-                <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                    <View style={{ flex: 1 }}>
-                        <Entrada label="Programa" value={datosAlumno?.PROGRAMA ?? ""} editable={false} />
+                    <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                        <View style={{ flex: 1 }}>
+                            <Entrada label="Programa" value={datosAlumno?.PROGRAMA ?? ""} editable={false} />
+                        </View>
+
+                        <View style={{ flex: 1 }}>
+                            <Entrada label="Promoción" value={datosAlumno?.promocion ?? ""} editable={false} />
+                        </View>
                     </View>
 
-                    <View style={{ flex: 1 }}>
-                        <Entrada label="Promoción" value={datosAlumno?.promocion ?? ""} editable={false} />
+                    <View style={{ marginBottom: 15 }}>
+                        <Entrada label="Sede" value={datosAlumno?.sede ?? ""} editable={false} />
+                    </View>
+
+                    <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                        <View style={{ flex: 1, marginBottom: 0 }}>
+                            <Entrada label="Tarjeta" value={String(datosAlumno?.tarjetaDisponible) ?? ""} editable={false} />
+                        </View>
+                        <View style={{ flex: 1, marginBottom: 0 }}>
+                            <Entrada label="Tipo de Beca" value={datosAlumno?.tipoBeca ?? ""} editable={false} />
+                        </View>
+                    </View>
+
+                    <View style={{ marginBottom: 15 }}>
+                        <Entrada label="Ubicación" value={datosAlumno?.ubicacion ?? ""} editable={false} />
                     </View>
                 </View>
 
-                <View style={{ marginBottom: 15 }}>
-                    <Entrada label="Sede" value={datosAlumno?.sede ?? ""} editable={false} />
-                </View>
-
-                <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                    <View style={{ flex: 1, marginBottom: 0 }}>
-                        <Entrada label="Tarjeta" value={datosAlumno?.tarjetaDisponible ?? ""} editable={false} />
-                    </View>
-                    <View style={{ flex: 1, marginBottom: 0 }}>
-                        <Entrada label="Tipo de Beca" value={datosAlumno?.tipoBeca ?? ""} editable={false} />
-                    </View>
-                </View>
-
-                <View style={{ marginBottom: 15 }}>
-                    <Entrada label="Ubicación" value={datosAlumno?.ubicacion ?? ""} editable={false} />
-                </View>
-            </View>
-
-            {/* Monta el modal para poder usar modalAPI.current?.show(...) */}
-            <ModalAPI ref={modalAPI} />
-        </ScrollView>
+                {/* Monta el modal para poder usar modalAPI.current?.show(...) */}
+                <ModalAPI ref={modalAPI} />
+            </ScrollView>
+        </>
     );
 }
 

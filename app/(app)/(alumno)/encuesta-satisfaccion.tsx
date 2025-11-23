@@ -42,7 +42,7 @@ function SectionHeader({ title }: { title: string }) {
 }
 
 export default function EncuestaSatisfaccion() {
-    const { sesion } = useAuth();
+    const { sesion, verificarToken } = useAuth();
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
 
@@ -66,6 +66,8 @@ export default function EncuestaSatisfaccion() {
     };
 
     const handleSubmit = async () => {
+        verificarToken();
+        
         const newErrors: Record<string, boolean> = {};
         QUESTIONS.forEach((q) => {
             if (!answers[q.id]) {
@@ -102,7 +104,7 @@ export default function EncuestaSatisfaccion() {
             console.error(e);
             modalRef.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         } finally {
-            setLoading(false);
+           setLoading (false);
         }
     };
 

@@ -421,3 +421,15 @@ export const plazaEsquema = z.object({
 });
 
 export type PlazaFormulario = z.infer<typeof plazaEsquema>;
+
+export const asignarPlazaEsquema = z.object({
+  programa: z
+    .string()
+    .nonempty("El programa es obligatorio"),
+
+  plaza: z
+    .string()
+    .nonempty("La plaza es obligatoria"),
+});
+
+export type AsignarPlazaFormulario = z.infer<typeof asignarPlazaEsquema>;

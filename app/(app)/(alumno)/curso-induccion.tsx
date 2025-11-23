@@ -4,40 +4,48 @@ import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import * as FileSystem from "expo-file-system/legacy";
+import { useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React, { useEffect, useRef, useState } from "react";
-import { Image, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Image, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function CursoInduccion() {
+  const { sesion, verificarToken } = useAuth();
+  const router = useRouter();
+
+  const [cargando, setCargando] = useState(false);
+
   const { width } = useWindowDimensions();
   const esPantallaPequeña = width < 790;
-  const { sesion } = useAuth();
 
   const [codigoQR, setCodigoQR] = useState<string | null>(null);
 
   const modalRef = useRef<ModalAPIRef>(null);
 
-  useEffect(() => {
-    const obtenerDatos = async () => {
-      if (!sesion?.token) return;
+  const obtenerDatos = async () => {
+    verificarToken();
 
-      try {
-        const response = await fetchData(`qr/generarQr?tk=${sesion.token}`);
-        const match = response?.match?.(/<img src="([^"]+)"/);
+    try {
+      setCargando(true);
+      const response = await fetchData(`qr/generarQr?tk=${sesion.token}`);
+      const match = response?.match?.(/<img src="([^"]+)"/);
 
-        if (match && match[1]) {
-          setCodigoQR(match[1]);
-        } else {
-          modalRef.current?.show(false, "Hubo un problema al obtener tu código QR del servidor. Inténtalo de nuevo más tarde.");
-        }
-      } catch (error) {
-        console.error("Error en la solicitud:", error);
-        modalRef.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+      if (match && match[1]) {
+        setCodigoQR(match[1]);
+      } else {
+        modalRef.current?.show(false, "Hubo un problema al obtener tu código QR del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
       }
-    };
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      modalRef.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+    } finally {
+      setCargando(false);
+    }
+  };
 
+  useEffect(() => {
     obtenerDatos();
-  }, [sesion]);
+  }, []);
 
   const descargarQR = async (qr: string) => {
     if (!qr) {
@@ -77,38 +85,45 @@ export default function CursoInduccion() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View
-        style={[
-          styles.contenedorFormulario,
-          esPantallaPequeña && { maxWidth: "95%" },
-        ]}
-      >
-        <Text style={styles.titulo}>Curso de inducción</Text>
-
-        <Text style={styles.subtitulo}>
-          Este código QR es único y personal para cada alumno. Se utilizará para registrar su asistencia al curso de inducción del servicio social.
-        </Text>
-
-        <Text style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>
-          Importante: Presenta este código en el momento de ingresar al curso. No debe ser compartido ni reutilizado.
-        </Text>
-
-        {codigoQR ? (
-          <Image source={{ uri: codigoQR }} style={styles.logo} />
-        ) : (
-          <Text style={{ textAlign: "center", marginVertical: 20 }}>
-            Generando tu código QR...
-          </Text>
-        )}
-
-        <View style={{ marginTop: 15, alignItems: "center" }}>
-          <Boton title="Descargar QR" onPress={() => descargarQR(codigoQR!)} />
+    <>
+      {cargando && (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+          <ActivityIndicator size="large" color="#5a0839" />
         </View>
-      </View>
+      )}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View
+          style={[
+            styles.contenedorFormulario,
+            esPantallaPequeña && { maxWidth: "95%" },
+          ]}
+        >
+          <Text style={styles.titulo}>Curso de inducción</Text>
 
-      <ModalAPI ref={modalRef} />
-    </ScrollView>
+          <Text style={styles.subtitulo}>
+            Este código QR es único y personal para cada alumno. Se utilizará para registrar su asistencia al curso de inducción del servicio social.
+          </Text>
+
+          <Text style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>
+            Importante: Presenta este código en el momento de ingresar al curso. No debe ser compartido ni reutilizado.
+          </Text>
+
+          {codigoQR ? (
+            <Image source={{ uri: codigoQR }} style={styles.logo} />
+          ) : (
+            <Text style={{ textAlign: "center", marginVertical: 20 }}>
+              Generando tu código QR...
+            </Text>
+          )}
+
+          <View style={{ marginTop: 15, alignItems: "center" }}>
+            <Boton title="Descargar QR" onPress={() => descargarQR(codigoQR!)} />
+          </View>
+        </View>
+
+        <ModalAPI ref={modalRef} />
+      </ScrollView>
+    </>
   );
 }
 
