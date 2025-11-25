@@ -6,7 +6,7 @@ import Paginacion from "@/componentes/ui/Paginacion";
 import Selector from "@/componentes/ui/Selector";
 import Tabla from "@/componentes/ui/Tabla";
 import { useAuth } from "@/context/AuthProvider";
-import { plazaEsquema, type PlazaFormulario } from "@/lib/validacion";
+import { plazaEditarEsquema, plazaEsquema, type PlazaEditarFormulario, type PlazaFormulario } from "@/lib/validacion";
 import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,9 +30,7 @@ export default function GestionPlazas() {
     const [modalDetalle, setModalDetalle] = useState(false);
     const [modalAgregar, setModalAgregar] = useState(false);
     const [modalDarBaja, setModalDarBaja] = useState<any | null>(null);
-    const [modalCargar, setModalCargar] = useState(false);
-    const [archivoSeleccionado, setArchivoSeleccionado] = useState<any>();
-    const [errorArchivo, setErrorArchivo] = useState<string>("");
+    const [modalEditar, setModalEditar] = useState(false);
 
     // --- Estados para búsqueda, filtros y paginación ---
     const [busqueda, setBusqueda] = useState("");
@@ -95,6 +93,7 @@ export default function GestionPlazas() {
         try {
             const payload = {
                 ...data,
+                tarjeta: Number(data.tarjeta),
                 carrera: data.carrera === "Médico Cirujano y Homeópata" ? 1 : 2,
                 estatus: data.estatus === "Baja" ? 0 : 1,
                 tk: sesion.token,
@@ -111,6 +110,44 @@ export default function GestionPlazas() {
                 modalAPI.current?.show(false, "Hubo un problema al registrar la plaza. Inténtalo de nuevo más tarde.");
             }
         } catch {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+        }
+    };
+
+    const {
+        control: controlEditar,
+        handleSubmit: handleSubmitEditar,
+        reset: resetEditar,
+        formState: { errors: errorsEditar, isSubmitting: isSubmittingEditar } } = useForm<PlazaEditarFormulario>({
+            resolver: zodResolver(plazaEditarEsquema),
+        });
+
+    const onSubmitEditar = async (data: PlazaEditarFormulario) => {
+        verificarToken();
+
+        try {
+            const payload = {
+                idPlaza: plazaSeleccion.ID, 
+                ...data,
+                tarjeta: Number(data.tarjeta),
+                carrera: data.carrera === "Médico Cirujano y Homeópata" ? 1 : 2,
+                tk: sesion.token,
+            };
+
+            console.log("payload editarPlaza:", payload);
+
+            const response = await postData("plaza/editarPlaza", payload);
+
+            if (response.error === 0) {
+                resetEditar();
+                setModalEditar(false);
+                setPlazaSeleccion(null);
+                obtenerPlazas();
+                modalAPI.current?.show(true, "Los datos del personal administrativo se han actualizado correctamente.");
+            } else {
+                modalAPI.current?.show(false, "Hubo un problema al actualizar los datos del personal dministrativo. Inténtalo de nuevo más tarde.");
+            }
+        } catch (error) {
             modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         }
     };
@@ -331,6 +368,181 @@ export default function GestionPlazas() {
         );
     };
 
+    const renderModalEditar = () => {
+    if (!plazaSeleccion) return null;
+
+    return (
+        <Modal
+            visible={modalEditar}
+            titulo="Editar plaza"
+            maxWidth={700}
+            onClose={() => {
+                setPlazaSeleccion(null);
+                setModalEditar(false);
+                resetEditar();
+            }}
+            cancelar
+            deshabilitado={isSubmittingEditar}
+            textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
+        >
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === "web" ? undefined : "padding"}
+                keyboardVerticalOffset={80}
+            >
+                {/* SEDE */}
+                <View style={{ marginBottom: 15 }}>
+                    <Controller
+                        control={controlEditar}
+                        name="sede"
+                        defaultValue={plazaSeleccion.sede || ""}
+                        render={({ field }) => (
+                            <Entrada
+                                label="Sede"
+                                {...field}
+                                error={errorsEditar.sede?.message}
+                            />
+                        )}
+                    />
+                </View>
+
+                {/* UBICACION */}
+                <View style={{ marginBottom: 15 }}>
+                    <Controller
+                        control={controlEditar}
+                        name="ubicacion"
+                        defaultValue={plazaSeleccion.ubicacion || ""}
+                        render={({ field }) => (
+                            <Entrada
+                                label="Ubicación"
+                                {...field}
+                                error={errorsEditar.ubicacion?.message}
+                            />
+                        )}
+                    />
+                </View>
+
+                {/* PROGRAMA / TARJETA */}
+                <View
+                    style={
+                        esPantallaPequeña
+                            ? { flexDirection: "column" }
+                            : { flexDirection: "row", gap: 12 }
+                    }
+                >
+                    <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Controller
+                            control={controlEditar}
+                            name="programa"
+                            defaultValue={plazaSeleccion.PROGRAMA || ""}
+                            render={({ field }) => (
+                                <Entrada
+                                    label="Programa"
+                                    {...field}
+                                    error={errorsEditar.programa?.message}
+                                />
+                            )}
+                        />
+                    </View>
+
+                    <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Controller
+                            control={controlEditar}
+                            name="tarjeta"
+                            defaultValue={
+                                plazaSeleccion.tarjetaDisponible
+                                    ? plazaSeleccion.tarjetaDisponible.toString()
+                                    : ""
+                            }
+                            render={({ field }) => (
+                                <Entrada
+                                    label="Número de tarjeta"
+                                    keyboardType="numeric"
+                                    value={field.value?.toString() ?? ""}
+                                    onChangeText={(v) => field.onChange(v)}
+                                    onBlur={field.onBlur}
+                                    error={errorsEditar.tarjeta?.message}
+                                />
+                            )}
+                        />
+                    </View>
+                </View>
+
+                {/* BECA */}
+                <View style={{ marginBottom: 15 }}>
+                    <Controller
+                        control={controlEditar}
+                        name="beca"
+                        defaultValue={plazaSeleccion.tipoBeca || ""}
+                        render={({ field }) => (
+                            <Entrada
+                                label="Tipo de beca"
+                                {...field}
+                                error={errorsEditar.beca?.message}
+                            />
+                        )}
+                    />
+                </View>
+
+                {/* CARRERA / PROMOCION */}
+                <View
+                    style={
+                        esPantallaPequeña
+                            ? { flexDirection: "column" }
+                            : { flexDirection: "row", gap: 12 }
+                    }
+                >
+                    <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Controller
+                            control={controlEditar}
+                            name="carrera"
+                            defaultValue={
+                                plazaSeleccion.carrera === 1
+                                    ? "Médico Cirujano y Homeópata"
+                                    : "Médico Cirujano y Partero"
+                            }
+                            render={({ field: { onChange, value } }) => (
+                                <Selector
+                                    label="Carrera"
+                                    selectedValue={value}
+                                    onValueChange={onChange}
+                                    items={[
+                                        {
+                                            label: "Médico Cirujano y Homeópata",
+                                            value: "Médico Cirujano y Homeópata",
+                                        },
+                                        {
+                                            label: "Médico Cirujano y Partero",
+                                            value: "Médico Cirujano y Partero",
+                                        },
+                                    ]}
+                                    error={errorsEditar.carrera?.message}
+                                />
+                            )}
+                        />
+                    </View>
+
+                    <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Controller
+                            control={controlEditar}
+                            name="promocion"
+                            defaultValue={plazaSeleccion.promocion || ""}
+                            render={({ field }) => (
+                                <Entrada
+                                    label="Promoción"
+                                    {...field}
+                                    error={errorsEditar.promocion?.message}
+                                />
+                            )}
+                        />
+                    </View>
+                </View>
+            </KeyboardAvoidingView>
+        </Modal>
+    );
+};
+
+
     const renderModalDarBaja = () => {
         if (!modalDarBaja) return null;
 
@@ -453,6 +665,11 @@ export default function GestionPlazas() {
                                     render: (_: any, fila: any) => (
                                         <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
                                             <Boton
+                                                onPress={() => { setPlazaSeleccion(fila); setModalEditar(true); }}
+                                                icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                color={Colores.textoInfo}
+                                            />
+                                            <Boton
                                                 onPress={() => { setModalDarBaja(fila) }}
                                                 icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
                                                 color={Colores.textoError}
@@ -494,6 +711,7 @@ export default function GestionPlazas() {
 
                 </View>
                 {renderModalDetalle()}
+                {renderModalEditar()}
                 {renderModalAgregar()}
                 {renderModalDarBaja()}
                 <ModalAPI ref={modalAPI} />

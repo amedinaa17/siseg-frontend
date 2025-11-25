@@ -433,3 +433,44 @@ export const asignarPlazaEsquema = z.object({
 });
 
 export type AsignarPlazaFormulario = z.infer<typeof asignarPlazaEsquema>;
+
+export const plazaEditarEsquema = z.object({
+  carrera: z
+    .string()
+    .nonempty("La carrera es obligatoria"),
+
+  promocion: z
+    .string()
+    .nonempty("La promoción es obligatoria"),
+
+  programa: z
+    .string()
+    .nonempty("El programa es obligatorio")
+    .min(3, "El programa debe tener al menos 3 caracteres"),
+
+  sede: z
+    .string()
+    .nonempty("La sede es obligatoria")
+    .min(3, "La sede debe tener al menos 3 caracteres"),
+
+  beca: z
+    .string()
+    .nonempty("El tipo de beca es obligatorio"),
+
+  tarjeta: z
+    .string()
+    .nonempty("El número de tarjeta es obligatorio")
+    .refine((v) => /^\d+$/.test(v), {
+      message: "La tarjeta debe contener solo dígitos",
+    })
+    .refine((v) => Number(v) >= 0, {
+      message: "La tarjeta debe ser un número entero positivo",
+    }),
+
+  ubicacion: z
+    .string()
+    .nonempty("La ubicación es obligatoria")
+    .min(3, "La ubicación debe tener al menos 3 caracteres"),
+});
+
+export type PlazaEditarFormulario = z.infer<typeof plazaEditarEsquema>;

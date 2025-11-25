@@ -2,9 +2,9 @@ import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Boton from "@/componentes/ui/Boton";
 import Likert from "@/componentes/ui/BotonRadio";
 import { useAuth } from "@/context/AuthProvider";
-import { postData } from "@/servicios/api";
+import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 type ScaleValue = 1 | 2 | 3 | 4 | 5;
@@ -51,6 +51,9 @@ export default function EncuestaSatisfaccion() {
     const [answers, setAnswers] = useState<Answers>({});
     const [errors, setErrors] = useState<Record<string, boolean>>({});
 
+    const [puedeResponder, setPuedeResponder] = useState<boolean | null>(null); // null = cargando
+    const [mensajeBloqueo, setMensajeBloqueo] = useState<string | null>(null);
+
     const sections = useMemo(() => {
         return {
             Ambiente: QUESTIONS.filter((q) => q.section === "Ambiente"),
@@ -65,9 +68,59 @@ export default function EncuestaSatisfaccion() {
         setErrors((prev) => ({ ...prev, [id]: false }));
     };
 
+    useEffect(() => {
+        const cargarPermiso = async () => {
+
+            try {
+                if (!sesion?.token || !sesion?.boleta) {
+                    setPuedeResponder(true);
+                    return;
+                }
+
+                const url = `encuesta/obtenerFechaUltimaEncuesta?boleta=${sesion.boleta}&tk=${sesion.token}`;
+                const resp = await fetchData(url);
+                
+                if (resp?.error === 0 && resp.fecha) {
+                    const ultima = new Date(resp.fecha);
+                    const hoy = new Date();
+                    const mismoAnio = ultima.getFullYear() === hoy.getFullYear();
+                    const mismoMes = ultima.getMonth() === hoy.getMonth();
+
+                    if (mismoAnio && mismoMes) {
+                        setPuedeResponder(false);
+
+                        const siguienteMes = new Date(ultima);
+                        siguienteMes.setMonth(siguienteMes.getMonth() + 1);
+                        siguienteMes.setDate(1);
+
+                        const mensaje =
+                            `Ya respondiste la encuesta de satisfacción en este mes. ` +
+                            `Podrás volver a contestarla a partir del ${siguienteMes.toLocaleDateString("es-MX")}.`;
+
+                        setMensajeBloqueo(mensaje);
+                        modalRef.current?.show(false, mensaje);
+
+                        return;
+                    }
+                }
+
+                setPuedeResponder(true);
+            } catch (e) {
+                setPuedeResponder(true);
+            }
+        };
+
+        cargarPermiso();
+    }, [sesion]); 
+
     const handleSubmit = async () => {
-        verificarToken();
-        
+        verificarToken(); 
+
+        if (puedeResponder === false) {
+            modalRef.current?.show(false, mensajeBloqueo || "Ya has respondido la encuesta este mes.");
+            return;
+        }
+
         const newErrors: Record<string, boolean> = {};
         QUESTIONS.forEach((q) => {
             if (!answers[q.id]) {
@@ -97,6 +150,7 @@ export default function EncuestaSatisfaccion() {
             if (resp?.error === 0) {
                 modalRef.current?.show(true, "Encuesta enviada correctamente");
                 setAnswers({});
+                setPuedeResponder(false);
             } else {
                 modalRef.current?.show(false, "Hubo un problema al enviar tu encuesta. Inténtalo de nuevo más tarde.");
             }
@@ -104,9 +158,18 @@ export default function EncuestaSatisfaccion() {
             console.error(e);
             modalRef.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         } finally {
-           setLoading (false);
+            setLoading(false);
         }
     };
+
+    const tituloBoton = () => {
+        if (puedeResponder === false) return "Encuesta ya respondida";
+        if (loading) return "Enviando…";
+        if (puedeResponder === null) return "Cargando…";
+        return "Enviar encuesta";
+    };
+
+    const botonDeshabilitado = loading || puedeResponder === false || puedeResponder === null;
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -117,6 +180,12 @@ export default function EncuestaSatisfaccion() {
                     completamente confidenciales y nos ayudarán a identificar áreas donde podemos mejorar para ofrecer
                     una mejor experiencia en el futuro.
                 </Text>
+
+                {puedeResponder === false && (
+                    <Text style={[styles.error, { marginBottom: 16 }]}>
+                        {mensajeBloqueo || "Ya respondiste la encuesta de satisfacción en este mes."}
+                    </Text>
+                )}
 
                 <SectionHeader title="Ambiente y condiciones" />
                 {sections.Ambiente.map((q) => (
@@ -184,9 +253,9 @@ export default function EncuestaSatisfaccion() {
 
                 <View style={{ marginTop: 20, alignItems: "center" }}>
                     <Boton
-                        title={loading ? "Enviando…" : "Enviar encuesta"}
+                        title={tituloBoton()}
                         onPress={handleSubmit}
-                        disabled={loading}
+                        disabled={botonDeshabilitado}
                     />
                 </View>
             </View>

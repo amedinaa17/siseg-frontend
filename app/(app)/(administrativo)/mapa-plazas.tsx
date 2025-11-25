@@ -327,7 +327,6 @@ export default function MapaPlazas() {
           boleta
         )}`
       );
-      console.log(resp.data)
       if (resp?.error === 0 && resp?.data) {
         setAlumnoDetalles(resp.data as DetallesAlumno);
         setModalAlumnoVisible(true);
@@ -504,41 +503,172 @@ export default function MapaPlazas() {
         )}
       </Modal>
 
-      <Modal
-        visible={modalAlumnoVisible}
-        onClose={() => setModalAlumnoVisible(false)}
-        titulo="Datos del Alumno"
-        maxWidth={900}
-        cancelar
-      >
-        <ScrollView style={{ maxHeight: 520 }}>
-          {loadingAlumno && <Text style={{ color: Colores.textoClaro }}>Cargando…</Text>}
-          {!loadingAlumno && alumnoDetalles && (
-            <View style={{ gap: 12 }}>
-              <View style={styles.grid2}>
-                <Entrada label="Nombre" value={alumnoDetalles?.nombre ?? ""} editable={false} />
-                <Entrada label="Apellido Paterno" value={alumnoDetalles?.apellido_paterno ?? ""} editable={false} />
-                <Entrada label="Apellido Materno" value={alumnoDetalles?.apellido_materno ?? ""} editable={false} />
-                <Entrada label="CURP" value={alumnoDetalles?.curp ?? ""} maxLength={18} editable={false} />
-                <Entrada label="RFC" value={alumnoDetalles?.rfc ?? ""} editable={false} />
-                <Entrada label="Boleta" value={alumnoDetalles?.boleta ?? ""} editable={false} maxLength={10} />
-                <Entrada label="Carrera" value={alumnoDetalles?.carrera ?? ""} editable={false} />
-                <Entrada label="Generación" value={String(alumnoDetalles?.generacion ?? "")} editable={false} />
-                <Entrada label="Promedio" value={String(alumnoDetalles?.promedio ?? "")} editable={false} />
-                <Entrada label="Calle y Número" value={alumnoDetalles?.calle_y_numero ?? ""} editable={false} />
-                <Entrada label="Colonia" value={alumnoDetalles?.colonia ?? ""} editable={false} />
-                <Entrada label="Delegación / Municipio" value={alumnoDetalles?.delegacion ?? ""} editable={false} />
-                <Entrada label="Estado" value={alumnoDetalles?.estado ?? ""} editable={false} />
-                <Entrada label="Código Postal" value={alumnoDetalles?.cp ?? ""} editable={false} />
-                <Entrada label="Sexo" value={alumnoDetalles?.sexo ?? ""} editable={false} />
-                <Entrada label="Teléfono Celular" value={alumnoDetalles?.telcelular ?? ""} maxLength={10} editable={false} />
-                <Entrada label="Teléfono Local" value={alumnoDetalles?.tellocal ?? ""} maxLength={10} editable={false} />
-                <Entrada label="Sede" value={alumnoDetalles?.sede ?? modalSede} editable={false} />
-              </View>
-            </View>
-          )}
-        </ScrollView>
-      </Modal>
+<Modal
+  visible={modalAlumnoVisible}
+  onClose={() => setModalAlumnoVisible(false)}
+  titulo="Datos del alumno"
+  maxWidth={750}
+>
+  <View style={{ paddingVertical: 10 }}>
+    {loadingAlumno && (
+      <Text style={{ color: Colores.textoClaro }}>Cargando…</Text>
+    )}
+
+    {!loadingAlumno && alumnoDetalles && (
+      <View style={{ width: "100%" }}>
+        
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Nombre"
+            value={alumnoDetalles.nombre ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Apellido Paterno"
+            value={alumnoDetalles.apellido_paterno ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Apellido Materno"
+            value={alumnoDetalles.apellido_materno ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="CURP"
+            value={alumnoDetalles.curp ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="RFC"
+            value={alumnoDetalles.rfc ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Boleta"
+            value={alumnoDetalles.boleta ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Carrera"
+            value={alumnoDetalles.carrera ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Generación"
+            value={String(alumnoDetalles.generacion ?? "")}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Promedio"
+            value={String(alumnoDetalles.promedio ?? "")}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Correo Electrónico Institucional"
+            value={alumnoDetalles.correo ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Calle y Número"
+            value={alumnoDetalles.calle_y_numero ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Colonia"
+            value={alumnoDetalles.colonia ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Delegación / Municipio"
+            value={alumnoDetalles.delegacion ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Estado de procedencia"
+            value={alumnoDetalles.estado ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Código Postal"
+            value={alumnoDetalles.cp ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Sexo"
+            value={alumnoDetalles.sexo ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Teléfono Celular"
+            value={alumnoDetalles.telcelular ?? ""}
+            editable={false}
+          />
+        </View>
+
+        <View style={{ marginBottom: 12 }}>
+          <Entrada
+            label="Teléfono Local"
+            value={alumnoDetalles.tellocal ?? ""}
+            editable={false}
+          />
+        </View>
+
+      </View>
+    )}
+  </View>
+</Modal>
+
+
+
+
 
       <ModalAPI ref={modalAPI} />
     </ScrollView>
@@ -622,5 +752,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 12,
+  },
+  colFull: {
+    width: "100%",
+  },
+  colHalf: {
+    width: "48%", 
   },
 });
