@@ -1,3 +1,4 @@
+import { storage } from "@/lib/almacenamiento";
 import { useRouter } from "expo-router";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 import { login, logout, verificarJWT } from "../lib/auth/authServicio";
@@ -21,9 +22,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Verificar token al cargar la página y cada vez que se haga una petición
   const verificarToken = async () => {
+    const token = await storage.getItem("token");
+
     try {
-      const usuario = await verificarJWT();
+      if (sesion && !token) throw new Error("La sesión no es válida. Inicia sesión de nuevo para continuar.");
       
+      const usuario = await verificarJWT();
       setSesion(usuario);
     } catch (error) {
       router.replace("/(auth)/iniciar-sesion");

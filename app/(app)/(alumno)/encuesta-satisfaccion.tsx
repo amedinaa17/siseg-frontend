@@ -4,8 +4,10 @@ import Likert from "@/componentes/ui/BotonRadio";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 type ScaleValue = 1 | 2 | 3 | 4 | 5;
 
@@ -43,16 +45,17 @@ function SectionHeader({ title }: { title: string }) {
 
 export default function EncuestaSatisfaccion() {
     const { sesion, verificarToken } = useAuth();
+    const router = useRouter();
+
+    const [cargando, setCargando] = useState(false);
     const { width } = useWindowDimensions();
     const esPantallaPequeña = width < 790;
 
-    const modalRef = useRef<ModalAPIRef>(null);
+    const modalAPI = useRef<ModalAPIRef>(null);
+    const [mensaje, setMensaje] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [answers, setAnswers] = useState<Answers>({});
     const [errors, setErrors] = useState<Record<string, boolean>>({});
-
-    const [puedeResponder, setPuedeResponder] = useState<boolean | null>(null); // null = cargando
-    const [mensajeBloqueo, setMensajeBloqueo] = useState<string | null>(null);
 
     const sections = useMemo(() => {
         return {
@@ -68,58 +71,39 @@ export default function EncuestaSatisfaccion() {
         setErrors((prev) => ({ ...prev, [id]: false }));
     };
 
-    useEffect(() => {
-        const cargarPermiso = async () => {
+    const cargarPermiso = async () => {
+        verificarToken();
 
-            try {
-                if (!sesion?.token || !sesion?.boleta) {
-                    setPuedeResponder(true);
+        try {
+            setCargando(true);
+            const url = `encuesta/obtenerFechaUltimaEncuesta?boleta=${sesion.boleta}&tk=${sesion.token}`;
+            const resp = await fetchData(url);
+
+            if (resp?.error === 0 && resp.fecha) {
+                const ultima_respuesta = new Date(resp.fecha);
+                const hoy = new Date();
+
+                if (ultima_respuesta.getFullYear() === hoy.getFullYear() && ultima_respuesta.getMonth() === hoy.getMonth()) {
+                    const siguienteMes = new Date(ultima_respuesta);
+                    siguienteMes.setMonth(siguienteMes.getMonth() + 1);
+                    siguienteMes.setDate(1);
+                    setMensaje(`${siguienteMes.toLocaleDateString("es-MX")}.`);
                     return;
                 }
-
-                const url = `encuesta/obtenerFechaUltimaEncuesta?boleta=${sesion.boleta}&tk=${sesion.token}`;
-                const resp = await fetchData(url);
-                
-                if (resp?.error === 0 && resp.fecha) {
-                    const ultima = new Date(resp.fecha);
-                    const hoy = new Date();
-                    const mismoAnio = ultima.getFullYear() === hoy.getFullYear();
-                    const mismoMes = ultima.getMonth() === hoy.getMonth();
-
-                    if (mismoAnio && mismoMes) {
-                        setPuedeResponder(false);
-
-                        const siguienteMes = new Date(ultima);
-                        siguienteMes.setMonth(siguienteMes.getMonth() + 1);
-                        siguienteMes.setDate(1);
-
-                        const mensaje =
-                            `Ya respondiste la encuesta de satisfacción en este mes. ` +
-                            `Podrás volver a contestarla a partir del ${siguienteMes.toLocaleDateString("es-MX")}.`;
-
-                        setMensajeBloqueo(mensaje);
-                        modalRef.current?.show(false, mensaje);
-
-                        return;
-                    }
-                }
-
-                setPuedeResponder(true);
-            } catch (e) {
-                setPuedeResponder(true);
             }
-        };
+        } catch (error) {
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
+        } finally {
+            setCargando(false);
+        }
+    };
 
+    useEffect(() => {
         cargarPermiso();
-    }, [sesion]); 
+    }, []);
 
     const handleSubmit = async () => {
-        verificarToken(); 
-
-        if (puedeResponder === false) {
-            modalRef.current?.show(false, mensajeBloqueo || "Ya has respondido la encuesta este mes.");
-            return;
-        }
+        verificarToken();
 
         const newErrors: Record<string, boolean> = {};
         QUESTIONS.forEach((q) => {
@@ -131,7 +115,7 @@ export default function EncuestaSatisfaccion() {
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) {
-            modalRef.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
             return;
         }
 
@@ -148,125 +132,127 @@ export default function EncuestaSatisfaccion() {
             });
 
             if (resp?.error === 0) {
-                modalRef.current?.show(true, "Encuesta enviada correctamente");
+                modalAPI.current?.show(true, "La encuesta se ha enviado correctamente.", () => { router.replace("/inicio-alumno"); });
                 setAnswers({});
-                setPuedeResponder(false);
             } else {
-                modalRef.current?.show(false, "Hubo un problema al enviar tu encuesta. Inténtalo de nuevo más tarde.");
+                modalAPI.current?.show(false, "Hubo un problema al enviar tu encuesta. Inténtalo de nuevo más tarde.");
             }
         } catch (e) {
-            console.error(e);
-            modalRef.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
         } finally {
             setLoading(false);
         }
     };
 
-    const tituloBoton = () => {
-        if (puedeResponder === false) return "Encuesta ya respondida";
-        if (loading) return "Enviando…";
-        if (puedeResponder === null) return "Cargando…";
-        return "Enviar encuesta";
-    };
-
-    const botonDeshabilitado = loading || puedeResponder === false || puedeResponder === null;
-
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={[styles.contenedor, esPantallaPequeña && { maxWidth: "95%" }]}>
-                <Text style={styles.titulo}>Encuesta de satisfacción</Text>
-                <Text style={styles.texto}>
-                    Responde a esta breve encuesta de satisfacción sobre tu servicio social. Tus respuestas son
-                    completamente confidenciales y nos ayudarán a identificar áreas donde podemos mejorar para ofrecer
-                    una mejor experiencia en el futuro.
-                </Text>
-
-                {puedeResponder === false && (
-                    <Text style={[styles.error, { marginBottom: 16 }]}>
-                        {mensajeBloqueo || "Ya respondiste la encuesta de satisfacción en este mes."}
-                    </Text>
-                )}
-
-                <SectionHeader title="Ambiente y condiciones" />
-                {sections.Ambiente.map((q) => (
-                    <View key={q.id} style={styles.tarjeta}>
-                        <Text style={styles.tarjetaTitulo}>
-                            <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
-                            {q.text}
-                        </Text>
-                        <Likert
-                            valor={answers[q.id]}
-                            onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                            etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
-                        />
-                        {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
-                    </View>
-                ))}
-
-                <SectionHeader title="Actividades" />
-                {sections.Actividades.map((q) => (
-                    <View key={q.id} style={styles.tarjeta}>
-                        <Text style={styles.tarjetaTitulo}>
-                            <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
-                            {q.text}
-                        </Text>
-                        <Likert
-                            valor={answers[q.id]}
-                            onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                            etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
-                        />
-                        {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
-                    </View>
-                ))}
-
-                <SectionHeader title="Supervisión y comunicación" />
-                {sections.Supervision.map((q) => (
-                    <View key={q.id} style={styles.tarjeta}>
-                        <Text style={styles.tarjetaTitulo}>
-                            <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
-                            {q.text}
-                        </Text>
-                        <Likert
-                            valor={answers[q.id]}
-                            onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                            etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
-                        />
-                        {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
-                    </View>
-                ))}
-
-                <SectionHeader title="Valoración general" />
-                {sections.Valoracion.map((q) => (
-                    <View key={q.id} style={styles.tarjeta}>
-                        <Text style={styles.tarjetaTitulo}>
-                            <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
-                            {q.text}
-                        </Text>
-                        <Likert
-                            valor={answers[q.id]}
-                            onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                            etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
-                        />
-                        {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
-                    </View>
-                ))}
-
-                <View style={{ marginTop: 20, alignItems: "center" }}>
-                    <Boton
-                        title={tituloBoton()}
-                        onPress={handleSubmit}
-                        disabled={botonDeshabilitado}
-                    />
+        <>
+            {cargando && (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+                    <ActivityIndicator size="large" color="#5a0839" />
                 </View>
-            </View>
+            )}
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={[styles.contenedor, esPantallaPequeña && { maxWidth: "95%" }]}>
+                    {mensaje ? (
+                        <View style={[styles.contenedorCompletada]}>
+                            <Ionicons name="checkmark-circle-outline" size={65} color={Colores.textoExito} />
+                            <Text style={styles.titulo}>Encuesta completada</Text>
+                            <Text style={styles.textoCompletada}>Ya enviaste la encuesta de este mes. Podrás volver a contestarla a partir del {mensaje}</Text>
+                            <Boton title="Regresar al inicio" onPress={() => router.replace("/inicio-alumno")} />
+                        </View>
+                    ) : (
+                        <>
+                            <Text style={styles.titulo}>Encuesta de satisfacción</Text>
+                            <Text style={styles.texto}>
+                                Responde a esta breve encuesta de satisfacción sobre tu servicio social. Tus respuestas son
+                                completamente confidenciales y nos ayudarán a identificar áreas donde podemos mejorar para ofrecer
+                                una mejor experiencia en el futuro.
+                            </Text>
 
-            <ModalAPI ref={modalRef} />
-        </ScrollView>
+                            <SectionHeader title="Ambiente y condiciones" />
+                            {sections.Ambiente.map((q) => (
+                                <View key={q.id} style={styles.tarjeta}>
+                                    <Text style={styles.tarjetaTitulo}>
+                                        <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
+                                        {q.text}
+                                    </Text>
+                                    <Likert
+                                        valor={answers[q.id]}
+                                        onChange={(v: ScaleValue) => setAnswer(q.id, v)}
+                                        etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
+                                    />
+                                    {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
+                                </View>
+                            ))}
+
+                            <SectionHeader title="Actividades" />
+                            {sections.Actividades.map((q) => (
+                                <View key={q.id} style={styles.tarjeta}>
+                                    <Text style={styles.tarjetaTitulo}>
+                                        <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
+                                        {q.text}
+                                    </Text>
+                                    <Likert
+                                        valor={answers[q.id]}
+                                        onChange={(v: ScaleValue) => setAnswer(q.id, v)}
+                                        etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
+                                    />
+                                    {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
+                                </View>
+                            ))}
+
+                            <SectionHeader title="Supervisión y comunicación" />
+                            {sections.Supervision.map((q) => (
+                                <View key={q.id} style={styles.tarjeta}>
+                                    <Text style={styles.tarjetaTitulo}>
+                                        <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
+                                        {q.text}
+                                    </Text>
+                                    <Likert
+                                        valor={answers[q.id]}
+                                        onChange={(v: ScaleValue) => setAnswer(q.id, v)}
+                                        etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
+                                    />
+                                    {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
+                                </View>
+                            ))}
+
+                            <SectionHeader title="Valoración general" />
+                            {sections.Valoracion.map((q) => (
+                                <View key={q.id} style={styles.tarjeta}>
+                                    <Text style={styles.tarjetaTitulo}>
+                                        <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
+                                        {q.text}
+                                    </Text>
+                                    <Likert
+                                        valor={answers[q.id]}
+                                        onChange={(v: ScaleValue) => setAnswer(q.id, v)}
+                                        etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
+                                    />
+                                    {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
+                                </View>
+                            ))}
+
+                            <View style={{ marginTop: 20, alignItems: "center" }}>
+                                <Boton
+                                    title={loading ? "Enviando…" : "Enviar encuesta"}
+                                    onPress={handleSubmit}
+                                    disabled={loading}
+                                />
+                            </View>
+                        </>
+                    )}
+                </View>
+
+                <ModalAPI ref={modalAPI} />
+            </ScrollView>
+        </>
     );
 }
 
 const styles = StyleSheet.create({
     contenedor: {
+        flex: 1,
         width: "90%",
         maxWidth: 1050,
         margin: "auto",
@@ -276,6 +262,11 @@ const styles = StyleSheet.create({
         borderColor: Colores.borde,
         backgroundColor: Colores.fondo,
         marginVertical: 30,
+    },
+    contenedorCompletada: {
+        alignItems: "center",
+        margin: "auto",
+        justifyContent: "center",
     },
     titulo: {
         fontSize: Fuentes.titulo,
@@ -310,6 +301,13 @@ const styles = StyleSheet.create({
         fontSize: Fuentes.cuerpo,
         color: Colores.textoPrincipal,
         marginBottom: 10,
+    },
+    textoCompletada: {
+        fontSize: Fuentes.cuerpo,
+        color: Colores.textoClaro,
+        textAlign: "center",
+        marginTop: 10,
+        marginBottom: 40,
     },
     error: {
         marginTop: 6,

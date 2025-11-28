@@ -1,6 +1,6 @@
 import { Colores } from '@/temas/colores';
 import React, { useState } from 'react';
-import { Image, ImageBackground, Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ImageBackground, Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import ModalAvisoPrivacidad from './AvisoPrivacidad';
 import ModalContacto from './Contacto';
@@ -19,17 +19,6 @@ export default function PiePagina() {
     >
       <SafeAreaView edges={["bottom"]} style={{ backgroundColor: "transparent" }}>
         <View style={[styles.contenedor, { flexDirection: esPantallaPequeña ? 'column' : 'row'}]}>
-          {!esPantallaPequeña && (
-            <View style={styles.fila}>
-              <Image
-                source={require('@/activos/imagenes/ipn.png')}
-                style={styles.imagen}
-                resizeMode="contain"
-              />
-              <Text style={styles.texto}>© {new Date().getFullYear()} Instituto Politécnico Nacional</Text>
-            </View>
-          )}
-
           <Text style={styles.texto}>Desarrollado por la Escuela Superior de Cómputo</Text>
           {esPantallaPequeña && (
             <View style={[styles.fila, { gap: 50 }]}>
@@ -79,7 +68,6 @@ const styles = StyleSheet.create({
   imagen: {
     width: 30,
     height: 30,
-    tintColor: Colores.onPrimario,
     marginRight: 5,
   },
   texto: {

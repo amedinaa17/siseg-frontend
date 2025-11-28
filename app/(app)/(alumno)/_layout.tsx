@@ -3,10 +3,10 @@ import AlumnoMenuWeb from '@/componentes/layout/AlumnoMenuWeb';
 import { useAuth } from "@/context/AuthProvider";
 import { Colores, Fuentes } from '@/temas/colores';
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
-import { Slot, useRouter } from "expo-router";
+import { Slot, usePathname, useRouter } from "expo-router";
 import { Drawer } from "expo-router/drawer";
 import React, { useState } from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function AlumnoLayout() {
   const esMovil = Platform.OS === "ios" || Platform.OS === "android";
@@ -18,20 +18,19 @@ export default function AlumnoLayout() {
           screenOptions={{
             headerStyle: { backgroundColor: Colores.fondoInstitucional },
             headerTintColor: Colores.onPrimario,
-            drawerActiveTintColor: Colores.primario,
-            drawerStyle: { backgroundColor: Colores.fondo },
+            drawerStyle: { backgroundColor: Colores.fondoInstitucional },
           }}
           drawerContent={(props) => <AlumnoDrawerContent {...props} />}
         >
-          <Drawer.Screen name="index" options={{ title: "Inicio" }} />
-          <Drawer.Screen name="acuse-solicitud" options={{ title: "Acuse de Solicitud" }} />
-          <Drawer.Screen name="expediente-digital" options={{ title: "Ver Expediente" }} />
-          <Drawer.Screen name="curso-induccion" options={{ title: "Curso de Inducción" }} />
-          <Drawer.Screen name="plazas" options={{ title: "Plazas" }} />
-          <Drawer.Screen name="plaza-asignada" options={{ title: "Plaza Asignada" }} />
-          <Drawer.Screen name="reportes-riesgo" options={{ title: "Situación de Riesgo" }} />
-          <Drawer.Screen name="encuesta-satisfaccion" options={{ title: "Encuesta de Satisfacción" }} />
-          <Drawer.Screen name="mi-perfil" options={{ title: "Mi Perfil" }} />
+          <Drawer.Screen name="inicio-alumno" options={{ title: "" }} />
+          <Drawer.Screen name="acuse-solicitud" options={{ title: "" }} />
+          <Drawer.Screen name="expediente-digital" options={{ title: "" }} />
+          <Drawer.Screen name="curso-induccion" options={{ title: "" }} />
+          <Drawer.Screen name="plazas" options={{ title: "" }} />
+          <Drawer.Screen name="plaza-asignada" options={{ title: "" }} />
+          <Drawer.Screen name="reportes-riesgo" options={{ title: "" }} />
+          <Drawer.Screen name="encuesta-satisfaccion" options={{ title: "" }} />
+          <Drawer.Screen name="mi-perfil" options={{ title: "" }} />
         </Drawer>
 
         <ChatbotWidget endpoint="chatbot/chatbotQuery" title="Asistente SISEG" />
@@ -53,111 +52,134 @@ function AlumnoDrawerContent(props) {
   const { cerrarSesion } = useAuth();
   const router = useRouter();
 
-  const [submenuExpediente, setsubmenuExpediente] = useState(false);
-  const [submenuPlazas, setSubmenuPlazas] = useState(false);
-  const [submenuReportes, setSubmenuReportes] = useState(false);
+  const [mostrarSubmenuExpediente, setMostrarSubmenuExpediente] = useState(false);
+  const [mostrarSubmenuPlazas, setMostrarSubmenuPlazas] = useState(false);
+  const [mostrarSubmenuReportes, setMostrarSubmenuReportes] = useState(false);
+
+  const pathname = usePathname();
+
+  const activoItem = pathname;
 
   const handleLogout = async () => {
     await cerrarSesion();
   };
 
+  const toggleCerrar = () => {
+    setMostrarSubmenuReportes(false);
+    setMostrarSubmenuExpediente(false);
+    setMostrarSubmenuPlazas(false);
+  }
+
   return (
     <DrawerContentScrollView {...props}>
+      <View style={{ alignItems: "center" }}>
+        <Image
+          source={require('@/activos/imagenes/favicon.png')}
+          style={{ width: 50, height: 50, marginVertical: 15 }}
+          tintColor={Colores.onPrimario}
+        />
+      </View>
       <DrawerItem
         label="INICIO"
-        onPress={() => router.push("/(app)/(alumno)")}
+        labelStyle={{ color: Colores.onPrimario }}
+        style={activoItem === "/inicio-alumno" && drawerStyles.activo}
+        onPress={() => { toggleCerrar(); router.push("/(app)/(alumno)/inicio-alumno") }}
       />
 
       <TouchableOpacity
-        onPress={() => setsubmenuExpediente(!submenuExpediente)}
-        style={drawerStyles.seccionEncabezado}
+        onPress={() => { toggleCerrar(); setMostrarSubmenuExpediente(!mostrarSubmenuExpediente) }}
+        style={[drawerStyles.seccionEncabezado, activoItem === "/acuse-solicitud" || activoItem === "/expediente-digital" ? drawerStyles.activo : []]}
       >
         <Text style={drawerStyles.seccionEncabezadoTexto}>
-          EXPEDIENTE DIGITAL {submenuExpediente ? "▴" : "▾"}
+          EXPEDIENTE DIGITAL {mostrarSubmenuExpediente ? "▴" : "▾"}
         </Text>
       </TouchableOpacity>
-      {submenuExpediente && (
-        <View style={drawerStyles.submenuContenedor}>
+      {mostrarSubmenuExpediente && (
+        <View style={drawerStyles.mostrarSubmenuContenedor}>
           <TouchableOpacity
-            style={drawerStyles.submenuItem}
-            onPress={() => router.push("/acuse-solicitud")}
+            style={[drawerStyles.mostrarSubmenuItem, activoItem === "/acuse-solicitud" && drawerStyles.activoSubmenuItem]}
+            onPress={() => { toggleCerrar(); router.push("/acuse-solicitud") }}
           >
-            <Text style={drawerStyles.submenuText}>Acuse de Solicitud</Text>
+            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/acuse-solicitud" && { color: Colores.onPrimario }]}>Acuse de Solicitud</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={drawerStyles.submenuItem}
-            onPress={() => router.push("/expediente-digital")}
+            style={[drawerStyles.mostrarSubmenuItem, activoItem === "/expediente-digital" && drawerStyles.activoSubmenuItem]}
+            onPress={() => { toggleCerrar(); router.push("/expediente-digital") }}
           >
-            <Text style={drawerStyles.submenuText}>Ver Expediente</Text>
+            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/expediente-digital" && { color: Colores.onPrimario }]}>Ver Expediente</Text>
           </TouchableOpacity>
         </View>
       )}
 
       <DrawerItem
         label="CURSO DE INDUCCIÓN"
-        onPress={() => router.push("/(app)/(alumno)/curso-induccion")}
+        labelStyle={{ color: Colores.onPrimario }}
+        style={activoItem === "/curso-induccion" && drawerStyles.activo}
+        onPress={() => { toggleCerrar(); router.push("/(app)/(alumno)/curso-induccion") }}
       />
 
       <TouchableOpacity
-        onPress={() => setSubmenuPlazas(!submenuPlazas)}
-        style={drawerStyles.seccionEncabezado}
+        onPress={() => { toggleCerrar(); setMostrarSubmenuPlazas(!mostrarSubmenuPlazas) }}
+        style={[drawerStyles.seccionEncabezado, activoItem === "/plazas" || activoItem === "/plaza-asignada" ? drawerStyles.activo : []]}
       >
         <Text style={drawerStyles.seccionEncabezadoTexto}>
-          PLAZAS {submenuPlazas ? "▴" : "▾"}
+          PLAZAS {mostrarSubmenuPlazas ? "▴" : "▾"}
         </Text>
       </TouchableOpacity>
-      {submenuPlazas && (
-        <View style={drawerStyles.submenuContenedor}>
+      {mostrarSubmenuPlazas && (
+        <View style={drawerStyles.mostrarSubmenuContenedor}>
           <TouchableOpacity
-            style={drawerStyles.submenuItem}
-            onPress={() => router.push("/(app)/(alumno)/plazas")}
+            style={[drawerStyles.mostrarSubmenuItem, activoItem === "/plazas" && drawerStyles.activoSubmenuItem]}
+            onPress={() => { toggleCerrar(); router.push("/plazas") }}
           >
-            <Text style={drawerStyles.submenuText}>Plazas</Text>
+            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/plazas" && { color: Colores.onPrimario }]}>Plazas</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={drawerStyles.submenuItem}
-            onPress={() => router.push("/(app)/(alumno)/plaza-asignada")}
+            style={[drawerStyles.mostrarSubmenuItem, activoItem === "/plaza-asignada" && drawerStyles.activoSubmenuItem]}
+            onPress={() => { toggleCerrar(); router.push("/plaza-asignada") }}
           >
-            <Text style={drawerStyles.submenuText}>Plaza Asignada</Text>
+            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/plaza-asignada" && { color: Colores.onPrimario }]}>Plaza Asignada</Text>
           </TouchableOpacity>
         </View>
       )}
 
       <TouchableOpacity
-        onPress={() => setSubmenuReportes(!submenuReportes)}
-        style={drawerStyles.seccionEncabezado}
+        onPress={() => { toggleCerrar(); setMostrarSubmenuReportes(!mostrarSubmenuReportes) }}
+        style={[drawerStyles.seccionEncabezado, activoItem === "/reportes-riesgo" || activoItem === "/encuesta-satisfaccion" ? drawerStyles.activo : []]}
       >
         <Text style={drawerStyles.seccionEncabezadoTexto}>
-          REPORTES {submenuReportes ? "▴" : "▾"}
+          REPORTES {mostrarSubmenuReportes ? "▴" : "▾"}
         </Text>
       </TouchableOpacity>
-      {submenuReportes && (
-        <View style={drawerStyles.submenuContenedor}>
+      {mostrarSubmenuReportes && (
+        <View style={drawerStyles.mostrarSubmenuContenedor}>
           <TouchableOpacity
-            style={drawerStyles.submenuItem}
-            onPress={() => router.push("/reportes-riesgo")}
+            style={[drawerStyles.mostrarSubmenuItem, activoItem === "/reportes-riesgo" && drawerStyles.activoSubmenuItem]}
+            onPress={() => { toggleCerrar(); router.push("/reportes-riesgo") }}
           >
-            <Text style={drawerStyles.submenuText}>Situación de Riesgo</Text>
+            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/reportes-riesgo" && { color: Colores.onPrimario }]}>Situación de Riesgo</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={drawerStyles.submenuItem}
-            onPress={() => router.push("/encuesta-satisfaccion")}
+            style={[drawerStyles.mostrarSubmenuItem, activoItem === "/encuesta-satisfaccion" && drawerStyles.activoSubmenuItem]}
+            onPress={() => { toggleCerrar(); router.push("/encuesta-satisfaccion") }}
           >
-            <Text style={drawerStyles.submenuText}>Encuesta de Satisfacción</Text>
+            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/encuesta-satisfaccion" && { color: Colores.onPrimario }]}>Encuesta de Satisfacción</Text>
           </TouchableOpacity>
         </View>
       )}
 
       <DrawerItem
         label="MI PERFIL"
-        onPress={() => router.push("/mi-perfil")}
+        labelStyle={{ color: Colores.onPrimario }}
+        style={activoItem === "/mi-perfil" && drawerStyles.activo}
+        onPress={() => { toggleCerrar(); router.push("/mi-perfil") }}
       />
 
-      <View><Text style={{ color: Colores.borderColor }}>──────────────────</Text></View>
+      <View><Text style={{ width: "100%", borderBottomColor: Colores.onPrimario, borderBottomWidth: 1 }}></Text></View>
 
       <DrawerItem
         label="CERRAR SESIÓN"
-        labelStyle={{ color: Colores.primario, fontWeight: "600" }}
+        labelStyle={{ color: Colores.onPrimario, fontWeight: "700" }}
         onPress={handleLogout}
       />
     </DrawerContentScrollView>
@@ -171,29 +193,38 @@ const drawerStyles = StyleSheet.create({
     paddingVertical: 11,
     paddingStart: 16,
     paddingEnd: 24,
-    backgroundColor: Colores.fondo,
+    backgroundColor: Colores.fondoInstitucional,
   },
   seccionEncabezadoTexto: {
     flex: 1,
-    color: '#5f5f5fff',
+    color: Colores.onPrimario,
     lineHeight: 24,
     fontWeight: "500",
   },
-  submenuContenedor: {
+  mostrarSubmenuContenedor: {
     overflow: "hidden",
-    marginLeft: 32,
+    backgroundColor: Colores.onPrimario
   },
-  submenuItem: {
+  mostrarSubmenuItem: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 15,
     paddingStart: 16,
     paddingEnd: 24,
   },
-  submenuText: {
+  mostrarSubmenuText: {
     fontSize: Fuentes.cuerpo,
-    color: '#5f5f5fff',
+    color: Colores.textoPrincipal,
     flex: 1,
     lineHeight: 20,
+  },
+  activo: {
+    backgroundColor: "rgba(51, 51, 51, 0.6)",
+    borderRadius: 0
+  },
+  activoSubmenuItem: {
+    backgroundColor: "rgba(51, 51, 51, 0.6)",
+    color: Colores.onPrimario,
+    borderRadius: 0,
   },
 });

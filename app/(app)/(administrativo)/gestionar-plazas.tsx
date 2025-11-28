@@ -52,10 +52,10 @@ export default function GestionPlazas() {
             if (response.error === 0) {
                 setPlazas(response.plazas ?? []);
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
         } finally {
             setCargando(false);
         }
@@ -143,9 +143,9 @@ export default function GestionPlazas() {
                 setModalEditar(false);
                 setPlazaSeleccion(null);
                 obtenerPlazas();
-                modalAPI.current?.show(true, "Los datos del personal administrativo se han actualizado correctamente.");
+                modalAPI.current?.show(true, "Los datos de la plaza se han actualizado correctamente.");
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al actualizar los datos del personal dministrativo. Inténtalo de nuevo más tarde.");
+                modalAPI.current?.show(false, "Hubo un problema al actualizar los datos de la plaza. Inténtalo de nuevo más tarde.");
             }
         } catch (error) {
             modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");

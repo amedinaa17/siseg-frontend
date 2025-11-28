@@ -4,16 +4,19 @@ import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
 import { Link } from 'expo-router';
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 export default function InicioPersonalAdministrativo() {
   const { sesion, verificarToken } = useAuth();
 
   const [cargando, setCargando] = useState(false);
 
-  const esMovil = Platform.OS === "ios" || Platform.OS === "android";
-
+  const [administrativo, setAdministrativo] = useState<any>(null);
   const modalAPI = useRef<ModalAPIRef>(null);
+
+  const { width } = useWindowDimensions();
+  const esPantallaPequeña = width < 790;
+  const esMovil = Platform.OS === "ios" || Platform.OS === "android";
 
   const [kpis, setKpis] = useState({
     alumnosRegistrados: "-",
@@ -49,6 +52,31 @@ export default function InicioPersonalAdministrativo() {
     obtenerKpis();
   }, []);
 
+  useEffect(() => {
+    const obtenerDatos = async () => {
+      verificarToken();
+
+      if (sesion?.token) {
+        try {
+          setCargando(true);
+
+          const response = await fetchData(`users/obtenerTodosDatosAdmin?tk=${sesion.token}`);
+          if (response.error === 0) {
+            setAdministrativo(response.data);
+          } else {
+            modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.");
+          }
+        } catch (error) {
+          modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+        } finally {
+          setCargando(false);
+        }
+      }
+    };
+
+    obtenerDatos();
+  }, []);
+
   return (
     <>
       {cargando && (
@@ -56,21 +84,25 @@ export default function InicioPersonalAdministrativo() {
           <ActivityIndicator size="large" color="#5a0839" />
         </View>
       )}
-      <View style={{ flex: 1, backgroundColor: Colores.background }}>
+      <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.contenedorFormulario}>
-            <View style={styles.encabezado}>
-              <Text style={styles.sisegTexto}>SISEG</Text>
+            <View style={styles.sisegContenedor}>
+              <Text style={styles.sisegSiglas}>SISEG</Text>
               {!esMovil && (
-                <Text style={styles.sisegDescripcion}>
+                <Text style={styles.siseg}>
                   Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
                 </Text>
               )}
             </View>
-
+            <View style={styles.sisegContenedor}>
+              <Text style={[styles.sisegDescripcion, esMovil || esPantallaPequeña ? { textAlign: "justify" } : { textAlign: "right", width: "50%" }]}>
+                Es una herramienta informática diseñada para dar seguimiento al servicio social de la <Text style={{ fontWeight: '600' }}>Escuela Nacional de Medicina y Homeopatía</Text>.
+              </Text>
+            </View>
             <Text style={styles.titulo}>Bienvenido</Text>
-            <Text style={styles.nombrePersonalAdministrativo}>{sesion?.nombre || "Personal Administrativo"}</Text>
-            <Text style={styles.idPersonalAdministrativo}>{sesion?.boleta || ""}</Text>
+            <Text style={styles.nombreAdmin}>{sesion?.nombre + " " + administrativo?.apellido_paterno + " " + administrativo?.apellido_materno}</Text>
+            <Text style={styles.boleta}>{sesion?.boleta || ""}</Text>
 
             <View style={[styles.tarjetaContenedor, { flexDirection: esMovil ? "column" : "row" }]}>
               <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { minWidth: "100%", marginBottom: 15 }}>
@@ -137,23 +169,28 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  encabezado: {
+  sisegContenedor: {
     flexDirection: "row",
     justifyContent: "flex-end",
     flexWrap: "nowrap",
     alignItems: "center",
     marginBottom: 24,
   },
-  sisegTexto: {
+  sisegSiglas: {
     fontSize: Fuentes.display,
     color: Colores.primario,
     fontWeight: "700",
     marginRight: 12,
   },
+  siseg: {
+    fontSize: Fuentes.cuerpo,
+    color: Colores.textoSecundario,
+    paddingTop: 3,
+    flexWrap: "nowrap",
+  },
   sisegDescripcion: {
     fontSize: Fuentes.cuerpo,
     color: Colores.textoSecundario,
-    flexWrap: "nowrap",
   },
   titulo: {
     fontSize: Fuentes.titulo,
@@ -162,15 +199,16 @@ const styles = StyleSheet.create({
     marginTop: 25,
     marginBottom: 10,
   },
-  nombrePersonalAdministrativo: {
+  nombreAdmin: {
     fontSize: Fuentes.subtitulo,
     color: Colores.textoPrincipal,
+    fontWeight: "600",
     marginBottom: 3,
   },
-  idPersonalAdministrativo: {
+  boleta: {
     fontSize: Fuentes.subtitulo,
     color: Colores.textoSecundario,
-    marginBottom: 20,
+    marginBottom: 3,
   },
   tarjetaContenedor: {
     justifyContent: "space-around",

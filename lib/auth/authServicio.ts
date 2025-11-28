@@ -36,7 +36,7 @@ export const verificarJWT = async () => {
         }
     } catch (error) {
         await storage.removeItem("token");
-        throw new Error("La sesión no es válida o ha expirado. Inicia sesión de nuevo para continuar.");
+        throw new Error("La sesión ha expirado. Inicia sesión de nuevo para continuar.");
     }
 };
 
@@ -58,11 +58,11 @@ export const refreshToken = async (tk: string) => {
             };
         } else {
             await storage.removeItem("token");
-            throw new Error("La sesión no es válida o ha expirado. Inicia sesión de nuevo para continuar.");
+            throw new Error("La sesión ha expirado. Inicia sesión de nuevo para continuar.");
         }
     } catch (error) {
         await storage.removeItem("token");
-        throw new Error("La sesión no es válida o ha expirado. Inicia sesión de nuevo para continuar.");
+        throw new Error("La sesión ha expirado. Inicia sesión de nuevo para continuar.");
     }
 };
 

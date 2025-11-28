@@ -33,11 +33,11 @@ export default function CursoInduccion() {
       if (match && match[1]) {
         setCodigoQR(match[1]);
       } else {
-        modalRef.current?.show(false, "Hubo un problema al obtener tu código QR del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+        modalRef.current?.show(false, "Hubo un problema al obtener tu código QR del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
       }
     } catch (error) {
       console.error("Error en la solicitud:", error);
-      modalRef.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+      modalRef.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
     } finally {
       setCargando(false);
     }

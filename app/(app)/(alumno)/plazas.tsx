@@ -51,11 +51,11 @@ export default function CatalogoPlazas() {
       }
       else {
         setCargando(false);
-        modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+        modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
       }
     } catch (e) {
       setCargando(false);
-      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
     }
   };
 
@@ -76,10 +76,10 @@ export default function CatalogoPlazas() {
       if (res?.error === 0 && Array.isArray(res.plazas))
         setPlazas(res.plazas.filter((plaza) => plaza.carrera !== alumno.carrera));
       else
-        modalAPI.current?.show(false, "Hubo un problema al obtener las plazas. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+        modalAPI.current?.show(false, "Hubo un problema al obtener las plazas. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
     } catch (e) {
       console.error("[Plazas] Error de red", e);
-      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
     } finally {
       setCargando(false);
     }

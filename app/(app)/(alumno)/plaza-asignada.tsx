@@ -31,16 +31,16 @@ export default function PlazaAsignada() {
                 if (response.plaza.sede) {
                     setDatosAlumno(response.plaza);
                 } else {
-                    modalAPI.current?.show(false, "Aún no tienes una plaza asignada.", () => { router.replace("/"); });
+                    modalAPI.current?.show(false, "Aún no tienes una plaza asignada.", () => { router.replace("/inicio-alumno"); });
                     setDatosAlumno(null);
                 }
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
                 setDatosAlumno(null);
             }
         } catch (error) {
             console.error(error);
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
         } finally {
             setCargando(false);
         }
@@ -89,8 +89,6 @@ export default function PlazaAsignada() {
                         <Entrada label="Ubicación" value={datosAlumno?.ubicacion ?? ""} editable={false} />
                     </View>
                 </View>
-
-                {/* Monta el modal para poder usar modalAPI.current?.show(...) */}
                 <ModalAPI ref={modalAPI} />
             </ScrollView>
         </>

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 function AuthGate() {
-  const { sesion, errorMessage, cargando, verificarToken } = useAuth();
+  const { sesion, cargando, verificarToken } = useAuth();
   const router = useRouter();
   const segmentos = useSegments() as string[];
   const [montado, setMontado] = useState(false);
@@ -48,11 +48,11 @@ function AuthGate() {
 
       // Redirigir según rol
       if (sesion.rol === "ALUMNO") {
-        router.replace("/(app)/(alumno)");
+        router.replace("/(app)/(alumno)/inicio-alumno");
         return;
       }
       if (sesion.rol === "P_ADMIN") {
-        router.replace("/(app)/(administrativo)");
+        router.replace("/(app)/(administrativo)/inicio-administrativo");
         return;
       }
     }
@@ -60,14 +60,14 @@ function AuthGate() {
     // Si HAY sesión y está en (app)
     if (sesion.rol === "ALUMNO") {
       if (!enGrupoApp || subgrupo !== "(alumno)") {
-        router.replace("/(app)/(alumno)");
+        router.replace("/(app)/(alumno)/inicio-alumno");
       }
       return;
     }
 
     if (sesion.rol === "P_ADMIN") {
       if (!enGrupoApp || subgrupo !== "(administrativo)") {
-        router.replace("/(app)/(administrativo)");
+        router.replace("/(app)/(administrativo)/inicio-administrativo");
       }
       return;
     }

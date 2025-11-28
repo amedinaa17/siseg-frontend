@@ -1,12 +1,11 @@
 import { useAuth } from "@/context/AuthProvider";
 import { Colores, Fuentes } from "@/temas/colores";
-import { Link, usePathname, useRouter } from "expo-router";
+import { Link, usePathname } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 export default function AlumnoMenuWeb() {
   const { cerrarSesion } = useAuth();
-  const router = useRouter();
   const pathname = usePathname();
 
   const { width } = useWindowDimensions();
@@ -20,17 +19,7 @@ export default function AlumnoMenuWeb() {
   const [menuItemHoverItem, setmenuItemHoverItem] = useState<string | null>(null);
   const [menuItemHoverSubItem, setmenuItemHoverSubItem] = useState<string | null>(null);
 
-  const getActivoItem = (): string | null => {
-    if (pathname === "/") return "inicio";
-    if (["/expediente-digital", "/acuse-solicitud"].includes(pathname)) return "expediente";
-    if (pathname === "/curso-induccion") return "curso";
-    if (["/plazas", "/plaza-asignada"].includes(pathname)) return "plazas";
-    if (["/reportes-riesgo", "/encuesta-satisfaccion"].includes(pathname)) return "reportes";
-    if (pathname === "/mi-perfil") return "perfil";
-    return null;
-  };
-
-  const activoItem = getActivoItem();
+  const activoItem = pathname;
 
   const handleLogout = async () => {
     await cerrarSesion();
@@ -58,7 +47,7 @@ export default function AlumnoMenuWeb() {
       <View style={[styles.menu, menuHamburguesa ? styles.menuHamburguesa : { top: -10 }]}>
         {(menuHamburguesaVisible || !menuHamburguesa) && (
           <>
-            <Link href="/(app)/(alumno)" asChild>
+            <Link href="/(app)/(alumno)/inicio-alumno" asChild>
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("inicio")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
@@ -69,11 +58,11 @@ export default function AlumnoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "inicio" && styles.menuItemHover,
-                    activoItem === "inicio" && styles.activo,
-                    activoItem === "inicio" && !menuHamburguesa && { bottom: -10 },
+                    activoItem === "/inicio-alumno" && styles.activo,
+                    activoItem === "/inicio-alumno" && !menuHamburguesa && { bottom: -10 },
                   ]}
                 >
-                  <Text style={activoItem === "inicio" && !menuHamburguesa && { top: -10 }}>
+                  <Text style={activoItem === "/inicio-alumno" && !menuHamburguesa && { top: -10 }}>
                     INICIO
                   </Text>
                 </Text>
@@ -90,12 +79,12 @@ export default function AlumnoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "expediente" && styles.menuItemHover,
-                    activoItem === "expediente" && styles.activo,
-                    activoItem === "expediente" && !menuHamburguesa && { bottom: -10 },
+                    (activoItem === "/expediente-digital" || activoItem === "/acuse-solicitud") && styles.activo,
+                    (activoItem === "/expediente-digital" || activoItem === "/acuse-solicitud") && !menuHamburguesa && { bottom: -10 },
                   ]}
                 >
                   <Text
-                    style={activoItem === "expediente" && !menuHamburguesa && { top: -10 }}
+                    style={(activoItem === "/expediente-digital" || activoItem === "/acuse-solicitud") && !menuHamburguesa && { top: -10 }}
                   >
                     EXPEDIENTE DIGITAL {mostrarSubmenuExpediente ? "▴" : "▾"}
                   </Text>
@@ -112,8 +101,9 @@ export default function AlumnoMenuWeb() {
                     >
                       <Text
                         style={[
-                          styles.submenuitem,
+                          styles.submenuItem,
                           menuItemHoverSubItem === "acuse-solicitud" && styles.submenuItemHover,
+                          activoItem === "/acuse-solicitud" && styles.activoSubmenuItem,
                         ]}
                       >
                         Acuse de Solicitud
@@ -129,9 +119,9 @@ export default function AlumnoMenuWeb() {
                     >
                       <Text
                         style={[
-                          styles.submenuitem,
-                          menuItemHoverSubItem === "expediente-digital" &&
-                            styles.submenuItemHover,
+                          styles.submenuItem,
+                          menuItemHoverSubItem === "expediente-digital" && styles.submenuItemHover,
+                          activoItem === "/expediente-digital" && styles.activoSubmenuItem,
                         ]}
                       >
                         Ver Expediente
@@ -153,11 +143,11 @@ export default function AlumnoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "curso" && styles.menuItemHover,
-                    activoItem === "curso" && styles.activo,
-                    activoItem === "curso" && !menuHamburguesa && { bottom: -10 },
+                    activoItem === "/curso-induccion" && styles.activo,
+                    activoItem === "/curso-induccion" && !menuHamburguesa && { bottom: -10 },
                   ]}
                 >
-                  <Text style={activoItem === "curso" && !menuHamburguesa && { top: -10 }}>
+                  <Text style={activoItem === "/curso-induccion" && !menuHamburguesa && { top: -10 }}>
                     CURSO DE INDUCCIÓN
                   </Text>
                 </Text>
@@ -174,11 +164,11 @@ export default function AlumnoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "plazas" && styles.menuItemHover,
-                    activoItem === "plazas" && styles.activo,
-                    activoItem === "plazas" && !menuHamburguesa && { bottom: -10 },
+                    (activoItem === "/plazas" || activoItem === "/plaza-asignada") && styles.activo,
+                    (activoItem === "/plazas" || activoItem === "/plaza-asignada") && !menuHamburguesa && { bottom: -10 },
                   ]}
                 >
-                  <Text style={activoItem === "plazas" && !menuHamburguesa && { top: -10 }}>
+                  <Text style={(activoItem === "/plazas" || activoItem === "/plaza-asignada") && !menuHamburguesa && { top: -10 }}>
                     PLAZAS {mostrarSubmenuPlazas ? "▴" : "▾"}
                   </Text>
                 </Text>
@@ -194,9 +184,9 @@ export default function AlumnoMenuWeb() {
                     >
                       <Text
                         style={[
-                          styles.submenuitem,
-                          menuItemHoverSubItem === "plazas" &&
-                            styles.submenuItemHover,
+                          styles.submenuItem,
+                          menuItemHoverSubItem === "plazas" && styles.submenuItemHover,
+                          activoItem === "/plazas" && styles.activoSubmenuItem,
                         ]}
                       >
                         Plazas
@@ -212,9 +202,9 @@ export default function AlumnoMenuWeb() {
                     >
                       <Text
                         style={[
-                          styles.submenuitem,
-                          menuItemHoverSubItem === "plaza-asignada" &&
-                            styles.submenuItemHover,
+                          styles.submenuItem,
+                          menuItemHoverSubItem === "plaza-asignada" && styles.submenuItemHover,
+                          activoItem === "/plaza-asignada" && styles.activoSubmenuItem,
                         ]}
                       >
                         Plaza Asignada
@@ -235,11 +225,11 @@ export default function AlumnoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "reportes" && styles.menuItemHover,
-                    activoItem === "reportes" && styles.activo,
-                    activoItem === "reportes" && !menuHamburguesa && { bottom: -10 },
+                    (activoItem === "/reportes-riesgo" || activoItem === "/encuesta-satisfaccion") && styles.activo,
+                    (activoItem === "/reportes-riesgo" || activoItem === "/encuesta-satisfaccion") && !menuHamburguesa && { bottom: -10 },
                   ]}
                 >
-                  <Text style={activoItem === "reportes" && !menuHamburguesa && { top: -10 }}>
+                  <Text style={(activoItem === "/reportes-riesgo" || activoItem === "/encuesta-satisfaccion") && !menuHamburguesa && { top: -10 }}>
                     REPORTES {mostrarSubmenuReportes ? "▴" : "▾"}
                   </Text>
                 </Text>
@@ -255,9 +245,9 @@ export default function AlumnoMenuWeb() {
                     >
                       <Text
                         style={[
-                          styles.submenuitem,
-                          menuItemHoverSubItem === "reportes-riesgo" &&
-                            styles.submenuItemHover,
+                          styles.submenuItem,
+                          menuItemHoverSubItem === "reportes-riesgo" && styles.submenuItemHover,
+                          activoItem === "/reportes-riesgo" && styles.activoSubmenuItem,
                         ]}
                       >
                         Situación de Riesgo
@@ -273,9 +263,9 @@ export default function AlumnoMenuWeb() {
                     >
                       <Text
                         style={[
-                          styles.submenuitem,
-                          menuItemHoverSubItem === "encuesta-satisfaccion" &&
-                            styles.submenuItemHover,
+                          styles.submenuItem,
+                          menuItemHoverSubItem === "encuesta-satisfaccion" && styles.submenuItemHover,
+                          activoItem === "/encuesta-satisfaccion" && styles.activoSubmenuItem,
                         ]}
                       >
                         Encuesta de Satisfacción
@@ -297,11 +287,11 @@ export default function AlumnoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "perfil" && styles.menuItemHover,
-                    activoItem === "perfil" && styles.activo,
-                    activoItem === "perfil" && !menuHamburguesa && { bottom: -10 },
+                    activoItem === "/mi-perfil" && styles.activo,
+                    activoItem === "/mi-perfil" && !menuHamburguesa && { bottom: -10 },
                   ]}
                 >
-                  <Text style={activoItem === "perfil" && !menuHamburguesa && { top: -10 }}>
+                  <Text style={activoItem === "/mi-perfil" && !menuHamburguesa && { top: -10 }}>
                     MI PERFIL
                   </Text>
                 </Text>
@@ -338,7 +328,6 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     borderRadius: 6,
   },
-
   menu: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -350,7 +339,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "flex-start",
   },
-
   menuItem: {
     fontSize: Fuentes.cuerpo,
     color: Colores.onPrimario,
@@ -370,10 +358,6 @@ const styles = StyleSheet.create({
   menuItemHover: {
     backgroundColor: "rgba(255,255,255,0.15)",
   },
-  activo: {
-    backgroundColor: "rgba(51, 51, 51, 0.6)",
-  },
-
   submenu: {
     backgroundColor: Colores.fondo,
     borderColor: Colores.borde,
@@ -393,14 +377,20 @@ const styles = StyleSheet.create({
     backgroundColor: Colores.fondo,
     paddingVertical: 4,
   },
-  submenuitem: {
+  submenuItem: {
     fontSize: Fuentes.cuerpo,
     color: Colores.textoSecundario,
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
   submenuItemHover: {
+    backgroundColor: "rgba(224, 224, 224, 0.8)",
+  },
+  activo: {
+    backgroundColor: "rgba(51, 51, 51, 0.6)",
+  },
+  activoSubmenuItem: {
     backgroundColor: "rgba(51, 51, 51, 0.8)",
-    color: Colores.onPrimario,
+    color: Colores.onPrimario
   },
 });

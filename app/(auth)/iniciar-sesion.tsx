@@ -44,6 +44,7 @@ export default function IniciarSesion() {
                 <Image
                   source={require('@/activos/imagenes/siseg.png')}
                   style={{ width: esPantallaPequeña ? 70 : 150, height: esPantallaPequeña ? 70 : 150, marginBottom: 10 }}
+                  tintColor= {Colores.primario}
                 />
 
                 <Text style={[styles.bienvenidaSubtitulo, { fontSize: esPantallaPequeña ? Fuentes.cuerpo : Fuentes.subtitulo }]}>
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   contenedorFormulario: {
     maxWidth: 500,
     padding: 24,
-    marginVertical: 50,
+    marginVertical: "auto",
     borderWidth: 1,
     borderRadius: 12,
     borderColor: Colores.borde,

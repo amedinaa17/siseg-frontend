@@ -1,12 +1,11 @@
 import { useAuth } from "@/context/AuthProvider";
 import { Colores, Fuentes } from "@/temas/colores";
-import { Link, usePathname, useRouter } from "expo-router";
+import { Link, usePathname } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 export default function AdministrativoMenuWeb() {
   const { cerrarSesion } = useAuth();
-  const router = useRouter();
 
   const { width } = useWindowDimensions();
   const menuHamburguesa = width < 790;
@@ -21,17 +20,7 @@ export default function AdministrativoMenuWeb() {
 
   const pathname = usePathname();
 
-  const getActivoItem = (): string | null => {
-    if (pathname === "/") return "inicio";
-    if (["/validar-documentos", "/lista-asistencia", "/gestionar-alumnos"].includes(pathname)) return "alumnos";
-    if (pathname === "/gestionar-personal") return "personal";
-    if (["/gestionar-plazas", "/asignar-plaza", "/mapa-plazas"].includes(pathname)) return "plazas";
-    if (["/revisar-reportes-riesgo", "/reportes-encuestas"].includes(pathname)) return "reportes";
-    if (pathname === "/perfil") return "perfil";
-    return null;
-  };
-
-  const activoItem = getActivoItem();
+  const activoItem = pathname;
 
   const handleLogout = async () => {
     await cerrarSesion();
@@ -57,7 +46,7 @@ export default function AdministrativoMenuWeb() {
       <View style={[styles.menu, menuHamburguesa ? styles.menuHamburguesa : { top: -10 }]}>
         {(menuHamburguesaVisible || !menuHamburguesa) && (
           <>
-            <Link href="/(app)/(administrativo)" asChild>
+            <Link href="/(app)/(administrativo)/inicio-administrativo" asChild>
               <Pressable
                 onHoverIn={() => setmenuItemHoverItem("inicio")}
                 onHoverOut={() => setmenuItemHoverItem(null)}
@@ -68,11 +57,11 @@ export default function AdministrativoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "inicio" && styles.menuItemHover,
-                    activoItem === "inicio" && styles.activo,
-                    activoItem === "inicio" && !menuHamburguesa && { bottom: -10 }
+                    activoItem === "/inicio-administrativo" && styles.activo,
+                    activoItem === "/inicio-administrativo" && !menuHamburguesa && { bottom: -10 }
                   ]}
                 >
-                  <Text style={activoItem === "inicio" && !menuHamburguesa && { top: -10 }}>INICIO</Text>
+                  <Text style={activoItem === "/inicio-administrativo" && !menuHamburguesa && { top: -10 }}>INICIO</Text>
                 </Text>
               </Pressable>
             </Link>
@@ -87,11 +76,11 @@ export default function AdministrativoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "alumnos" && styles.menuItemHover,
-                    activoItem === "alumnos" && styles.activo,
-                    activoItem === "alumnos" && !menuHamburguesa && { bottom: -10 }
+                    activoItem === "/validar-documentos" || activoItem === "/lista-asistencia" || activoItem === "/gestionar-alumnos" ? styles.activo : [],
+                    (activoItem === "/validar-documentos" || activoItem === "/lista-asistencia" || activoItem === "/gestionar-alumnos") && !menuHamburguesa && { bottom: -10 }
                   ]}
                 >
-                  <Text style={activoItem === "alumnos" && !menuHamburguesa && { top: -10 }}>ALUMNOS {mostrarSubmenuAlumnos ? "▴" : "▾"}</Text>
+                  <Text style={(activoItem === "/validar-documentos" || activoItem === "/lista-asistencia" || activoItem === "/gestionar-alumnos") && !menuHamburguesa && { top: -10 }}>ALUMNOS {mostrarSubmenuAlumnos ? "▴" : "▾"}</Text>
                 </Text>
               </Pressable>
 
@@ -105,7 +94,8 @@ export default function AdministrativoMenuWeb() {
                     >
                       <Text style={[
                         styles.submenuItem,
-                        menuItemHoverSubItem === "validar-documentos" && styles.submenuItemHover
+                        menuItemHoverSubItem === "validar-documentos" && styles.submenuItemHover,
+                        activoItem === "/validar-documentos" && styles.activoSubmenuItem,
                       ]}>
                         Validar Documentos</Text>
                     </Pressable>
@@ -118,7 +108,8 @@ export default function AdministrativoMenuWeb() {
                     >
                       <Text style={[
                         styles.submenuItem,
-                        menuItemHoverSubItem === "lista-asistencia" && styles.submenuItemHover
+                        menuItemHoverSubItem === "lista-asistencia" && styles.submenuItemHover,
+                        activoItem === "/lista-asistencia" && styles.activoSubmenuItem,
                       ]}>
                         Asistencia al Curso de Inducción
                       </Text>
@@ -132,7 +123,8 @@ export default function AdministrativoMenuWeb() {
                     >
                       <Text style={[
                         styles.submenuItem,
-                        menuItemHoverSubItem === "gestionar-alumnos" && styles.submenuItemHover
+                        menuItemHoverSubItem === "gestionar-alumnos" && styles.submenuItemHover,
+                        activoItem === "/gestionar-alumnos" && styles.activoSubmenuItem,
                       ]}>Gestionar Alumnos</Text>
                     </Pressable>
                   </Link>
@@ -151,11 +143,11 @@ export default function AdministrativoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "personal" && styles.menuItemHover,
-                    activoItem === "personal" && styles.activo,
-                    activoItem === "personal" && !menuHamburguesa && { bottom: -10 }
+                    activoItem === "/gestionar-personal" && styles.activo,
+                    activoItem === "/gestionar-personal" && !menuHamburguesa && { bottom: -10 }
                   ]}
                 >
-                  <Text style={activoItem === "personal" && !menuHamburguesa && { top: -10 }}>PERSONAL ADMINISTRATIVO</Text>
+                  <Text style={activoItem === "/gestionar-personal" && !menuHamburguesa && { top: -10 }}>PERSONAL ADMINISTRATIVO</Text>
                 </Text>
               </Pressable>
             </Link>
@@ -170,11 +162,11 @@ export default function AdministrativoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "plazas" && styles.menuItemHover,
-                    activoItem === "plazas" && styles.activo,
-                    activoItem === "plazas" && !menuHamburguesa && { bottom: -10 }
+                    (activoItem === "/gestionar-plazas" || activoItem === "/asignar-plaza" || activoItem === "/mapa-plazas") && styles.activo,
+                    (activoItem === "/gestionar-plazas" || activoItem === "/asignar-plaza" || activoItem === "/mapa-plazas") && !menuHamburguesa && { bottom: -10 }
                   ]}
                 >
-                  <Text style={activoItem === "plazas" && !menuHamburguesa && { top: -10 }}>PLAZAS {mostrarSubmenuPlazas ? "▴" : "▾"}</Text>
+                  <Text style={(activoItem === "/gestionar-plazas" || activoItem === "/asignar-plaza" || activoItem === "/mapa-plazas") && !menuHamburguesa && { top: -10 }}>PLAZAS {mostrarSubmenuPlazas ? "▴" : "▾"}</Text>
                 </Text>
               </Pressable>
 
@@ -188,7 +180,8 @@ export default function AdministrativoMenuWeb() {
                     >
                       <Text style={[
                         styles.submenuItem,
-                        menuItemHoverSubItem === "gestionar-plazas" && styles.submenuItemHover
+                        menuItemHoverSubItem === "gestionar-plazas" && styles.submenuItemHover,
+                        activoItem === "/gestionar-plazas" && styles.activoSubmenuItem,
                       ]}>Gestionar Plazas</Text>
                     </Pressable>
                   </Link>
@@ -200,7 +193,8 @@ export default function AdministrativoMenuWeb() {
                     >
                       <Text style={[
                         styles.submenuItem,
-                        menuItemHoverSubItem === "asignar-plaza" && styles.submenuItemHover
+                        menuItemHoverSubItem === "asignar-plaza" && styles.submenuItemHover,
+                        activoItem === "/asignar-plaza" && styles.activoSubmenuItem,
                       ]}>Asignar Plaza</Text>
                     </Pressable>
                   </Link>
@@ -212,7 +206,8 @@ export default function AdministrativoMenuWeb() {
                     >
                       <Text style={[
                         styles.submenuItem,
-                        menuItemHoverSubItem === "mapa-plazas" && styles.submenuItemHover
+                        menuItemHoverSubItem === "mapa-plazas" && styles.submenuItemHover,
+                        activoItem === "/mapa-plazas" && styles.activoSubmenuItem,
                       ]}>Mapa de Plazas</Text>
                     </Pressable>
                   </Link>
@@ -230,11 +225,11 @@ export default function AdministrativoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "reportes" && styles.menuItemHover,
-                    activoItem === "reportes" && styles.activo,
-                    activoItem === "reportes" && !menuHamburguesa && { bottom: -10 }
+                    (activoItem === "/revisar-reportes-riesgo" || activoItem === "/reportes-encuestas") && styles.activo,
+                    (activoItem === "/revisar-reportes-riesgo" || activoItem === "/reportes-encuestas") && !menuHamburguesa && { bottom: -10 }
                   ]}
                 >
-                  <Text style={activoItem === "reportes" && !menuHamburguesa && { top: -10 }}>REPORTES {mostrarSubmenuReportes ? "▴" : "▾"}</Text>
+                  <Text style={(activoItem === "/revisar-reportes-riesgo" || activoItem === "/reportes-encuestas") && !menuHamburguesa && { top: -10 }}>REPORTES {mostrarSubmenuReportes ? "▴" : "▾"}</Text>
                 </Text>
               </Pressable>
 
@@ -248,7 +243,8 @@ export default function AdministrativoMenuWeb() {
                     >
                       <Text style={[
                         styles.submenuItem,
-                        menuItemHoverSubItem === "revisar-reportes-riesgo" && styles.submenuItemHover
+                        menuItemHoverSubItem === "revisar-reportes-riesgo" && styles.submenuItemHover,
+                        activoItem === "/revisar-reportes-riesgo" && styles.activoSubmenuItem,
                       ]}>
                         Reportes de Situación de Riesgo
                       </Text>
@@ -262,7 +258,8 @@ export default function AdministrativoMenuWeb() {
                     >
                       <Text style={[
                         styles.submenuItem,
-                        menuItemHoverSubItem === "reportes-encuestas" && styles.submenuItemHover
+                        menuItemHoverSubItem === "reportes-encuestas" && styles.submenuItemHover,
+                        activoItem === "/reportes-encuestas" && styles.activoSubmenuItem,
                       ]}>Encuestas de Satisfacción</Text>
                     </Pressable>
                   </Link>
@@ -281,11 +278,11 @@ export default function AdministrativoMenuWeb() {
                   style={[
                     menuHamburguesa ? styles.menuItemHamburguesa : styles.menuItem,
                     menuItemHoverItem === "perfil" && styles.menuItemHover,
-                    activoItem === "perfil" && styles.activo,
-                    activoItem === "perfil" && !menuHamburguesa && { bottom: -10 }
+                    activoItem === "/perfil" && styles.activo,
+                    activoItem === "/perfil" && !menuHamburguesa && { bottom: -10 }
                   ]}
                 >
-                  <Text style={activoItem === "perfil" && !menuHamburguesa && { top: -10 }}>
+                  <Text style={activoItem === "/perfil" && !menuHamburguesa && { top: -10 }}>
                     MI PERFIL
                   </Text>
                 </Text>
@@ -377,10 +374,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   submenuItemHover: {
-    backgroundColor: "rgba(51, 51, 51, 0.8)",
-    color: Colores.onPrimario
+    backgroundColor: "rgba(224, 224, 224, 0.8)",
   },
   activo: {
     backgroundColor: "rgba(51, 51, 51, 0.6)",
+  },
+  activoSubmenuItem: {
+    backgroundColor: "rgba(51, 51, 51, 0.8)",
+    color: Colores.onPrimario
   },
 });

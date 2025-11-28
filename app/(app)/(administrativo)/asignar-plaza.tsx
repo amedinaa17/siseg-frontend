@@ -50,10 +50,10 @@ export default function AsignarPlaza() {
                 setAlumnos(response.data);
             }
             else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
             }
         } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
         } finally {
             setCargando(false);
         }
@@ -72,10 +72,10 @@ export default function AsignarPlaza() {
                 setPlazas(response.plazas.filter((plaza) => plaza.estatus == 1 && plaza.tarjetaDisponible > 0));
             }
             else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener las plazas del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+                modalAPI.current?.show(false, "Hubo un problema al obtener las plazas del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
             }
         } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
         }
     };
 
@@ -191,6 +191,7 @@ export default function AsignarPlaza() {
                     keyboardVerticalOffset={80}
                 >
                     <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{alumnoSeleccionado?.nombre} {alumnoSeleccionado?.apellido_materno} {alumnoSeleccionado?.apellido_paterno}</Text>
+                    <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 15 }}>{alumnoSeleccionado?.boleta}</Text>
                     <View style={{ marginTop: 5, marginBottom: 15 }}>
                         <Entrada label="Boleta" value={`${alumnoSeleccionado?.boleta || ""}`} keyboardType="numeric" maxLength={10} editable={false} />
                     </View>
@@ -325,9 +326,9 @@ export default function AsignarPlaza() {
                         <Tabla
                             columnas={[
                                 { key: "boleta", titulo: "Boleta", ancho: 130 },
-                                { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
-                                { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
-                                { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 350 }) },
+                                { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }), multilinea: true },
+                                { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }), multilinea: true },
+                                { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 350 }), multilinea: true },
                                 {
                                     key: "estatusAsignacion",
                                     titulo: "Estatus",

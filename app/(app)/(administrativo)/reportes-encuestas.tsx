@@ -175,7 +175,7 @@ export default function EncuestasAdmin() {
         setEncuestas(listaEnc);
       }
     } catch (e) {
-      modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+      modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
     } finally {
       setPaginaActual(1);
       setCargando(false);
