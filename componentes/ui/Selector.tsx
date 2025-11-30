@@ -29,7 +29,7 @@ export default function Selector({
 
   useEffect(() => {
     Animated.timing(anim, {
-      toValue: focused || !!selectedValue ? 1 : 0,
+      toValue: !!selectedValue ? 1 : 0,
       duration: 150,
       useNativeDriver: false,
     }).start();

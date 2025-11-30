@@ -4,6 +4,7 @@ import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Selector from "@/componentes/ui/Selector";
+import Tabla from "@/componentes/ui/Tabla";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
@@ -14,9 +15,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
-  useWindowDimensions,
+  useWindowDimensions
 } from "react-native";
 
 import NativeMap from "@/componentes/mapa/NativeMap";
@@ -56,28 +56,6 @@ type AlumnoMin = {
   [k: string]: any;
 };
 
-type DetallesAlumno = {
-  boleta: string;
-  correo?: string;
-  curp?: string;
-  rfc?: string;
-  nombre?: string;
-  apellido_paterno?: string;
-  apellido_materno?: string;
-  generacion?: string | number;
-  promedio?: string | number;
-  carrera?: string;
-  calle_y_numero?: string | null;
-  colonia?: string | null;
-  delegacion?: string | null;
-  estado?: string | null;
-  cp?: string | null;
-  sexo?: string | null;
-  telcelular?: string | null;
-  tellocal?: string | null;
-  sede?: string | null;
-};
-
 function normalizePrograma(plaza?: Plaza): string {
   return plaza?.PROGRAMA ? String(plaza.PROGRAMA).trim() : "";
 }
@@ -101,26 +79,6 @@ function normalizeCarreraPlaza(plaza?: Plaza): string {
     return CARRERA_LABELS[id] ?? String(id);
   }
   return "";
-}
-
-function normalizeCarreraAlumno(a?: AlumnoMin | null): string {
-  if (!a) return "";
-  if (a.carrera && typeof a.carrera === "object" && "NOMBRE" in a.carrera!) {
-    return String((a.carrera as any).NOMBRE ?? "").trim();
-  }
-  if (typeof a.carrera === "string") return String(a.carrera).trim();
-  if (typeof a.carrera === "number") {
-    return CARRERA_LABELS[a.carrera] ?? String(a.carrera);
-  }
-  return "";
-}
-
-function nombreCompleto(a?: AlumnoMin | null): string {
-  if (!a) return "";
-  return [a.nombre, a.apellido_paterno, a.apellido_materno]
-    .filter(Boolean)
-    .map((x) => String(x).trim())
-    .join(" ");
 }
 
 function useMapaPlazas() {
@@ -218,15 +176,15 @@ function useMapaPlazas() {
 
 export default function MapaPlazas() {
   const { width } = useWindowDimensions();
-  const esPequeña = width < 790;
+  const esPantallaPequeña = width < 790;
 
   const modalAPI = useRef<ModalAPIRef>(null);
   const { sesion } = useAuth();
-  const { loading, errorMsg, puntos, programas, carreras, alumnosPorPlaza, recargar } =
+  const { loading, puntos, programas, carreras, alumnosPorPlaza, recargar } =
     useMapaPlazas();
 
   const [filtroCarrera, setFiltroCarrera] = useState<string>("Todos");
-  const [filtroPrograma, setFiltroPrograma] = useState<string>("");
+  const [filtroPrograma, setFiltroPrograma] = useState<string>("Todos");
   const [busquedaTexto, setBusquedaTexto] = useState<string>("");
   const [sedeJump, setSedeJump] = useState<string>("");
 
@@ -235,8 +193,7 @@ export default function MapaPlazas() {
   const [modalAlumnos, setModalAlumnos] = useState<AlumnoMin[]>([]);
 
   const [modalAlumnoVisible, setModalAlumnoVisible] = useState(false);
-  const [alumnoDetalles, setAlumnoDetalles] = useState<DetallesAlumno | null>(null);
-  const [loadingAlumno, setLoadingAlumno] = useState(false);
+  const [alumno, setAlumnoDetalles] = useState<any | null>(null);
 
   const puntosFiltrados: PuntoConPlaza[] = useMemo(() => {
     return puntos.filter((p) => {
@@ -246,7 +203,7 @@ export default function MapaPlazas() {
       const progLabel = normalizePrograma(p.plaza);
       const carreraLabel = normalizeCarreraPlaza(p.plaza);
 
-      const progOK = !filtroPrograma || progLabel === filtroPrograma;
+      const progOK = filtroPrograma === "Todos" || progLabel === filtroPrograma;
       const carreraOK = filtroCarrera === "Todos" || carreraLabel === filtroCarrera;
 
       const texto = `${p.sede} ${p.ubicacion} ${progLabel} ${carreraLabel}`.toLowerCase();
@@ -285,27 +242,6 @@ export default function MapaPlazas() {
     }
   }, [sedeJump, puntos]);
 
-  const programasOpts = [
-    { label: "Todos los programas", value: "" },
-    ...programas.map((p) => ({ label: p, value: p })),
-  ];
-
-  const carrerasOpts = [
-    { label: "Todos", value: "Todos" },
-    ...carreras.map((c) => ({ label: c, value: c })),
-  ];
-
-  const sedesOpts = [
-    { label: "Ir a sede…", value: "" },
-    ...sedesDisponibles.map((s) => ({ label: s, value: s })),
-  ];
-
-  useEffect(() => {
-    if (errorMsg) modalAPI.current?.show(false, errorMsg);
-  }, [errorMsg]);
-
-  const disableIrASede = sedesDisponibles.length === 0;
-
   const handleMarkerPress = (p: PuntoConPlaza) => {
     setSedeJump(p.sede);
 
@@ -319,7 +255,6 @@ export default function MapaPlazas() {
 
   async function verAlumno(boleta: string) {
     try {
-      setLoadingAlumno(true);
       setAlumnoDetalles(null);
 
       const resp = await fetchData(
@@ -328,118 +263,63 @@ export default function MapaPlazas() {
         )}`
       );
       if (resp?.error === 0 && resp?.data) {
-        setAlumnoDetalles(resp.data as DetallesAlumno);
+        setAlumnoDetalles(resp.data);
+        setModalVisible(false);
         setModalAlumnoVisible(true);
       } else {
         modalAPI.current?.show(false, "Hubo un problema al obtener los datos del alumno. Inténtalo de nuevo más tarde.");
       }
     } catch (e) {
       modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
-    } finally {
-      setLoadingAlumno(false);
     }
   }
 
-  const renderFilaAlumno = (a: AlumnoMin, idx: number) => {
-    const nombre = nombreCompleto(a) || "(Sin nombre)";
-    const carrera = normalizeCarreraAlumno(a) || "-";
-    return (
-      <View key={`${a.boleta}-${idx}`} style={styles.row}>
-        <View style={[styles.cell, { flex: 2 }]}>
-          <Text style={styles.cellText}>{nombre}</Text>
-        </View>
-        <View style={[styles.cell, { flex: 2 }]}>
-          <Text style={styles.cellText}>{carrera}</Text>
-        </View>
-        <View style={[styles.cell, { width: 80, alignItems: "center" }]}>
-          <TouchableOpacity
-            onPress={() => verAlumno(a.boleta)}
-            style={styles.iconBtn}
-          >
-            <Ionicons name="eye" size={18} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
-
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={[styles.contenedor, esPequeña && { maxWidth: "95%" }]}>
+      <View style={[styles.contenedor, esPantallaPequeña && { maxWidth: "95%" }]}>
         <Text style={styles.titulo}>Mapa de plazas</Text>
-
-        <View style={styles.filtros}>
-          <View style={esPequeña ? { width: "100%", marginBottom: 15 } : { width: "34%" }}>
+        <View style={[styles.controlesSuperiores, !esPantallaPequeña && { marginBottom: 15 }]}>
+          <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "34%" }}>
             <Entrada
               label="Buscar"
               value={busquedaTexto}
               onChangeText={setBusquedaTexto}
+              editable={!loading}
             />
           </View>
 
-          <View style={esPequeña ? { width: "100%", marginBottom: 15 } : { width: "30%" }}>
-            {Platform.OS === "web" ? (
-              <View>
-                <Selector
-                  label="Programa"
-                  items={[{ label: "Todos los programas", value: "" }, ...programas.map((p) => ({ label: p, value: p }))]}
-                  selectedValue={filtroPrograma}
-                  onValueChange={(v) => setFiltroPrograma(String(v))}
-                />
-              </View>
-            ) : (
-              <Selector
-                label="Programa"
-                items={[{ label: "Todos los programas", value: "" }, ...programas.map((p) => ({ label: p, value: p }))]}
-                selectedValue={filtroPrograma}
-                onValueChange={(v) => setFiltroPrograma(String(v))}
-              />
-            )}
+          <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "30%" }}>
+            <Selector
+              label="Programa"
+              items={[{ label: "Todos", value: "Todos" }, ...programas.map((p) => ({ label: p, value: p }))]}
+              selectedValue={filtroPrograma}
+              onValueChange={(v) => setFiltroPrograma(String(v))}
+              editable={!loading}
+            />
           </View>
 
-          <View style={esPequeña ? { width: "100%", marginBottom: 15 } : { width: "30%" }}>
-            {Platform.OS === "web" ? (
-              <View>
-                <Selector
-                  label="Carrera"
-                  items={[{ label: "Todos", value: "Todos" }, ...carreras.map((c) => ({ label: c, value: c }))]}
-                  selectedValue={filtroCarrera}
-                  onValueChange={(v) => setFiltroCarrera(String(v))}
-                />
-              </View>
-            ) : (
-              <Selector
-                label="Carrera"
-                items={[{ label: "Todos", value: "" }, ...carreras.map((c) => ({ label: c, value: c }))]}
-                selectedValue={filtroCarrera}
-                onValueChange={(v) => setFiltroCarrera(String(v))}
-              />
-            )}
+          <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "30%" }}>
+            <Selector
+              label="Carrera"
+              items={[{ label: "Todos", value: "Todos" }, ...carreras.map((c) => ({ label: c, value: c }))]}
+              selectedValue={filtroCarrera}
+              onValueChange={(v) => setFiltroCarrera(String(v))}
+              editable={!loading}
+            />
           </View>
         </View>
-
-        <View style={[styles.fila, { marginVertical: 15 }]}>
-          <View style={esPequeña ? { width: "100%" } : { width: "60%" }}>
-            {Platform.OS === "web" ? (
-              <View>
-                <Selector
-                  label="Ir a sede"
-                  items={[{ label: "Ir a sede…", value: "" }, ...sedesDisponibles.map((s) => ({ label: s, value: s }))]}
-                  selectedValue={sedeJump}
-                  onValueChange={(v) => setSedeJump(String(v))}
-                />
-              </View>
-            ) : (
-              <Selector
-                label="Ir a sede"
-                items={[{ label: "Ir a sede…", value: "" }, ...sedesDisponibles.map((s) => ({ label: s, value: s }))]}
-                selectedValue={sedeJump}
-                onValueChange={(v) => setSedeJump(String(v))}
-              />
-            )}
+        <View style={[styles.controlesSuperiores, { marginBottom: 15 }]}>
+          <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "60%" }}>
+            <Selector
+              label="Ir a sede"
+              items={[{ label: "Todos", value: "" }, ...sedesDisponibles.map((s) => ({ label: s, value: s }))]}
+              selectedValue={sedeJump}
+              onValueChange={(v) => setSedeJump(String(v))}
+              editable={!loading}
+            />
           </View>
 
-          <View style={{ flex: 1, alignItems: esPequeña ? "stretch" : "flex-end", justifyContent: "flex-end" }}>
+          <View style={{ width: esPantallaPequeña ? "100%" : "40%", alignItems: "flex-end", justifyContent: "flex-end" }}>
             <Boton onPress={recargar} title={loading ? "Cargando..." : "Recargar"} />
           </View>
         </View>
@@ -458,7 +338,7 @@ export default function MapaPlazas() {
           />
         )}
 
-        <Text style={{ marginTop: 10, color: Colores.textoClaro, fontSize: 13 }}>
+        <Text style={{ marginTop: 15, color: Colores.textoClaro, fontSize: Fuentes.caption }}>
           Mostrando {puntosFiltrados.length} sede(s) con coordenadas válidas.
         </Text>
       </View>
@@ -468,210 +348,148 @@ export default function MapaPlazas() {
         onClose={() => setModalVisible(false)}
         titulo={modalSede || "Detalle de sede"}
         maxWidth={820}
-        cancelar
       >
-        {Platform.OS === "web" ? (
-          <View style={{ paddingTop: 8 }}>
-            <View style={[styles.row, styles.headerRow]}>
-              <View style={[styles.cell, { flex: 2 }]}><Text style={styles.headerText}>Alumno</Text></View>
-              <View style={[styles.cell, { flex: 2 }]}><Text style={styles.headerText}>Carrera</Text></View>
-              <View style={[styles.cell, { width: 80, alignItems: "center" }]}><Text style={styles.headerText}>Acciones</Text></View>
+        <View style={{ marginTop: 10 }}>
+          {modalAlumnos.length === 0 ? (
+            <View style={{ margin: "auto" }}>
+              <Text style={{ color: Colores.textoClaro, textAlign: "center" }}>No hay alumnos realizando su servicio social en esta sede.</Text>
             </View>
-            {modalAlumnos.length === 0 ? (
-              <View style={[styles.row, { justifyContent: "center", paddingVertical: 16 }]}>
-                <Text style={{ color: Colores.textoClaro }}>No hay alumnos asignados a esta sede.</Text>
-              </View>
-            ) : (
-              modalAlumnos.map((a, i) => renderFilaAlumno(a, i))
-            )}
-          </View>
-        ) : (
-          <ScrollView style={{ maxHeight: 420 }}>
-            <View style={[styles.row, styles.headerRow]}>
-              <View style={[styles.cell, { flex: 2 }]}><Text style={styles.headerText}>Alumno</Text></View>
-              <View style={[styles.cell, { flex: 2 }]}><Text style={styles.headerText}>Carrera</Text></View>
-              <View style={[styles.cell, { width: 80, alignItems: "center" }]}><Text style={styles.headerText}>Acciones</Text></View>
-            </View>
-            {modalAlumnos.length === 0 ? (
-              <View style={[styles.row, { justifyContent: "center", paddingVertical: 16 }]}>
-                <Text style={{ color: Colores.textoClaro }}>No hay alumnos asignados a esta sede.</Text>
-              </View>
-            ) : (
-              modalAlumnos.map((a, i) => renderFilaAlumno(a, i))
-            )}
-          </ScrollView>
-        )}
+          ) : (
+            <ScrollView horizontal={esPantallaPequeña}>
+              <Tabla
+                columnas={[
+                  { key: "boleta", titulo: "Boleta", ancho: 150 },
+                  { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
+                  { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
+
+                  {
+                    key: "acciones",
+                    titulo: "Acciones",
+                    ancho: 110,
+                    render: (_, fila) => (
+                      <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                        <Boton
+                          onPress={() => { verAlumno(fila.boleta); }}
+                          icon={<Ionicons name="eye" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                          color={Colores.textoInfo}
+                        />
+                      </View>
+                    ),
+                  },
+                ]}
+                datos={modalAlumnos.map((fila) => ({
+                  ...fila,
+                  nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                  carrera: fila.carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Homeópata"
+                }))}
+              />
+            </ScrollView>
+          )}
+        </View>
       </Modal>
 
-<Modal
-  visible={modalAlumnoVisible}
-  onClose={() => setModalAlumnoVisible(false)}
-  titulo="Datos del alumno"
-  maxWidth={750}
->
-  <View style={{ paddingVertical: 10 }}>
-    {loadingAlumno && (
-      <Text style={{ color: Colores.textoClaro }}>Cargando…</Text>
-    )}
-
-    {!loadingAlumno && alumnoDetalles && (
-      <View style={{ width: "100%" }}>
-        
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Nombre"
-            value={alumnoDetalles.nombre ?? ""}
-            editable={false}
-          />
+      <Modal
+        visible={modalAlumnoVisible}
+        onClose={() => {setModalAlumnoVisible(false); setModalVisible(true)}}
+        titulo="Datos del alumno"
+        maxWidth={750}
+      >
+        <View style={{ marginBottom: 15 }} >
+          <Entrada label="Nombre" value={alumno?.nombre || ""} editable={false} />
         </View>
 
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Apellido Paterno"
-            value={alumnoDetalles.apellido_paterno ?? ""}
-            editable={false}
-          />
+        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Apellido Paterno" value={alumno?.apellido_paterno || ""} editable={false} />
+          </View>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Apellido Materno" value={alumno?.apellido_materno || ""} editable={false} />
+          </View>
         </View>
 
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Apellido Materno"
-            value={alumnoDetalles.apellido_materno ?? ""}
-            editable={false}
-          />
+        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="CURP" value={alumno?.curp || ""} maxLength={18} editable={false} />
+          </View>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="RFC" value={alumno?.rfc || ""} editable={false} />
+          </View>
         </View>
 
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="CURP"
-            value={alumnoDetalles.curp ?? ""}
-            editable={false}
-          />
+        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Boleta" value={alumno?.boleta || ""} keyboardType="numeric" maxLength={10} editable={false} />
+          </View>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Carrera" value={alumno?.carrera || ""} editable={false} />
+          </View>
         </View>
 
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="RFC"
-            value={alumnoDetalles.rfc ?? ""}
-            editable={false}
-          />
+        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Generación" value={alumno?.generacion || ""} editable={false} />
+          </View>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Promedio" value={alumno?.promedio || ""} keyboardType="decimal-pad" editable={false} />
+          </View>
         </View>
 
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Boleta"
-            value={alumnoDetalles.boleta ?? ""}
-            editable={false}
-          />
-        </View>
-
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Carrera"
-            value={alumnoDetalles.carrera ?? ""}
-            editable={false}
-          />
-        </View>
-
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Generación"
-            value={String(alumnoDetalles.generacion ?? "")}
-            editable={false}
-          />
-        </View>
-
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Promedio"
-            value={String(alumnoDetalles.promedio ?? "")}
-            editable={false}
-          />
-        </View>
-
-        <View style={{ marginBottom: 12 }}>
+        <View style={{ marginBottom: 15 }} >
           <Entrada
             label="Correo Electrónico Institucional"
-            value={alumnoDetalles.correo ?? ""}
+            value={alumno?.correo || ""}
+            keyboardType="email-address"
             editable={false}
           />
         </View>
 
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Calle y Número"
-            value={alumnoDetalles.calle_y_numero ?? ""}
-            editable={false}
-          />
+        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Calle y Número" value={alumno?.calle_y_numero || ""} editable={false} />
+          </View>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Colonia" value={alumno?.colonia || ""} editable={false} />
+          </View>
         </View>
 
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Colonia"
-            value={alumnoDetalles.colonia ?? ""}
-            editable={false}
-          />
+        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Delegación / Municipio" value={alumno?.delegacion || ""} editable={false} />
+          </View>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Estado de Procedencia" value={alumno?.estado || ""} editable={false} />
+          </View>
         </View>
 
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Delegación / Municipio"
-            value={alumnoDetalles.delegacion ?? ""}
-            editable={false}
-          />
+        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Código Postal" value={alumno?.cp || ""} keyboardType="numeric" editable={false} />
+          </View>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Selector
+              label="Sexo"
+              selectedValue={alumno?.sexo === "F" ? "Femenino" : alumno?.sexo === "M" ? "Masculino" : ""}
+              items={[
+                { label: "Masculino", value: "M" },
+                { label: "Femenino", value: "F" },
+              ]}
+              onValueChange={() => { }}
+              editable={false}
+            />
+          </View>
         </View>
 
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Estado de procedencia"
-            value={alumnoDetalles.estado ?? ""}
-            editable={false}
-          />
+        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Teléfono Celular" value={alumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+          </View>
+          <View style={{ flex: 1, marginBottom: 15 }}>
+            <Entrada label="Teléfono Local" value={alumno?.tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+          </View>
         </View>
-
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Código Postal"
-            value={alumnoDetalles.cp ?? ""}
-            editable={false}
-          />
-        </View>
-
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Sexo"
-            value={alumnoDetalles.sexo ?? ""}
-            editable={false}
-          />
-        </View>
-
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Teléfono Celular"
-            value={alumnoDetalles.telcelular ?? ""}
-            editable={false}
-          />
-        </View>
-
-        <View style={{ marginBottom: 12 }}>
-          <Entrada
-            label="Teléfono Local"
-            value={alumnoDetalles.tellocal ?? ""}
-            editable={false}
-          />
-        </View>
-
-      </View>
-    )}
-  </View>
-</Modal>
-
-
-
-
-
+      </Modal>
       <ModalAPI ref={modalAPI} />
-    </ScrollView>
+    </ScrollView >
   );
 }
 
@@ -706,6 +524,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 6,
   },
+  controlesSuperiores: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+  },
   fila: {
     flexDirection: "row",
     gap: 12,
@@ -716,9 +539,7 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
     borderRadius: 8,
-    border: `1px solid ${Colores.borde}` as any,
   },
-
   row: {
     flexDirection: "row",
     borderBottomWidth: 1,
@@ -757,6 +578,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   colHalf: {
-    width: "48%", 
+    width: "48%",
   },
 });

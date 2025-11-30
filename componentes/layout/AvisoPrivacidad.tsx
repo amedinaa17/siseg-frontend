@@ -34,7 +34,7 @@ export default function ModalAvisoPrivacidad({ visible, onClose }: Props) {
         así como en los Lineamientos Generales de Protección de Datos Personales para el Sector Público{" "}
         y el marco normativo institucional en materia de transparencia y protección de datos del IPN.{"\n\n"}
         Su recopilación tiene como objeto permitir el registro, seguimiento y verificación del servicio social{" "}
-        de los estudiantes de la ENMYH, así como la gestión de información relacionada con la recepción de documentos,
+        de los estudiantes de la ENMyH, así como la gestión de información relacionada con la recepción de documentos,
         emisión de documentos electrónicos, asignación de plazas, supervisión y evaluación de satisfacción.{" "}
         El tratamiento de los datos se realizará bajo los principios de licitud, finalidad, lealtad,
         proporcionalidad y responsabilidad, conforme lo establecen los artículos 3, 4 y 6 de la LGPDPPSO.{"\n\n"}

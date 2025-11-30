@@ -1,3 +1,4 @@
+import ModalAvisoPrivacidad from '@/componentes/layout/AvisoPrivacidad';
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
@@ -10,6 +11,8 @@ export default function InicioPersonalAdministrativo() {
   const { sesion, verificarToken } = useAuth();
 
   const [cargando, setCargando] = useState(false);
+
+  const [visibleAviso, setVisibleAviso] = useState(false);
 
   const [administrativo, setAdministrativo] = useState<any>(null);
   const modalAPI = useRef<ModalAPIRef>(null);
@@ -129,13 +132,17 @@ export default function InicioPersonalAdministrativo() {
               <View style={styles.avisoContainer}>
                 <Text style={styles.avisoTexto}>AVISO</Text>
                 <View style={styles.separacion} />
-                <Text style={styles.piePaginaTexto}>
+                <Text style={styles.piePaginaTexto} onPress={() => setVisibleAviso(true)}>
                   Tus datos personales son protegidos conforme a lo establecido por la Ley General de Protección de Datos Personales en Posesión de los Particulares.
                 </Text>
               </View>
             </View>
           </View>
           <ModalAPI ref={modalAPI} />
+          <ModalAvisoPrivacidad
+            visible={visibleAviso}
+            onClose={() => setVisibleAviso(false)}
+          />
         </ScrollView>
       </View>
     </>
@@ -259,11 +266,11 @@ const styles = StyleSheet.create({
     fontSize: Fuentes.titulo,
     color: Colores.primario,
     fontWeight: "700",
-    marginRight: 10,
+    marginRight: 25,
   },
   separacion: {
     backgroundColor: Colores.primario,
-    width: 1.5,
+    width: 2,
     height: 35,
     marginRight: 10,
   },

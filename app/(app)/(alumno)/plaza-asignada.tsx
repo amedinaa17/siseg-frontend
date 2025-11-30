@@ -81,7 +81,7 @@ export default function PlazaAsignada() {
                             <Entrada label="Tarjeta" value={String(datosAlumno?.tarjetaDisponible) ?? ""} editable={false} />
                         </View>
                         <View style={{ flex: 1, marginBottom: 0 }}>
-                            <Entrada label="Tipo de Beca" value={datosAlumno?.tipoBeca ?? ""} editable={false} />
+                            <Entrada label="Beca" value={datosAlumno?.tipoBeca ?? ""} editable={false} />
                         </View>
                     </View>
 

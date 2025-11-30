@@ -181,7 +181,7 @@ export default function AsignarPlaza() {
                 titulo={`Asignar plaza`}
                 maxWidth={700}
                 cancelar
-                textoAceptar={isSubmitting ? "Asignando…" : "Asignar"}
+                textoAceptar={isSubmitting ? "Asignando…" : "Asignar plaza"}
                 onAceptar={handleSubmit(asignarPlaza)}
                 deshabilitado={isSubmitting}
             >
@@ -190,8 +190,10 @@ export default function AsignarPlaza() {
                     behavior={Platform.OS === "web" ? undefined : "padding"}
                     keyboardVerticalOffset={80}
                 >
-                    <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{alumnoSeleccionado?.nombre} {alumnoSeleccionado?.apellido_materno} {alumnoSeleccionado?.apellido_paterno}</Text>
-                    <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 15 }}>{alumnoSeleccionado?.boleta}</Text>
+                    <View style={{ marginTop: 5, marginBottom: 15 }}>
+                        <Entrada label="Nombre" value={`${alumnoSeleccionado?.nombre + " " + alumnoSeleccionado?.apellido_materno + " " + alumnoSeleccionado?.apellido_paterno}` || " "} keyboardType="numeric" maxLength={10} editable={false} />
+                    </View>
+
                     <View style={{ marginTop: 5, marginBottom: 15 }}>
                         <Entrada label="Boleta" value={`${alumnoSeleccionado?.boleta || ""}`} keyboardType="numeric" maxLength={10} editable={false} />
                     </View>
@@ -243,7 +245,7 @@ export default function AsignarPlaza() {
                         plazaSeleccionada && (
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                                 <View style={{ flex: 1, marginBottom: 15 }}>
-                                    <Entrada label="Número de tarjeta" value={String(plazaSeleccionada?.tarjetaDisponible) || ""} editable={false} />
+                                    <Entrada label="Tarjeta" value={String(plazaSeleccionada?.tarjetaDisponible) || ""} editable={false} />
                                 </View>
                                 <View style={{ flex: 1, marginBottom: 15 }}>
                                     <Entrada label="Beca" value={plazaSeleccionada?.tipoBeca || ""} editable={false} />

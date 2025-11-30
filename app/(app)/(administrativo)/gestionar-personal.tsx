@@ -266,7 +266,7 @@ export default function GestionPersonalAdministrativo() {
             <Modal visible={modalAgregar} onClose={() => { setModalAgregar(false); resetAgregar(); }} titulo="Agregar personal administrativo" maxWidth={700}
                 cancelar deshabilitado={isSubmittingAgregar} textoAceptar={isSubmittingAgregar ? "Agregando…" : "Agregar personal"} onAceptar={handleSubmitAgregar(onSubmitAgregar)}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
-                    <View style={{ marginTop: 10, marginBottom: 15 }}>
+                    <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlAgregar}
                             name="nombre"

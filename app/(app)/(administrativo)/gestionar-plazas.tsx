@@ -208,13 +208,13 @@ export default function GestionPlazas() {
                             <Entrada label="Programa" value={PROGRAMA || ""} editable={false} />
                         </View>
                         <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Número de tarjeta" value={tarjetaDisponible || ""} editable={false} />
+                            <Entrada label="Tarjeta" value={tarjetaDisponible || ""} editable={false} />
                         </View>
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                         <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Tipo de beca" value={tipoBeca || ""} editable={false} />
+                            <Entrada label="Beca" value={tipoBeca || ""} editable={false} />
                         </View>
                         <View style={{ flex: 1, marginBottom: 15 }}>
                             <Entrada label="Estatus" value={estatus === 0 ? "Baja" : "Alta"} editable={false} />
@@ -287,7 +287,7 @@ export default function GestionPlazas() {
                                 defaultValue=""
                                 render={({ field }) => (
                                     <Entrada
-                                        label="Número de tarjeta"
+                                        label="Tarjeta"
                                         keyboardType="numeric"
                                         value={field.value?.toString() ?? ""}
                                         onChangeText={(v) => field.onChange(v)}
@@ -306,7 +306,7 @@ export default function GestionPlazas() {
                                 name="beca"
                                 defaultValue=""
                                 render={({ field }) => (
-                                    <Entrada label="Tipo de beca" {...field} error={errorsAgregar.beca?.message} />
+                                    <Entrada label="Beca" {...field} error={errorsAgregar.beca?.message} />
                                 )}
                             />
                         </View>
@@ -456,7 +456,7 @@ export default function GestionPlazas() {
                             }
                             render={({ field }) => (
                                 <Entrada
-                                    label="Número de tarjeta"
+                                    label="Tarjeta"
                                     keyboardType="numeric"
                                     value={field.value?.toString() ?? ""}
                                     onChangeText={(v) => field.onChange(v)}
@@ -476,7 +476,7 @@ export default function GestionPlazas() {
                         defaultValue={plazaSeleccion.tipoBeca || ""}
                         render={({ field }) => (
                             <Entrada
-                                label="Tipo de beca"
+                                label="Beca"
                                 {...field}
                                 error={errorsEditar.beca?.message}
                             />

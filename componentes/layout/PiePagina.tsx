@@ -14,13 +14,13 @@ export default function PiePagina() {
   return (
     <ImageBackground
       source={require('@/activos/imagenes/pattern-gris.png')}
-      style={{ width: '100%', height: "auto"}}
+      style={{ width: '100%', height: "auto" }}
       resizeMode='repeat'
     >
       <SafeAreaView edges={["bottom"]} style={{ backgroundColor: "transparent" }}>
-        <View style={[styles.contenedor, { flexDirection: esPantallaPequeña ? 'column' : 'row'}]}>
-          <Text style={styles.texto}>Desarrollado por la Escuela Superior de Cómputo</Text>
-          {esPantallaPequeña && (
+        <View style={[styles.contenedor, { flexDirection: esPantallaPequeña ? 'column' : 'row' }]}>
+          {esPantallaPequeña && (<>
+            <Text style={styles.texto}>Desarrollado por la Escuela Superior de Cómputo</Text>
             <View style={[styles.fila, { gap: 50 }]}>
               <TouchableOpacity onPress={() => setVisibleAviso(true)}>
                 <Text style={styles.texto}> Aviso de Privacidad</Text>
@@ -30,15 +30,17 @@ export default function PiePagina() {
                 <Text style={styles.texto}>Contacto</Text>
               </TouchableOpacity>
             </View>
+          </>
           )}
           {!esPantallaPequeña && (
             <>
               <TouchableOpacity style={styles.fila} onPress={() => setVisibleAviso(true)}>
-                <Text style={styles.texto}> Aviso de Privacidad</Text>
+                <Text style={styles.texto}>Aviso de Privacidad</Text>
               </TouchableOpacity>
+              <Text style={styles.texto}>Desarrollado por la Escuela Superior de Cómputo</Text>
 
               <TouchableOpacity style={styles.fila} onPress={() => setVisibleContacto(true)}>
-                <Text style={styles.texto}>Contacto</Text>
+                <Text style={styles.texto}>Contacto{"         "}</Text>
               </TouchableOpacity>
             </>
           )}

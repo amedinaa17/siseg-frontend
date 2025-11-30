@@ -395,7 +395,7 @@ export default function GestionAlumnos() {
                 titulo="Agregar alumno" maxWidth={700} cancelar deshabilitado={isSubmittingAgregar}
                 textoAceptar={isSubmittingAgregar ? "Agregando…" : "Agregar alumno"} onAceptar={handleSubmitAgregar(onSubmitAgregar)}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
-                    <View style={{ marginTop: 5, marginBottom: 15 }}>
+                    <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlAgregar}
                             name="nombre"

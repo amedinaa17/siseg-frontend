@@ -32,11 +32,11 @@ type Encuesta = {
 type Question = {
   index: number;
   text: string;
-  scale: "FREQ" | "AGREE";
+  scale: "FREQ" | "AGREE" | "QUALI" | "SATIS";
 };
 
 const QUESTIONS: Question[] = [
-  { index: 1, text: "¿Cómo consideras que es el ambiente de trabajo en la institución?", scale: "AGREE" },
+  { index: 1, text: "¿Cómo consideras que es el ambiente de trabajo en la institución?", scale: "QUALI" },
   { index: 2, text: "¿Cuentas con los recursos y herramientas necesarios para realizar tus actividades?", scale: "FREQ" },
   { index: 3, text: "¿Tu lugar de trabajo es seguro y cómodo?", scale: "AGREE" },
   { index: 4, text: "¿Las actividades que realizas están relacionadas con tu formación académica?", scale: "FREQ" },
@@ -45,34 +45,22 @@ const QUESTIONS: Question[] = [
   { index: 7, text: "¿Recibes orientación o supervisión por parte del responsable del hospital?", scale: "FREQ" },
   { index: 8, text: "¿El responsable del hospital se encuentra disponible para resolver dudas o problemas?", scale: "FREQ" },
   { index: 9, text: "¿Te informan oportunamente sobre cambios en tus actividades?", scale: "FREQ" },
-  { index: 10, text: "¿Qué tan satisfecho te sientes con tu experiencia en esta etapa del servicio social?", scale: "FREQ" },
+  { index: 10, text: "¿Qué tan satisfecho te sientes con tu experiencia en esta etapa del servicio social?", scale: "SATIS" },
   { index: 11, text: "¿Recomendarías esta plaza a otros compañeros?", scale: "AGREE" },
   { index: 12, text: "¿Te has sentido apoyado(a) por la institución durante este mes?", scale: "FREQ" },
 ];
 
-const LABELS_FREQ = ["Nunca", "Rara vez", "Algunas veces", "A menudo", "Siempre"];
-const LABELS_AGREE = [
-  "Totalmente en desacuerdo",
-  "En desacuerdo",
-  "Neutral",
-  "De acuerdo",
-  "Totalmente de acuerdo",
-];
-
-function prettyLabel(index: number, valor: number, base: string) {
-  if (index === 1) {
-    return ["Muy mala", "Mala", "Regular", "Buena", "Excelente"][valor - 1] ?? base;
-  }
-  if (index === 10) {
-    return ["Nada satisfecho", "Poco satisfecho", "Neutral", "Satisfecho", "Muy satisfecho"][valor - 1] ?? base;
-  }
-  return base;
-}
+const LABELS = {
+  FREQ: ["Nunca", "Rara vez", "Algunas veces", "A menudo", "Siempre"],
+  AGREE: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"],
+  QUALI: ["Muy malo", "Malo", "Regular", "Bueno", "Muy bueno"],
+  SATIS: ["Muy insatisfecho", "Insatisfecho", "Neutro", "Satisfecho", "Muy satisfecho"]
+};
 
 function valueToLabel(q: Question, valor: number): string {
-  const arr = q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE;
+  const arr = LABELS[q.scale];
   const base = arr[(valor ?? 0) - 1] ?? "-";
-  return prettyLabel(q.index, valor, base);
+  return base;
 }
 
 function fullName(a: Alumno) {

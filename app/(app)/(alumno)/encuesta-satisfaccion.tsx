@@ -15,17 +15,21 @@ type Question = {
     id: string;
     index: number;
     text: string;
-    scale: "FREQ" | "AGREE";
+    scale: "FREQ" | "AGREE" | "QUALI" | "SATIS";
     section: "Ambiente" | "Actividades" | "Supervision" | "Valoracion";
 };
 
 type Answers = Record<string, ScaleValue | undefined>;
 
-const LABELS_FREQ = ["Nunca", "Rara vez", "Algunas veces", "A menudo", "Siempre"];
-const LABELS_AGREE = ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"];
+const LABELS = {
+  FREQ: ["Nunca", "Rara vez", "Algunas veces", "A menudo", "Siempre"],
+  AGREE: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"],
+  QUALI: ["Muy malo", "Malo", "Regular", "Bueno", "Muy bueno"],
+  SATIS: ["Muy insatisfecho", "Insatisfecho", "Neutro", "Satisfecho", "Muy satisfecho"]
+};
 
 const QUESTIONS: Question[] = [
-    { id: "ambiente_trabajo", index: 1, text: "¿Cómo consideras que es el ambiente de trabajo en la institución?", scale: "AGREE", section: "Ambiente" },
+    { id: "ambiente_trabajo", index: 1, text: "¿Cómo consideras que es el ambiente de trabajo en la institución?", scale: "QUALI", section: "Ambiente" },
     { id: "recursos_herramientas", index: 2, text: "¿Cuentas con los recursos y herramientas necesarios para realizar tus actividades?", scale: "FREQ", section: "Ambiente" },
     { id: "lugar_seguro_comodo", index: 3, text: "¿Tu lugar de trabajo es seguro y cómodo?", scale: "AGREE", section: "Ambiente" },
     { id: "actividades_relacion_formacion", index: 4, text: "¿Las actividades que realizas están relacionadas con tu formación académica?", scale: "FREQ", section: "Actividades" },
@@ -34,7 +38,7 @@ const QUESTIONS: Question[] = [
     { id: "recibes_orientacion_supervision", index: 7, text: "¿Recibes orientación o supervisión por parte del responsable del hospital?", scale: "FREQ", section: "Supervision" },
     { id: "responsable_disponible_resolver", index: 8, text: "¿El responsable del hospital se encuentra disponible para resolver dudas o problemas?", scale: "FREQ", section: "Supervision" },
     { id: "informan_cambios_actividades", index: 9, text: "¿Te informan oportunamente sobre cambios en tus actividades?", scale: "FREQ", section: "Supervision" },
-    { id: "satisfaccion_experiencia", index: 10, text: "¿Qué tan satisfecho te sientes con tu experiencia en esta etapa del servicio social?", scale: "FREQ", section: "Valoracion" },
+    { id: "satisfaccion_experiencia", index: 10, text: "¿Qué tan satisfecho te sientes con tu experiencia en esta etapa del servicio social?", scale: "SATIS", section: "Valoracion" },
     { id: "recomendarias_plaza", index: 11, text: "¿Recomendarías esta plaza a otros compañeros?", scale: "AGREE", section: "Valoracion" },
     { id: "te_has_sentido_apoyado", index: 12, text: "¿Te has sentido apoyado(a) por la institución durante este mes?", scale: "FREQ", section: "Valoracion" },
 ];
@@ -179,7 +183,7 @@ export default function EncuestaSatisfaccion() {
                                     <Likert
                                         valor={answers[q.id]}
                                         onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                                        etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
+                                        etiquetas={LABELS[q.scale] || []}
                                     />
                                     {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
                                 </View>
@@ -195,7 +199,7 @@ export default function EncuestaSatisfaccion() {
                                     <Likert
                                         valor={answers[q.id]}
                                         onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                                        etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
+                                        etiquetas={LABELS[q.scale] || []}
                                     />
                                     {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
                                 </View>
@@ -211,7 +215,7 @@ export default function EncuestaSatisfaccion() {
                                     <Likert
                                         valor={answers[q.id]}
                                         onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                                        etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
+                                        etiquetas={LABELS[q.scale] || []}
                                     />
                                     {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
                                 </View>
@@ -227,7 +231,7 @@ export default function EncuestaSatisfaccion() {
                                     <Likert
                                         valor={answers[q.id]}
                                         onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                                        etiquetas={q.scale === "FREQ" ? LABELS_FREQ : LABELS_AGREE}
+                                        etiquetas={LABELS[q.scale] || []}
                                     />
                                     {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
                                 </View>
