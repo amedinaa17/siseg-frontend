@@ -190,11 +190,11 @@ export default function AsignarPlaza() {
                     behavior={Platform.OS === "web" ? undefined : "padding"}
                     keyboardVerticalOffset={80}
                 >
-                    <View style={{ marginTop: 5, marginBottom: 15 }}>
+                    <View style={{ marginBottom: 15 }}>
                         <Entrada label="Nombre" value={`${alumnoSeleccionado?.nombre + " " + alumnoSeleccionado?.apellido_materno + " " + alumnoSeleccionado?.apellido_paterno}` || " "} keyboardType="numeric" maxLength={10} editable={false} />
                     </View>
 
-                    <View style={{ marginTop: 5, marginBottom: 15 }}>
+                    <View style={{ marginBottom: 15 }}>
                         <Entrada label="Boleta" value={`${alumnoSeleccionado?.boleta || ""}`} keyboardType="numeric" maxLength={10} editable={false} />
                     </View>
 

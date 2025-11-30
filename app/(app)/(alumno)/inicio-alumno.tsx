@@ -99,9 +99,11 @@ const styles = StyleSheet.create({
   contenedorFormulario: {
     width: "90%",
     maxWidth: 1000,
-    height: "80%",
+    height: "auto",
+    minHeight: "90%",
     margin: "auto",
     padding: 24,
+    marginVertical: 20,
     borderWidth: 1,
     borderRadius: 12,
     borderColor: Colores.borde,

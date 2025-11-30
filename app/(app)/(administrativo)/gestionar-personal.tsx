@@ -271,8 +271,8 @@ export default function GestionPersonalAdministrativo() {
                             control={controlAgregar}
                             name="nombre"
                             defaultValue=""
-                            render={({ field }) => (
-                                <Entrada label="Nombre" {...field} error={errorsAgregar.nombre?.message} />
+                            render={({ field: { onChange, value } }) => (
+                                <Entrada label="Nombre" value={value} onChangeText={onChange} error={errorsAgregar.nombre?.message} />
                             )}
                         />
                     </View>
@@ -283,8 +283,8 @@ export default function GestionPersonalAdministrativo() {
                                 control={controlAgregar}
                                 name="apellido_paterno"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Apellido Paterno" {...field} error={errorsAgregar.apellido_paterno?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Apellido Paterno" value={value} onChangeText={onChange} error={errorsAgregar.apellido_paterno?.message} />
                                 )}
                             />
                         </View>
@@ -293,8 +293,8 @@ export default function GestionPersonalAdministrativo() {
                                 control={controlAgregar}
                                 name="apellido_materno"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Apellido Materno" {...field} error={errorsAgregar.apellido_materno?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Apellido Materno" value={value} onChangeText={onChange} error={errorsAgregar.apellido_materno?.message} />
                                 )}
                             />
                         </View>
@@ -345,8 +345,8 @@ export default function GestionPersonalAdministrativo() {
                             control={controlAgregar}
                             name="numempleado"
                             defaultValue=""
-                            render={({ field }) => (
-                                <Entrada label="No. Empleado" keyboardType="numeric" {...field} error={errorsAgregar.numempleado?.message} />
+                            render={({ field: { onChange, value } }) => (
+                                <Entrada label="No. Empleado" keyboardType="numeric" value={value} onChangeText={onChange} error={errorsAgregar.numempleado?.message} />
                             )}
                         />
                     </View>
@@ -396,8 +396,8 @@ export default function GestionPersonalAdministrativo() {
                             control={controlAgregar}
                             name="correo"
                             defaultValue=""
-                            render={({ field }) => (
-                                <Entrada label="Correo Electrónico" keyboardType="email-address" {...field} error={errorsAgregar.correo?.message} />
+                            render={({ field: { onChange, value } }) => (
+                                <Entrada label="Correo Electrónico" keyboardType="email-address" value={value} onChangeText={onChange} error={errorsAgregar.correo?.message} />
                             )}
                         />
                     </View>
@@ -408,8 +408,8 @@ export default function GestionPersonalAdministrativo() {
                                 control={controlAgregar}
                                 name="telcelular"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Teléfono Celular" keyboardType="phone-pad" maxLength={10} {...field} error={errorsAgregar.telcelular?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Teléfono Celular" keyboardType="phone-pad" maxLength={10} value={value} onChangeText={onChange} error={errorsAgregar.telcelular?.message} />
                                 )}
                             />
                         </View>
@@ -418,8 +418,8 @@ export default function GestionPersonalAdministrativo() {
                                 control={controlAgregar}
                                 name="tellocal"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Teléfono Local" keyboardType="phone-pad" maxLength={10} {...field} error={errorsAgregar.tellocal?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Teléfono Local" keyboardType="phone-pad" maxLength={10} value={value} onChangeText={onChange} error={errorsAgregar.tellocal?.message} />
                                 )}
                             />
                         </View>
@@ -445,8 +445,8 @@ export default function GestionPersonalAdministrativo() {
                             control={controlEditar}
                             name="nombre"
                             defaultValue={persona.nombre || ""}
-                            render={({ field }) => (
-                                <Entrada label="Nombre" {...field} error={errorsEditar.nombre?.message} />
+                            render={({ field: { onChange, value } }) => (
+                                <Entrada label="Nombre" value={value} onChangeText={onChange} error={errorsEditar.nombre?.message} />
                             )}
                         />
                     </View>
@@ -457,10 +457,10 @@ export default function GestionPersonalAdministrativo() {
                                 control={controlEditar}
                                 name="apellido_paterno"
                                 defaultValue={persona.APELLIDO_PATERNO || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Apellido Paterno"
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.apellido_paterno?.message}
                                     />
                                 )}
@@ -471,10 +471,10 @@ export default function GestionPersonalAdministrativo() {
                                 control={controlEditar}
                                 name="apellido_materno"
                                 defaultValue={persona.APELLIDO_MATERNO || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Apellido Materno"
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.apellido_materno?.message}
                                     />
                                 )}
@@ -488,11 +488,11 @@ export default function GestionPersonalAdministrativo() {
                                 control={controlEditar}
                                 name="curp"
                                 defaultValue={persona.curp || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="CURP"
                                         maxLength={18}
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.curp?.message}
                                         editable={false}
                                     />
@@ -525,11 +525,11 @@ export default function GestionPersonalAdministrativo() {
                             control={controlEditar}
                             name="numempleado"
                             defaultValue={persona.boleta || ""}
-                            render={({ field }) => (
+                            render={({ field: { onChange, value } }) => (
                                 <Entrada
                                     label="No. Empleado"
                                     keyboardType="numeric"
-                                    {...field}
+                                    value={value} onChangeText={onChange}
                                     editable={false}
                                     error={errorsEditar.numempleado?.message}
                                 />
@@ -582,11 +582,11 @@ export default function GestionPersonalAdministrativo() {
                             control={controlEditar}
                             name="correo"
                             defaultValue={persona.correo || ""}
-                            render={({ field }) => (
+                            render={({ field: { onChange, value } }) => (
                                 <Entrada
                                     label="Correo Electrónico"
                                     keyboardType="email-address"
-                                    {...field}
+                                    value={value} onChangeText={onChange}
                                     error={errorsEditar.correo?.message}
                                 />
                             )}
@@ -599,12 +599,12 @@ export default function GestionPersonalAdministrativo() {
                                 control={controlEditar}
                                 name="telcelular"
                                 defaultValue={persona.telefonoMovil || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Teléfono Celular"
                                         keyboardType="phone-pad"
                                         maxLength={10}
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.telcelular?.message}
                                         style={{ flex: 1 }}
                                     />
@@ -616,12 +616,12 @@ export default function GestionPersonalAdministrativo() {
                                 control={controlEditar}
                                 name="tellocal"
                                 defaultValue={persona.telefonoFijo || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Teléfono Local"
                                         keyboardType="phone-pad"
                                         maxLength={10}
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.tellocal?.message}
                                         style={{ flex: 1 }}
                                     />

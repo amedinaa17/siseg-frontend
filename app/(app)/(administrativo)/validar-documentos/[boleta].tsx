@@ -29,6 +29,7 @@ export default function RevisarExpediente() {
 
   const [documentos, setDocumentos] = useState<any[]>([]);
   const [docSeleccionado, setDocSeleccionado] = useState<any | null>(null);
+  const [modalDetalle, setModalDetalle] = useState(false);
 
   const [estatus, setEstatus] = useState<"aprobado" | "rechazado" | null>(null);
   const [modalConfirmacionVisible, setModalConfirmacionVisible] = useState(false);
@@ -95,7 +96,7 @@ export default function RevisarExpediente() {
       observacion, rutaArchivo, color } = docSeleccionado;
 
     return (
-      <Modal visible={!!docSeleccionado} onClose={() => setDocSeleccionado(null)} titulo={nombreArchivo}
+      <Modal visible={modalDetalle} onClose={() => { setModalDetalle(false); setDocSeleccionado(null) }} titulo={nombreArchivo}
         aceptar={estatus === "Pendiente" ? false : true}
         cancelar={estatus === "Pendiente" ? true : false}
         maxWidth={estatus === "Pendiente" ? 700 : undefined}>
@@ -110,6 +111,7 @@ export default function RevisarExpediente() {
                 title="Aprobar"
                 onPress={() => {
                   setEstatus("aprobado");
+                  setModalDetalle(false);
                   setModalConfirmacionVisible(true);
                 }}
                 color={Colores.textoExito}
@@ -118,6 +120,7 @@ export default function RevisarExpediente() {
                 title="Rechazar"
                 onPress={() => {
                   setEstatus("rechazado");
+                  setModalDetalle(false);
                   setModalConfirmacionVisible(true);
                 }}
                 color={Colores.textoError}
@@ -248,7 +251,7 @@ export default function RevisarExpediente() {
       <Modal
         visible={modalConfirmacionVisible}
         titulo={docSeleccionado.nombreArchivo}
-        onClose={() => { setModalConfirmacionVisible(false); setEstatus(null); setObservacion("") }} cancelar
+        onClose={() => { setModalConfirmacionVisible(false); setModalDetalle(true); setEstatus(null); setObservacion("") }} cancelar
         deshabilitado={isSubmitting} textoAceptar={isSubmitting ? "Guardando…" : "Guardar"}
         onAceptar={handleSubmit(enviarValidacion)}
       >
@@ -257,7 +260,6 @@ export default function RevisarExpediente() {
             {estatus}
           </Text>. ¿Tienes algúna observación que agregar?
           </Text>
-
           <EntradaMultilinea
             label="Observaciones (opcional)"
             value={observacion}
@@ -315,7 +317,7 @@ export default function RevisarExpediente() {
                 .map((fila) => ({
                   ...fila,
                   observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
-                  onPress: () => setDocSeleccionado(fila),
+                  onPress: () => { setModalDetalle(true), setDocSeleccionado(fila) },
                 }))}
             />
           </ScrollView>
@@ -343,7 +345,7 @@ export default function RevisarExpediente() {
                 .map((fila) => ({
                   ...fila,
                   observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
-                  onPress: () => setDocSeleccionado(fila),
+                  onPress: () => { setModalDetalle(true); setDocSeleccionado(fila) },
                 }))}
             />
           </ScrollView>

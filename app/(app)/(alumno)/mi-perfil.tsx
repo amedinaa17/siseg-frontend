@@ -267,10 +267,10 @@ export default function MiPerfil() {
                                             control={controlPerfil}
                                             name="calle"
                                             defaultValue={datosAlumno?.calle_y_numero || ""}
-                                            render={({ field }) => (
+                                            render={({ field: { onChange, value } }) => (
                                                 <Entrada
                                                     label="Calle y Número"
-                                                    {...field}
+                                                    value={value} onChangeText={onChange}
                                                     error={errorsPerfil.calle?.message}
                                                 />
                                             )}
@@ -281,10 +281,10 @@ export default function MiPerfil() {
                                             control={controlPerfil}
                                             name="colonia"
                                             defaultValue={datosAlumno?.colonia || ""}
-                                            render={({ field }) => (
+                                            render={({ field: { onChange, value } }) => (
                                                 <Entrada
                                                     label="Colonia"
-                                                    {...field}
+                                                    value={value} onChangeText={onChange}
                                                     error={errorsPerfil.colonia?.message}
                                                 />
                                             )}
@@ -299,10 +299,10 @@ export default function MiPerfil() {
                                             control={controlPerfil}
                                             name="delegacion"
                                             defaultValue={datosAlumno?.delegacion || ""}
-                                            render={({ field }) => (
+                                            render={({ field: { onChange, value } }) => (
                                                 <Entrada
                                                     label="Delegación / Municipio"
-                                                    {...field}
+                                                    value={value} onChangeText={onChange}
                                                     error={errorsPerfil.delegacion?.message}
                                                 />
                                             )}
@@ -313,10 +313,10 @@ export default function MiPerfil() {
                                             control={controlPerfil}
                                             name="estado"
                                             defaultValue={datosAlumno?.estado || ""}
-                                            render={({ field }) => (
+                                            render={({ field: { onChange, value } }) => (
                                                 <Entrada
                                                     label="Estado de Procedencia"
-                                                    {...field}
+                                                    value={value} onChangeText={onChange}
                                                     error={errorsPerfil.estado?.message}
                                                 />
                                             )}
@@ -331,11 +331,12 @@ export default function MiPerfil() {
                                             control={controlPerfil}
                                             name="cp"
                                             defaultValue={datosAlumno?.cp || ""}
-                                            render={({ field }) => (
+                                            render={({ field: { onChange, value } }) => (
                                                 <Entrada
                                                     label="Código Postal"
                                                     keyboardType="numeric"
-                                                    {...field}
+                                                    maxLength={5}
+                                                    value={value} onChangeText={onChange}
                                                     error={errorsPerfil.cp?.message}
                                                 />
                                             )}
@@ -367,12 +368,12 @@ export default function MiPerfil() {
                                             control={controlPerfil}
                                             name="telcelular"
                                             defaultValue={datosAlumno?.telcelular || ""}
-                                            render={({ field }) => (
+                                            render={({ field: { onChange, value } }) => (
                                                 <Entrada
                                                     label="Teléfono Celular"
                                                     keyboardType="phone-pad"
                                                     maxLength={10}
-                                                    {...field}
+                                                    value={value} onChangeText={onChange}
                                                     error={errorsPerfil.telcelular?.message}
                                                 />
                                             )}
@@ -383,12 +384,12 @@ export default function MiPerfil() {
                                             control={controlPerfil}
                                             name="tellocal"
                                             defaultValue={datosAlumno?.tellocal || ""}
-                                            render={({ field }) => (
+                                            render={({ field: { onChange, value } }) => (
                                                 <Entrada
                                                     label="Teléfono Local"
                                                     keyboardType="phone-pad"
                                                     maxLength={10}
-                                                    {...field}
+                                                    value={value} onChangeText={onChange}
                                                     error={errorsPerfil.tellocal?.message}
                                                 />
                                             )}

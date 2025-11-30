@@ -400,8 +400,8 @@ export default function GestionAlumnos() {
                             control={controlAgregar}
                             name="nombre"
                             defaultValue=""
-                            render={({ field }) => (
-                                <Entrada label="Nombre" {...field} error={errorsAgregar.nombre?.message} />
+                            render={({ field: { onChange, value } }) => (
+                                <Entrada label="Nombre" value={value} onChangeText={onChange} error={errorsAgregar.nombre?.message} />
                             )}
                         />
                     </View>
@@ -412,8 +412,8 @@ export default function GestionAlumnos() {
                                 control={controlAgregar}
                                 name="apellido_paterno"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Apellido Paterno" {...field} error={errorsAgregar.apellido_paterno?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Apellido Paterno" value={value} onChangeText={onChange} error={errorsAgregar.apellido_paterno?.message} />
                                 )}
                             />
                         </View>
@@ -422,8 +422,8 @@ export default function GestionAlumnos() {
                                 control={controlAgregar}
                                 name="apellido_materno"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Apellido Materno" {...field} error={errorsAgregar.apellido_materno?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Apellido Materno" value={value} onChangeText={onChange} error={errorsAgregar.apellido_materno?.message} />
                                 )}
                             />
                         </View>
@@ -447,15 +447,14 @@ export default function GestionAlumnos() {
                         />
                     </View>
 
-
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                         <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.boleta && errorsAgregar.estatus ? 20 : 15 }}>
                             <Controller
                                 control={controlAgregar}
                                 name="boleta"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Boleta" keyboardType="numeric" maxLength={10} {...field} error={errorsAgregar.boleta?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Boleta" keyboardType="numeric" maxLength={10} value={value} onChangeText={onChange} error={errorsAgregar.boleta?.message} />
                                 )}
                             />
                         </View>
@@ -486,8 +485,8 @@ export default function GestionAlumnos() {
                                 control={controlAgregar}
                                 name="generacion"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Generación" {...field} error={errorsAgregar.generacion?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Generación" value={value} onChangeText={onChange} error={errorsAgregar.generacion?.message} />
                                 )}
                             />
                         </View>
@@ -496,8 +495,8 @@ export default function GestionAlumnos() {
                                 control={controlAgregar}
                                 name="promedio"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Promedio" keyboardType="decimal-pad" {...field} error={errorsAgregar.promedio?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Promedio" keyboardType="decimal-pad" value={value} onChangeText={onChange} error={errorsAgregar.promedio?.message} />
                                 )}
                             />
                         </View>
@@ -531,11 +530,11 @@ export default function GestionAlumnos() {
                                 control={controlAgregar}
                                 name="correo"
                                 defaultValue=""
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Correo Electrónico"
                                         keyboardType="email-address"
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsAgregar.correo?.message}
                                     />
                                 )}
@@ -564,8 +563,8 @@ export default function GestionAlumnos() {
                             control={controlEditar}
                             name="nombre"
                             defaultValue={nombre || ""}
-                            render={({ field }) => (
-                                <Entrada label="Nombre" {...field} error={errorsEditar.nombre?.message} />
+                            render={({ field: { onChange, value } }) => (
+                                <Entrada label="Nombre" value={value} onChangeText={onChange} error={errorsEditar.nombre?.message} />
                             )}
                         />
                     </View>
@@ -576,10 +575,10 @@ export default function GestionAlumnos() {
                                 control={controlEditar}
                                 name="apellido_paterno"
                                 defaultValue={apellido_paterno || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Apellido Paterno"
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.apellido_paterno?.message}
                                     />
                                 )}
@@ -590,10 +589,10 @@ export default function GestionAlumnos() {
                                 control={controlEditar}
                                 name="apellido_materno"
                                 defaultValue={apellido_materno || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Apellido Materno"
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.apellido_materno?.message}
                                     />
                                 )}
@@ -606,11 +605,11 @@ export default function GestionAlumnos() {
                             control={controlEditar}
                             name="curp"
                             defaultValue={curp || ""}
-                            render={({ field }) => (
+                            render={({ field: { onChange, value } }) => (
                                 <Entrada
                                     label="CURP"
                                     maxLength={18}
-                                    {...field}
+                                    value={value} onChangeText={onChange}
                                     error={errorsEditar.curp?.message}
                                     editable={false}
                                 />
@@ -624,12 +623,12 @@ export default function GestionAlumnos() {
                                 control={controlEditar}
                                 name="boleta"
                                 defaultValue={boleta || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Boleta"
                                         keyboardType="numeric"
                                         maxLength={10}
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.boleta?.message}
                                         editable={false}
                                     />
@@ -663,10 +662,10 @@ export default function GestionAlumnos() {
                                 control={controlEditar}
                                 name="generacion"
                                 defaultValue={generacion || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Generación"
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.generacion?.message}
                                         style={{ flex: 1 }}
                                     />
@@ -678,11 +677,11 @@ export default function GestionAlumnos() {
                                 control={controlEditar}
                                 name="promedio"
                                 defaultValue={promedio || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Promedio"
                                         keyboardType="decimal-pad"
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.promedio?.message}
                                         style={{ flex: 1 }}
                                     />
@@ -697,11 +696,11 @@ export default function GestionAlumnos() {
                                 control={controlEditar}
                                 name="correo"
                                 defaultValue={correo || ""}
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Correo Electrónico"
                                         keyboardType="email-address"
-                                        {...field}
+                                        value={value} onChangeText={onChange}
                                         error={errorsEditar.correo?.message}
                                         editable={false}
                                     />

@@ -237,12 +237,12 @@ export default function MiPerfil() {
                                             control={controlPerfil}
                                             name="telcelular"
                                             defaultValue={datosAdministrativo?.telcelular || ""}
-                                            render={({ field }) => (
+                                            render={({ field: { onChange, value } }) => (
                                                 <Entrada
                                                     label="Teléfono Celular"
                                                     keyboardType="phone-pad"
                                                     maxLength={10}
-                                                    {...field}
+                                                    value={value} onChangeText={onChange}
                                                     error={errorsPerfil.telcelular?.message}
                                                 />
                                             )}
@@ -253,12 +253,12 @@ export default function MiPerfil() {
                                             control={controlPerfil}
                                             name="tellocal"
                                             defaultValue={datosAdministrativo?.tellocal}
-                                            render={({ field }) => (
+                                            render={({ field: { onChange, value } }) => (
                                                 <Entrada
                                                     label="Teléfono Local"
                                                     keyboardType="phone-pad"
                                                     maxLength={10}
-                                                    {...field}
+                                                    value={value} onChangeText={onChange}
                                                     error={errorsPerfil.tellocal?.message}
                                                 />
                                             )}

@@ -127,7 +127,7 @@ export default function GestionPlazas() {
 
         try {
             const payload = {
-                idPlaza: plazaSeleccion.ID, 
+                idPlaza: plazaSeleccion.ID,
                 ...data,
                 tarjeta: Number(data.tarjeta),
                 carrera: data.carrera === "Médico Cirujano y Homeópata" ? 1 : 2,
@@ -252,8 +252,8 @@ export default function GestionPlazas() {
                             control={controlAgregar}
                             name="sede"
                             defaultValue=""
-                            render={({ field }) => (
-                                <Entrada label="Sede" {...field} error={errorsAgregar.sede?.message} />
+                            render={({ field: { onChange, value } }) => (
+                                <Entrada label="Sede" value={value} onChangeText={onChange} error={errorsAgregar.sede?.message} />
                             )}
                         />
                     </View>
@@ -263,8 +263,8 @@ export default function GestionPlazas() {
                             control={controlAgregar}
                             name="ubicacion"
                             defaultValue=""
-                            render={({ field }) => (
-                                <Entrada label="Ubicación" {...field} error={errorsAgregar.ubicacion?.message} />
+                            render={({ field: { onChange, value } }) => (
+                                <Entrada label="Ubicación" value={value} onChangeText={onChange} error={errorsAgregar.ubicacion?.message} />
                             )}
                         />
                     </View>
@@ -275,8 +275,8 @@ export default function GestionPlazas() {
                                 control={controlAgregar}
                                 name="programa"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Programa" {...field} error={errorsAgregar.programa?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Programa" value={value} onChangeText={onChange} error={errorsAgregar.programa?.message} />
                                 )}
                             />
                         </View>
@@ -285,13 +285,11 @@ export default function GestionPlazas() {
                                 control={controlAgregar}
                                 name="tarjeta"
                                 defaultValue=""
-                                render={({ field }) => (
+                                render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Tarjeta"
                                         keyboardType="numeric"
-                                        value={field.value?.toString() ?? ""}
-                                        onChangeText={(v) => field.onChange(v)}
-                                        onBlur={field.onBlur}
+                                        value={value} onChangeText={onChange}
                                         error={errorsAgregar.tarjeta?.message}
                                     />
                                 )}
@@ -305,8 +303,8 @@ export default function GestionPlazas() {
                                 control={controlAgregar}
                                 name="beca"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Beca" {...field} error={errorsAgregar.beca?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Beca" value={value} onChangeText={onChange} error={errorsAgregar.beca?.message} />
                                 )}
                             />
                         </View>
@@ -357,8 +355,8 @@ export default function GestionPlazas() {
                                 control={controlAgregar}
                                 name="promocion"
                                 defaultValue=""
-                                render={({ field }) => (
-                                    <Entrada label="Promoción" {...field} error={errorsAgregar.promocion?.message} />
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada label="Promoción" value={value} onChangeText={onChange} error={errorsAgregar.promocion?.message} />
                                 )}
                             />
                         </View>
@@ -369,178 +367,176 @@ export default function GestionPlazas() {
     };
 
     const renderModalEditar = () => {
-    if (!plazaSeleccion) return null;
+        if (!plazaSeleccion) return null;
 
-    return (
-        <Modal
-            visible={modalEditar}
-            titulo="Editar plaza"
-            maxWidth={700}
-            onClose={() => {
-                setPlazaSeleccion(null);
-                setModalEditar(false);
-                resetEditar();
-            }}
-            cancelar
-            deshabilitado={isSubmittingEditar}
-            textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
-        >
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === "web" ? undefined : "padding"}
-                keyboardVerticalOffset={80}
+        return (
+            <Modal
+                visible={modalEditar}
+                titulo="Editar plaza"
+                maxWidth={700}
+                onClose={() => {
+                    setPlazaSeleccion(null);
+                    setModalEditar(false);
+                    resetEditar();
+                }}
+                cancelar
+                deshabilitado={isSubmittingEditar}
+                textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
             >
-                {/* SEDE */}
-                <View style={{ marginBottom: 15 }}>
-                    <Controller
-                        control={controlEditar}
-                        name="sede"
-                        defaultValue={plazaSeleccion.sede || ""}
-                        render={({ field }) => (
-                            <Entrada
-                                label="Sede"
-                                {...field}
-                                error={errorsEditar.sede?.message}
-                            />
-                        )}
-                    />
-                </View>
-
-                {/* UBICACION */}
-                <View style={{ marginBottom: 15 }}>
-                    <Controller
-                        control={controlEditar}
-                        name="ubicacion"
-                        defaultValue={plazaSeleccion.ubicacion || ""}
-                        render={({ field }) => (
-                            <Entrada
-                                label="Ubicación"
-                                {...field}
-                                error={errorsEditar.ubicacion?.message}
-                            />
-                        )}
-                    />
-                </View>
-
-                {/* PROGRAMA / TARJETA */}
-                <View
-                    style={
-                        esPantallaPequeña
-                            ? { flexDirection: "column" }
-                            : { flexDirection: "row", gap: 12 }
-                    }
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === "web" ? undefined : "padding"}
+                    keyboardVerticalOffset={80}
                 >
-                    <View style={{ flex: 1, marginBottom: 15 }}>
+                    {/* SEDE */}
+                    <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlEditar}
-                            name="programa"
-                            defaultValue={plazaSeleccion.PROGRAMA || ""}
-                            render={({ field }) => (
-                                <Entrada
-                                    label="Programa"
-                                    {...field}
-                                    error={errorsEditar.programa?.message}
-                                />
-                            )}
-                        />
-                    </View>
-
-                    <View style={{ flex: 1, marginBottom: 15 }}>
-                        <Controller
-                            control={controlEditar}
-                            name="tarjeta"
-                            defaultValue={
-                                plazaSeleccion.tarjetaDisponible
-                                    ? plazaSeleccion.tarjetaDisponible.toString()
-                                    : ""
-                            }
-                            render={({ field }) => (
-                                <Entrada
-                                    label="Tarjeta"
-                                    keyboardType="numeric"
-                                    value={field.value?.toString() ?? ""}
-                                    onChangeText={(v) => field.onChange(v)}
-                                    onBlur={field.onBlur}
-                                    error={errorsEditar.tarjeta?.message}
-                                />
-                            )}
-                        />
-                    </View>
-                </View>
-
-                {/* BECA */}
-                <View style={{ marginBottom: 15 }}>
-                    <Controller
-                        control={controlEditar}
-                        name="beca"
-                        defaultValue={plazaSeleccion.tipoBeca || ""}
-                        render={({ field }) => (
-                            <Entrada
-                                label="Beca"
-                                {...field}
-                                error={errorsEditar.beca?.message}
-                            />
-                        )}
-                    />
-                </View>
-
-                {/* CARRERA / PROMOCION */}
-                <View
-                    style={
-                        esPantallaPequeña
-                            ? { flexDirection: "column" }
-                            : { flexDirection: "row", gap: 12 }
-                    }
-                >
-                    <View style={{ flex: 1, marginBottom: 15 }}>
-                        <Controller
-                            control={controlEditar}
-                            name="carrera"
-                            defaultValue={
-                                plazaSeleccion.carrera === 1
-                                    ? "Médico Cirujano y Homeópata"
-                                    : "Médico Cirujano y Partero"
-                            }
+                            name="sede"
+                            defaultValue={plazaSeleccion.sede || ""}
                             render={({ field: { onChange, value } }) => (
-                                <Selector
-                                    label="Carrera"
-                                    selectedValue={value}
-                                    onValueChange={onChange}
-                                    items={[
-                                        {
-                                            label: "Médico Cirujano y Homeópata",
-                                            value: "Médico Cirujano y Homeópata",
-                                        },
-                                        {
-                                            label: "Médico Cirujano y Partero",
-                                            value: "Médico Cirujano y Partero",
-                                        },
-                                    ]}
-                                    error={errorsEditar.carrera?.message}
+                                <Entrada
+                                    label="Sede"
+                                    value={value} onChangeText={onChange}
+                                    error={errorsEditar.sede?.message}
                                 />
                             )}
                         />
                     </View>
 
-                    <View style={{ flex: 1, marginBottom: 15 }}>
+                    {/* UBICACION */}
+                    <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlEditar}
-                            name="promocion"
-                            defaultValue={plazaSeleccion.promocion || ""}
-                            render={({ field }) => (
+                            name="ubicacion"
+                            defaultValue={plazaSeleccion.ubicacion || ""}
+                            render={({ field: { onChange, value } }) => (
                                 <Entrada
-                                    label="Promoción"
-                                    {...field}
-                                    error={errorsEditar.promocion?.message}
+                                    label="Ubicación"
+                                    value={value} onChangeText={onChange}
+                                    error={errorsEditar.ubicacion?.message}
                                 />
                             )}
                         />
                     </View>
-                </View>
-            </KeyboardAvoidingView>
-        </Modal>
-    );
-};
+
+                    {/* PROGRAMA / TARJETA */}
+                    <View
+                        style={
+                            esPantallaPequeña
+                                ? { flexDirection: "column" }
+                                : { flexDirection: "row", gap: 12 }
+                        }
+                    >
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="programa"
+                                defaultValue={plazaSeleccion.PROGRAMA || ""}
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada
+                                        label="Programa"
+                                        value={value} onChangeText={onChange}
+                                        error={errorsEditar.programa?.message}
+                                    />
+                                )}
+                            />
+                        </View>
+
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="tarjeta"
+                                defaultValue={
+                                    plazaSeleccion.tarjetaDisponible
+                                        ? plazaSeleccion.tarjetaDisponible.toString()
+                                        : ""
+                                }
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada
+                                        label="Tarjeta"
+                                        keyboardType="numeric"
+                                        value={value} onChangeText={onChange}
+                                        error={errorsEditar.tarjeta?.message}
+                                    />
+                                )}
+                            />
+                        </View>
+                    </View>
+
+                    {/* BECA */}
+                    <View style={{ marginBottom: 15 }}>
+                        <Controller
+                            control={controlEditar}
+                            name="beca"
+                            defaultValue={plazaSeleccion.tipoBeca || ""}
+                            render={({ field: { onChange, value } }) => (
+                                <Entrada
+                                    label="Beca"
+                                    value={value} onChangeText={onChange}
+                                    error={errorsEditar.beca?.message}
+                                />
+                            )}
+                        />
+                    </View>
+
+                    {/* CARRERA / PROMOCION */}
+                    <View
+                        style={
+                            esPantallaPequeña
+                                ? { flexDirection: "column" }
+                                : { flexDirection: "row", gap: 12 }
+                        }
+                    >
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="carrera"
+                                defaultValue={
+                                    plazaSeleccion.carrera === 1
+                                        ? "Médico Cirujano y Homeópata"
+                                        : "Médico Cirujano y Partero"
+                                }
+                                render={({ field: { onChange, value } }) => (
+                                    <Selector
+                                        label="Carrera"
+                                        selectedValue={value}
+                                        onValueChange={onChange}
+                                        items={[
+                                            {
+                                                label: "Médico Cirujano y Homeópata",
+                                                value: "Médico Cirujano y Homeópata",
+                                            },
+                                            {
+                                                label: "Médico Cirujano y Partero",
+                                                value: "Médico Cirujano y Partero",
+                                            },
+                                        ]}
+                                        error={errorsEditar.carrera?.message}
+                                    />
+                                )}
+                            />
+                        </View>
+
+                        <View style={{ flex: 1, marginBottom: 15 }}>
+                            <Controller
+                                control={controlEditar}
+                                name="promocion"
+                                defaultValue={plazaSeleccion.promocion || ""}
+                                render={({ field: { onChange, value } }) => (
+                                    <Entrada
+                                        label="Promoción"
+                                        value={value} onChangeText={onChange}
+                                        error={errorsEditar.promocion?.message}
+                                    />
+                                )}
+                            />
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
+            </Modal>
+        );
+    };
 
 
     const renderModalDarBaja = () => {

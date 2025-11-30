@@ -239,10 +239,10 @@ export default function CompletarRegistro() {
                           control={control}
                           name="calle"
                           defaultValue=""
-                          render={({ field }) => (
+                          render={({ field: { onChange, value } }) => (
                             <Entrada
                               label="Calle y Número"
-                              {...field}
+                              value={value} onChangeText={onChange}
                               error={errors.calle?.message}
                             />
                           )}
@@ -253,10 +253,10 @@ export default function CompletarRegistro() {
                           control={control}
                           name="colonia"
                           defaultValue=""
-                          render={({ field }) => (
+                          render={({ field: { onChange, value } }) => (
                             <Entrada
                               label="Colonia"
-                              {...field}
+                              value={value} onChangeText={onChange}
                               error={errors.colonia?.message}
                             />
                           )}
@@ -269,10 +269,10 @@ export default function CompletarRegistro() {
                           control={control}
                           name="delegacion"
                           defaultValue=""
-                          render={({ field }) => (
+                          render={({ field: { onChange, value } }) => (
                             <Entrada
                               label="Delegación / Municipio"
-                              {...field}
+                              value={value} onChangeText={onChange}
                               error={errors.delegacion?.message}
                             />
                           )}
@@ -283,10 +283,10 @@ export default function CompletarRegistro() {
                           control={control}
                           name="estado"
                           defaultValue=""
-                          render={({ field }) => (
+                          render={({ field: { onChange, value } }) => (
                             <Entrada
                               label="Estado de Procedencia"
-                              {...field}
+                              value={value} onChangeText={onChange}
                               error={errors.estado?.message}
                             />
                           )}
@@ -300,11 +300,12 @@ export default function CompletarRegistro() {
                           control={control}
                           name="cp"
                           defaultValue=""
-                          render={({ field }) => (
+                          render={({ field: { onChange, value } }) => (
                             <Entrada
                               label="Código Postal"
                               keyboardType="numeric"
-                              {...field}
+                              maxLength={5}
+                              value={value} onChangeText={onChange}
                               error={errors.cp?.message}
                             />
                           )}
@@ -337,12 +338,12 @@ export default function CompletarRegistro() {
                           control={control}
                           name="telcelular"
                           defaultValue=""
-                          render={({ field }) => (
+                          render={({ field: { onChange, value } }) => (
                             <Entrada
                               label="Teléfono Celular"
                               keyboardType="phone-pad"
                               maxLength={10}
-                              {...field}
+                              value={value} onChangeText={onChange}
                               error={errors.telcelular?.message}
                             />
                           )}
@@ -353,12 +354,12 @@ export default function CompletarRegistro() {
                           control={control}
                           name="tellocal"
                           defaultValue=""
-                          render={({ field }) => (
+                          render={({ field: { onChange, value } }) => (
                             <Entrada
                               label="Teléfono Local"
                               keyboardType="phone-pad"
                               maxLength={10}
-                              {...field}
+                              value={value} onChangeText={onChange}
                               error={errors.tellocal?.message}
                             />
                           )}

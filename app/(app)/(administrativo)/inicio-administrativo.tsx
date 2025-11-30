@@ -19,7 +19,7 @@ export default function InicioPersonalAdministrativo() {
 
   const { width } = useWindowDimensions();
   const esPantallaPequeña = width < 790;
-  const esMovil = Platform.OS === "ios" || Platform.OS === "android";
+  const esMovil = Platform.OS === "ios" || Platform.OS === "android" || width < 425;
 
   const [kpis, setKpis] = useState({
     alumnosRegistrados: "-",
@@ -108,20 +108,20 @@ export default function InicioPersonalAdministrativo() {
             <Text style={styles.boleta}>{sesion?.boleta || ""}</Text>
 
             <View style={[styles.tarjetaContenedor, { flexDirection: esMovil ? "column" : "row" }]}>
-              <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { minWidth: "100%", marginBottom: 15 }}>
-                <View style={[styles.tarjeta, esMovil && { width: "100%" }]}>
+              <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { width: "100%", marginBottom: 15 }}>
+                <View style={[styles.tarjeta, esMovil && { width: "100%", minWidth: "auto", margin: "auto" }]}>
                   <Text style={styles.tarjetaTitulo}>Alumnos registrados</Text>
                   <Text style={styles.tarjetaValor}>{kpis.alumnosRegistrados}</Text>
                 </View>
               </Link>
-              <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { minWidth: "100%", marginBottom: 15 }}>
-                <View style={[styles.tarjeta, esMovil && { width: "100%" }]}>
+              <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { width: "100%", marginBottom: 15 }}>
+                <View style={[styles.tarjeta, esMovil && { width: "100%", minWidth: "auto", margin: "auto" }]}>
                   <Text style={styles.tarjetaTitulo}>Alumnos realizando su servicio social</Text>
                   <Text style={styles.tarjetaValor}>{kpis.alumnosRealizandoSS}</Text>
                 </View>
               </Link>
-              <Link href="/(app)/(administrativo)/revisar-reportes-riesgo">
-                <View style={[styles.tarjeta, esMovil && { width: "100%" }]}>
+              <Link href="/(app)/(administrativo)/revisar-reportes-riesgo" style={esMovil && { width: "100%", marginBottom: 15 }}>
+                <View style={[styles.tarjeta, esMovil && { width: "100%", minWidth: "auto", margin: "auto" }]}>
                   <Text style={styles.tarjetaTitulo}>Reportes de incidencia nuevos</Text>
                   <Text style={styles.tarjetaValor}>{kpis.reportesdeIncidencias}</Text>
                 </View>
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 300,
     margin: 8,
-    backgroundColor: Colores.fondos,
+    backgroundColor: Colores.fondo,
     padding: 16,
     borderRadius: 8,
     borderWidth: 1,
@@ -235,7 +235,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     ...Platform.select({
       ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
-      android: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
       web: { boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
     }),
     elevation: 2,
