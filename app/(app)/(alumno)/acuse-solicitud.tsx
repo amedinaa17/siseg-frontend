@@ -1,22 +1,17 @@
+import lugarFoto from "@/activos/imagenes/LugarFoto.png";
+import cabezaCarta from "@/activos/imagenes/cabezacarta.png";
+import pieCarta from "@/activos/imagenes/piecarta.png";
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
+import { Asset } from "expo-asset";
 import * as FS from "expo-file-system/legacy";
 import * as Print from "expo-print";
 import { useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  useWindowDimensions,
-} from "react-native";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { WebView } from "react-native-webview";
 
 export default function AcuseSolicitud() {
@@ -33,6 +28,11 @@ export default function AcuseSolicitud() {
 
   const [datosAlumno, setDatosAlumno] = useState<any>(null);
 
+  const [imagenes, setImagenes] = useState<{
+    cabeza: string;
+    pie: string;
+    lugar: string;
+  } | null>(null);
 
   const obtenerDatos = async () => {
     verificarToken();
@@ -58,8 +58,56 @@ export default function AcuseSolicitud() {
     obtenerDatos();
   }, []);
 
+  useEffect(() => {
+    const cargarImagenes = async () => {
+      try {
+        const [cabeza, pie, lugar] = await Asset.loadAsync([
+          cabezaCarta,
+          pieCarta,
+          lugarFoto,
+        ]);
+
+        if (Platform.OS === "web") {
+          setImagenes({
+            cabeza: cabeza.uri,
+            pie: pie.uri,
+            lugar: lugar.uri,
+          });
+          return;
+        }
+
+        const leerComoBase64 = async (asset: any) => {
+          const uri = asset.localUri ?? asset.uri;
+          const base64 = await FS.readAsStringAsync(uri, {
+            encoding: FS.EncodingType.Base64,
+          });
+          return `data:image/png;base64,${base64}`;
+        };
+
+        const cabezaB64 = await leerComoBase64(cabeza);
+        const pieB64 = await leerComoBase64(pie);
+        const lugarB64 = await leerComoBase64(lugar);
+
+        setImagenes({
+          cabeza: cabezaB64,
+          pie: pieB64,
+          lugar: lugarB64,
+        });
+      } catch (e) {
+        console.error("Error cargando imágenes del acuse:", e);
+      }
+    };
+
+    cargarImagenes();
+  }, []);
+
   const generarHTML = useCallback(
-    (includePrintButton: boolean) => `
+    (includePrintButton: boolean) => {
+      const cabezaSrc = imagenes?.cabeza ?? "";
+      const pieSrc = imagenes?.pie ?? "";
+      const lugarSrc = imagenes?.lugar ?? "";
+
+      return `
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -94,13 +142,13 @@ export default function AcuseSolicitud() {
 
     <body>
       <div align="center">
-        <img src="http://148.204.10.106/ServicioSocial/cabezacarta.png" width="871">
+        <img src="${cabezaSrc}" width="871">
       </div>
 
       <table width="681" border="0" cellspacing="0" cellpadding="0" align="center">
         <tbody>
           <tr>
-            <td width="681" class="titulo" background="http://148.204.10.106/ServicioSocial/LugarFoto.png">
+            <td width="681" class="titulo" background="${lugarSrc}">
               <div align="center">
                 <p><strong><u>SOLICITUD DE REGISTRO <br> SERVICIO SOCIAL</u></strong></p>
                 <p><strong>PROMOCIÓN: AGOSTO 2025 – JULIO 2026</strong></p>
@@ -158,26 +206,33 @@ export default function AcuseSolicitud() {
           </tr>
 
           <tr class="fin">
-            <td><p align="center"><img src="http://148.204.10.106/ServicioSocial/piecarta.png" width="871"></p></td>
+            <td><p align="center"><img src="${pieSrc}" width="871"></p></td>
           </tr>
         </tbody>
       </table>
 
-      ${includePrintButton
-        ? `<div align="center">
+      ${
+        includePrintButton
+          ? `<div align="center">
               <input type="button" name="imprimir" value="Imprimir" class="nover" onclick="window.print();">
             </div>`
-        : ``
+          : ``
       }
     </body>
-    </html>`,
-    [datosAlumno]
+    </html>`;
+    },
+    [datosAlumno, imagenes]
   );
 
   const onDescargarPDF = useCallback(async () => {
     try {
       if (!datosAlumno) {
         modalAPI.current?.show(false, "Aún no se cargan los datos del alumno.");
+        return;
+      }
+
+      if (!imagenes) {
+        modalAPI.current?.show(false, "Las imágenes del acuse aún se están cargando. Intenta de nuevo en unos segundos.");
         return;
       }
 
@@ -204,7 +259,7 @@ export default function AcuseSolicitud() {
       console.error(e);
       modalAPI.current?.show(false, "Hubo un problema al generar el acuse. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
     }
-  }, [datosAlumno, generarHTML]);
+  }, [datosAlumno, imagenes, generarHTML]);
 
   return (
     <>
@@ -282,8 +337,18 @@ const styles = StyleSheet.create({
     borderColor: Colores.borde,
     backgroundColor: Colores.fondo,
     ...Platform.select({
-      ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
-      android: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 6 },
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
+      },
+      android: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
+      },
       web: { boxShadow: "0px 4px 6px rgba(0,0,0,0.05)" },
     }),
     elevation: 2,

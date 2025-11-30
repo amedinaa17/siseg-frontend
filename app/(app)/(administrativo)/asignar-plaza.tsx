@@ -35,7 +35,7 @@ export default function AsignarPlaza() {
 
     const [busqueda, setBusqueda] = useState("");
     const [filtroCarrera, setFiltroCarrera] = useState("Todos");
-    const [filtroEstatus, setFiltroEstatus] = useState("Sin asignar");
+    const [filtroEstatus, setFiltroEstatus] = useState("Todos");
     const [paginaActual, setPaginaActual] = useState(1);
     const [filasPorPagina, setFilasPorPagina] = useState(5);
 

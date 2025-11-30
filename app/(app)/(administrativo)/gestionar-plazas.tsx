@@ -134,8 +134,6 @@ export default function GestionPlazas() {
                 tk: sesion.token,
             };
 
-            console.log("payload editarPlaza:", payload);
-
             const response = await postData("plaza/editarPlaza", payload);
 
             if (response.error === 0) {
@@ -381,7 +379,7 @@ export default function GestionPlazas() {
                 }}
                 cancelar
                 deshabilitado={isSubmittingEditar}
-                textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
+                textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar"} onAceptar={handleSubmitEditar(onSubmitEditar)}
             >
                 <KeyboardAvoidingView
                     style={{ flex: 1 }}
