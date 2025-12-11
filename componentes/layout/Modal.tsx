@@ -42,10 +42,10 @@ export default function ModalPersonalizado({
         <View style={[styles.contenedor, { maxHeight: height * 0.9, maxWidth }]}>
           {/* Encabezado */}
           <View style={styles.encabezado}>
-            <Text style={styles.titulo}>{titulo}</Text>
+            <Text allowFontScaling={false} style={styles.titulo}>{titulo}</Text>
             {cerrar && (
               <Pressable onPress={onClose}>
-                <Text style={{ fontSize: 20, color: Colores.textoPrincipal }}>✕</Text>
+                <Text allowFontScaling={false} style={{ fontSize: 20, color: Colores.textoPrincipal }}>✕</Text>
               </Pressable>
             )}
           </View>
@@ -72,7 +72,7 @@ export default function ModalPersonalizado({
                         opacity: deshabilitado ? 0.6 : 1 },
                     ]}
                   >
-                    <Text style={{ color: Colores.textoPrincipal }}>Cancelar</Text>
+                    <Text allowFontScaling={false} style={{ color: Colores.textoPrincipal }}>Cancelar</Text>
                   </Pressable>
                 )}
                 {aceptar && (
@@ -88,7 +88,7 @@ export default function ModalPersonalizado({
                        },
                     ]}
                   >
-                    <Text style={{ color: Colores.onPrimario, fontWeight: "500" }}>{textoAceptar}</Text>
+                    <Text allowFontScaling={false} style={{ color: Colores.onPrimario, fontWeight: "500" }}>{textoAceptar}</Text>
                   </Pressable>
                 )}
               </View>

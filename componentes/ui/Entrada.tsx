@@ -56,7 +56,7 @@ export default function Entrada({
           },
         ]}
       >
-        <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
+        <Animated.Text style={estiloEtiqueta} allowFontScaling={false}>{label}</Animated.Text>
         <ScrollView
           horizontal
           showsVerticalScrollIndicator={false}
@@ -68,6 +68,7 @@ export default function Entrada({
             {...props}
             editable={editable}
             value={value}
+            allowFontScaling={false}
             secureTextEntry={secureTextEntry && !mostrarContraseña}
             onFocus={(e) => {
               setFocused(true);
@@ -101,7 +102,7 @@ export default function Entrada({
       </View>
 
       {error && (
-        <Text style={styles.errorTexto}>{error}</Text>
+        <Text allowFontScaling={false} style={styles.errorTexto}>{error}</Text>
       )}
     </View>
   );

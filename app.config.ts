@@ -12,7 +12,7 @@ export default {
       GOOGLE_MAPS_API_KEY:
         process.env.GOOGLE_MAPS_API_KEY || "AIzaSyAN9dlyun_A3YnM9gR3NbMob6y6IPntkNA",
       eas: {
-        projectId: "733f616e-e525-4a99-921e-38393a115507"
+        projectId: process.env.PROJECT_ID
       }
     },
 

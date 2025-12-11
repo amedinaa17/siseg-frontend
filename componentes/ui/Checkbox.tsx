@@ -27,11 +27,11 @@ export default function Checkbox({ label, labelColor, value, onValueChange, erro
                 >
                     {value && <Ionicons name="checkmark" size={16} color={Colores.onPrimario} />}
                 </View>
-                <Text style={[styles.label, labelColor && { color: Colores[labelColor], fontWeight: "600" }, error && { color: Colores.textoError }]}>
+                <Text allowFontScaling={false} style={[styles.label, labelColor && { color: Colores[labelColor], fontWeight: "600" }, error && { color: Colores.textoError }]}>
                     {label}
                 </Text>
             </Pressable>
-            {error && <Text style={styles.errorTexto}>{error}</Text>}
+            {error && <Text allowFontScaling={false} style={styles.errorTexto}>{error}</Text>}
         </View>
     )
 }

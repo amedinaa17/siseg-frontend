@@ -239,7 +239,7 @@ export default function MiPerfil() {
 
                                 <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                                     <View style={{ flex: 1, marginBottom: 15 }}>
-                                        <Entrada label="Teléfono Celular" value={datosAlumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+                                        <Entrada label="Celular" value={datosAlumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                                     </View>
                                     <View style={{ flex: 1, marginBottom: 25 }}>
                                         <Entrada label="Teléfono Local" value={datosAlumno?.tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
@@ -370,7 +370,7 @@ export default function MiPerfil() {
                                             defaultValue={datosAlumno?.telcelular || ""}
                                             render={({ field: { onChange, value } }) => (
                                                 <Entrada
-                                                    label="Teléfono Celular"
+                                                    label="Celular"
                                                     keyboardType="phone-pad"
                                                     maxLength={10}
                                                     value={value} onChangeText={onChange}

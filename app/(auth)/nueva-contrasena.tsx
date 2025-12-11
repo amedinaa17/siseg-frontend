@@ -83,24 +83,27 @@ export default function NuevaContraseña() {
         {error ? (
           <View style={[styles.contenedorError]}>
             <Ionicons name="sad-outline" size={65} color={Colores.textoClaro} />
-            <Text style={styles.error}>¡Oops! Algo salió mal</Text>
-            <Text style={styles.mensaje}>{error}</Text>
+            <Text allowFontScaling={false} style={styles.error}>¡Oops! Algo salió mal</Text>
+            <Text allowFontScaling={false} style={styles.mensaje}>{error}</Text>
             <Boton title="Volver a intentarlo" onPress={() => router.replace("/restablecer-contrasena")} />
           </View>
         ) : (
           <>
             <View style={styles.contenedorFormulario}>
-              <Text style={styles.titulo}>Restablecer contraseña</Text>
-
+              <Text allowFontScaling={false} style={styles.titulo}>Restablecer contraseña</Text>
+              <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 20 }}>
+                Ingresa una nueva contraseña de 8 a 12 caracteres, que incluya al menos una letra mayúscula, una letra minúscula y un número.
+              </Text>
               <View style={{ marginBottom: 15 }}>
                 <Controller
                   control={control}
                   name="contraseña"
                   render={({ field: { onChange, value } }) => (
                     <Entrada
-                      label="Nueva Contraseña"
+                      label="Nueva contraseña"
                       secureTextEntry
                       value={value}
+                      maxLength={12}
                       onChangeText={onChange}
                       error={errors.contraseña?.message}
                     />
@@ -114,9 +117,10 @@ export default function NuevaContraseña() {
                   name="confirmarContraseña"
                   render={({ field: { onChange, value } }) => (
                     <Entrada
-                      label="Confirmar Contraseña"
+                      label="Confirmar contraseña"
                       secureTextEntry
                       value={value}
+                      maxLength={12}
                       onChangeText={onChange}
                       error={errors.confirmarContraseña?.message}
                     />

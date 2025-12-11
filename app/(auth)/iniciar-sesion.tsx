@@ -44,15 +44,15 @@ export default function IniciarSesion() {
                 <Image
                   source={require('@/activos/imagenes/siseg.png')}
                   style={{ width: esPantallaPequeña ? 70 : 150, height: esPantallaPequeña ? 70 : 150, marginBottom: 10 }}
-                  tintColor= {Colores.primario}
+                  tintColor={Colores.primario}
                 />
 
-                <Text style={[styles.bienvenidaSubtitulo, { fontSize: esPantallaPequeña ? Fuentes.cuerpo : Fuentes.subtitulo }]}>
+                <Text allowFontScaling={false} style={[styles.bienvenidaSubtitulo, { fontSize: esPantallaPequeña ? Fuentes.cuerpo : Fuentes.subtitulo }]}>
                   Sistema de Seguimiento del Servicio Social para la ENMyH
                 </Text>
                 {!esPantallaPequeña && (
-                  <Text style={styles.bienvenidaDescripcion}>
-                    <Text style={{ color: Colores.primario, fontWeight: '600' }}>SISEG</Text> es una herramienta informática diseñada para dar seguimiento al servicio social de la <Text style={{ fontWeight: '600' }}>Escuela Nacional de Medicina y Homeopatía</Text>.
+                  <Text allowFontScaling={false} style={styles.bienvenidaDescripcion}>
+                    <Text allowFontScaling={false} style={{ color: Colores.primario, fontWeight: '600' }}>SISEG</Text> es una herramienta informática diseñada para dar seguimiento al servicio social de la <Text style={{ fontWeight: '600' }}>Escuela Nacional de Medicina y Homeopatía</Text>.
                   </Text>
                 )}
               </View>
@@ -60,7 +60,7 @@ export default function IniciarSesion() {
           )}
 
           <View style={[styles.contenedorFormulario, { width: esPantallaPequeña ? '90%' : '70%' }]}>
-            <Text style={styles.titulo}>Iniciar sesión</Text>
+            <Text allowFontScaling={false} style={styles.titulo}>Iniciar sesión</Text>
             <View style={{ marginBottom: 15 }}>
               <Controller
                 control={control}
@@ -69,7 +69,10 @@ export default function IniciarSesion() {
                   <Entrada
                     label="Boleta"
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text) => {
+                      const digitos = text.replace(/[^0-9]/g, "");
+                      onChange(digitos);
+                    }}
                     autoCapitalize="none"
                     keyboardType="numeric"
                     maxLength={10}
@@ -96,10 +99,10 @@ export default function IniciarSesion() {
             </View>
 
             {errorMessage ? (
-              <Text style={styles.errorIniciarSesion}>{errorMessage}</Text>
+              <Text allowFontScaling={false} style={styles.errorIniciarSesion}>{errorMessage}</Text>
             ) : null}
 
-            <Link href="/(auth)/restablecer-contrasena" style={styles.olvidarContraseña}>¿Olvidaste tu contraseña?</Link>
+            <Link allowFontScaling={false} href="/(auth)/restablecer-contrasena" style={styles.olvidarContraseña}>¿Olvidaste tu contraseña?</Link>
 
             <Boton
               title={isSubmitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
@@ -110,8 +113,8 @@ export default function IniciarSesion() {
             <View style={styles.separador} />
 
             <View style={styles.iniciarSesionTexto}>
-              <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>¿Aún no tienes una cuenta?</Text>
-              <Link href="/(auth)/registrar-cuenta" style={styles.iniciarSesionLink}>
+              <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>¿Aún no tienes una cuenta?</Text>
+              <Link allowFontScaling={false} href="/(auth)/registrar-cuenta" style={styles.iniciarSesionLink}>
                 Regístrate aquí
               </Link>
             </View>

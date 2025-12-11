@@ -27,11 +27,12 @@ export default function Tabla({ columnas, datos }: Props) {
             key={col.key}
             style={[
               styles.encabezado,
-              col.ancho ? { width: col.ancho } : { flex: 1 }, 
+              col.ancho ? { width: col.ancho } : { flex: 1 },
               Platform.OS === "web"
                 ? ({ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } as any)
                 : null,
             ]}
+            allowFontScaling={false}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
@@ -53,7 +54,7 @@ export default function Tabla({ columnas, datos }: Props) {
             ]}
           >
             {columnas.map((col) => {
-              const isMultiline = col.multilinea; 
+              const isMultiline = col.multilinea;
               return (
                 <View
                   key={col.key}
@@ -71,18 +72,19 @@ export default function Tabla({ columnas, datos }: Props) {
                         isMultiline ? { flexWrap: "wrap" as any } : null,
                         Platform.OS === "web"
                           ? (isMultiline
-                              ? ({
-                                  whiteSpace: "normal",
-                                  wordBreak: "break-word",
-                                  overflow: "visible",
-                                } as any)
-                              : ({
-                                  whiteSpace: "nowrap",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                } as any))
+                            ? ({
+                              whiteSpace: "normal",
+                              wordBreak: "break-word",
+                              overflow: "visible",
+                            } as any)
+                            : ({
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            } as any))
                           : null,
                       ]}
+                      allowFontScaling={false}
                       numberOfLines={isMultiline ? undefined : 1}
                       ellipsizeMode={isMultiline ? undefined : "tail"}
                     >
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
     borderEndWidth: 1,
     borderColor: Colores.borde,
     flexShrink: 1,
-    minWidth: 0,  
+    minWidth: 0,
   },
   texto: {
     fontSize: Fuentes.cuerpo,

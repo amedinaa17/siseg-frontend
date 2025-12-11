@@ -68,17 +68,20 @@ export default function CambiarContraseña() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>
-          <Text style={styles.titulo}>Cambiar contraseña</Text>
-
+          <Text allowFontScaling={false} style={styles.titulo}>Cambiar contraseña</Text>
+          <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 20 }}>
+            Ingresa una nueva contraseña de 8 a 12 caracteres, que incluya al menos una letra mayúscula, una letra minúscula y un número.
+          </Text>
           <View style={{ marginBottom: 15 }}>
             <Controller
               control={control}
               name="contraseña"
               render={({ field: { onChange, value } }) => (
                 <Entrada
-                  label="Nueva Contraseña"
+                  label="Nueva contraseña"
                   secureTextEntry
                   value={value}
+                  maxLength={12}
                   onChangeText={onChange}
                   error={errors.contraseña?.message}
                 />
@@ -92,9 +95,10 @@ export default function CambiarContraseña() {
               name="confirmarContraseña"
               render={({ field: { onChange, value } }) => (
                 <Entrada
-                  label="Confirmar Contraseña"
+                  label="Confirmar contraseña"
                   secureTextEntry
                   value={value}
+                  maxLength={12}
                   onChangeText={onChange}
                   error={errors.confirmarContraseña?.message}
                 />

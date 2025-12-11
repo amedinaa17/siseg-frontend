@@ -139,7 +139,7 @@ export default function SelectorArchivo({
           },
         ]}
       >
-        <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
+        <Animated.Text style={estiloEtiqueta} allowFontScaling={false}>{label}</Animated.Text>
         <Pressable style={styles.entrada} onPress={seleccionarArchivo}>
           <Text
             style={{
@@ -153,9 +153,9 @@ export default function SelectorArchivo({
         </Pressable>
       </View>
       <View style={{ flexDirection: Platform.OS === "web" ? "row" : "column", justifyContent: errorArchivo ? "space-between" : error ? "flex-start" : "flex-end" }}>
-        {(error || errorArchivo) ? (<Text style={styles.errorTexto}>{errorArchivo ? errorArchivo : error}</Text>) : null}
+        {(error || errorArchivo) ? (<Text allowFontScaling={false} style={styles.errorTexto}>{errorArchivo ? errorArchivo : error}</Text>) : null}
         {archivo ? (
-          <Text style={{ color: errorArchivo ? Colores.textoError : Colores.textoInfo, fontSize: Fuentes.caption, marginTop: 5 }}>
+          <Text allowFontScaling={false} style={{ color: errorArchivo ? Colores.textoError : Colores.textoInfo, fontSize: Fuentes.caption, marginTop: 5 }}>
             ({(archivo.size / (1024 * 1024)).toFixed(2)} MB)
           </Text>
         ) : null}

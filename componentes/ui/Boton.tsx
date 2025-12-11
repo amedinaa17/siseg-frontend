@@ -26,7 +26,7 @@ export default function Boton({ title, onPress, disabled, icon, color }: Propied
     >
       <View style={styles.contenedorBoton}>
         {icon && <View>{icon}</View>}
-        {title && <Text style={styles.texto}>{title}</Text>}
+        {title && <Text allowFontScaling={false} style={styles.texto}>{title}</Text>}
       </View>
     </Pressable>
   );

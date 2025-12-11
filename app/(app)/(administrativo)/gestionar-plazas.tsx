@@ -379,7 +379,7 @@ export default function GestionPlazas() {
                 }}
                 cancelar
                 deshabilitado={isSubmittingEditar}
-                textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar"} onAceptar={handleSubmitEditar(onSubmitEditar)}
+                textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
             >
                 <KeyboardAvoidingView
                     style={{ flex: 1 }}

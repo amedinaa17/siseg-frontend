@@ -5,10 +5,25 @@ export const correoEsquema = z.object({
   correo: z
     .string()
     .nonempty("El correo electrónico institucional es obligatorio")
-    .endsWith(".ipn.mx", "El correo electrónico debe ser institucional (.ipn.mx)"),
+    .endsWith("ipn.mx", "El correo electrónico debe ser institucional (ipn.mx)"),
 });
 
 export type CorreoFormulario = z.infer<typeof correoEsquema>;
+
+export const registrarCuentaEsquema = z.object({
+  correo: z
+    .string()
+    .nonempty("El correo electrónico institucional es obligatorio")
+    .endsWith("ipn.mx", "El correo electrónico debe ser institucional (ipn.mx)"),
+  avisoPrivacidad: z.boolean().refine((val) => val === true, {
+    message: "Debe aceptar el Aviso de Privacidad.",
+  }),
+  terminosCondiciones: z.boolean().refine((val) => val === true, {
+    message: "Debe aceptar los Términos y Condiciones.",
+  }),
+});
+
+export type RegistrarCuentaFormulario = z.infer<typeof registrarCuentaEsquema>;
 
 // Validación para boleta
 export const boletaEsquema = z
@@ -45,7 +60,7 @@ export const registroEsquema = z.object({
 
   calle: z
     .string()
-    .nonempty("La calle es obligatoria")
+    .nonempty("La calle y número es obligatoria")
     .min(3, "Debe tener al menos 3 caracteres"),
 
   colonia: z
@@ -79,7 +94,7 @@ export const registroEsquema = z.object({
 
   telcelular: z
     .string()
-    .nonempty("El teléfono celular es obligatorio")
+    .nonempty("El celular es obligatorio")
     .refine((val) => /^\d+$/.test(val), {
       message: "El número de celular solo debe contener dígitos",
     })
@@ -121,7 +136,7 @@ export type CambiarContraseñaFormulario = z.infer<typeof cambiarContraseñaEsqu
 export const modificarPerfilEsquema = z.object({
   calle: z
     .string()
-    .nonempty("La calle es obligatoria")
+    .nonempty("La calle y número es obligatoria")
     .min(3, "Debe tener al menos 3 caracteres"),
 
   colonia: z
@@ -155,7 +170,7 @@ export const modificarPerfilEsquema = z.object({
 
   telcelular: z
     .string()
-    .nonempty("El teléfono celular es obligatorio")
+    .nonempty("El celular es obligatorio")
     .refine((val) => /^\d+$/.test(val), {
       message: "El número de celular solo debe contener dígitos",
     })
@@ -184,7 +199,7 @@ export const modificarPerfilAdminEsquema = z.object({
 
   telcelular: z
     .string()
-    .nonempty("El teléfono celular es obligatorio")
+    .nonempty("El celular es obligatorio")
     .refine((val) => /^\d+$/.test(val), {
       message: "El número de celular solo debe contener dígitos",
     })
@@ -335,7 +350,7 @@ export const personalEsquema = z.object({
 
   telcelular: z
     .string()
-    .nonempty("El teléfono celular es obligatorio")
+    .nonempty("El celular es obligatorio")
     .refine((val) => /^\d+$/.test(val), {
       message: "El número de celular solo debe contener dígitos",
     })

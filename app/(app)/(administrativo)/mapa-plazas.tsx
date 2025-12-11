@@ -481,7 +481,7 @@ export default function MapaPlazas() {
 
         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
           <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Teléfono Celular" value={alumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+            <Entrada label="Celular" value={alumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
           </View>
           <View style={{ flex: 1, marginBottom: 15 }}>
             <Entrada label="Teléfono Local" value={alumno?.tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />

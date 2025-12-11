@@ -249,7 +249,7 @@ export default function GestionPersonalAdministrativo() {
 
                         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                             <View style={{ flex: 1, marginBottom: 15 }}>
-                                <Entrada label="Teléfono Celular" value={persona.telefonoMovil || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+                                <Entrada label="Celular" value={persona.telefonoMovil || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                             </View>
                             <View style={{ flex: 1, marginBottom: 25 }}>
                                 <Entrada label="Teléfono Local" value={persona.telefonoFijo || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
@@ -409,7 +409,7 @@ export default function GestionPersonalAdministrativo() {
                                 name="telcelular"
                                 defaultValue=""
                                 render={({ field: { onChange, value } }) => (
-                                    <Entrada label="Teléfono Celular" keyboardType="phone-pad" maxLength={10} value={value} onChangeText={onChange} error={errorsAgregar.telcelular?.message} />
+                                    <Entrada label="Celular" keyboardType="phone-pad" maxLength={10} value={value} onChangeText={onChange} error={errorsAgregar.telcelular?.message} />
                                 )}
                             />
                         </View>
@@ -601,7 +601,7 @@ export default function GestionPersonalAdministrativo() {
                                 defaultValue={persona.telefonoMovil || ""}
                                 render={({ field: { onChange, value } }) => (
                                     <Entrada
-                                        label="Teléfono Celular"
+                                        label="Celular"
                                         keyboardType="phone-pad"
                                         maxLength={10}
                                         value={value} onChangeText={onChange}

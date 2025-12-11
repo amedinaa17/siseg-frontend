@@ -27,7 +27,7 @@ const Likert = ({ valor, onChange, etiquetas }: LikertProps) => {
                         style={[styles.opcion]}
                     >
                         <View style={[styles.circulo, valor === index + 1 && styles.circuloActivo]} />
-                        <Text style={styles.etiqueta}>
+                        <Text allowFontScaling={false} style={styles.etiqueta}>
                             {etiqueta}
                         </Text>
                     </Pressable>

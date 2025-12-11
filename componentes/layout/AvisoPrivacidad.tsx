@@ -20,8 +20,8 @@ export default function ModalAvisoPrivacidad({ visible, onClose }: Props) {
       textoAceptar="Aceptar"
       onAceptar={onClose}
     >
-      <Text style={styles.titulo}>AVISO DE PRIVACIDAD Y CONFIDENCIALIDAD DE TUS DATOS PERSONALES</Text>
-      <Text style={{ color: Colores.textoPrincipal, fontSize: 14, textAlign: "justify" }}>
+      <Text allowFontScaling={false} style={styles.titulo}>AVISO DE PRIVACIDAD Y CONFIDENCIALIDAD DE TUS DATOS PERSONALES</Text>
+      <Text allowFontScaling={false} style={{ color: Colores.textoPrincipal, fontSize: 14, textAlign: "justify" }}>
         La información personal recabada a través del{" "}
         <Text style={styles.siseg}>Sistema de Seguimiento del Servicio Social para la ENMyH (SISEG)</Text>
         {" "}será protegida, incorporada y tratada por el{" "}
@@ -62,7 +62,8 @@ const styles = StyleSheet.create({
   titulo: {
     fontSize: Fuentes.subtitulo,
     textAlign: "center",
-    marginBottom: 25,
+    marginTop: -10,
+    marginBottom: 15,
     fontWeight: 700,
   },
   subtitulo: {

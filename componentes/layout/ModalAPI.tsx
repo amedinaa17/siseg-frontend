@@ -47,14 +47,14 @@ const ModalAPI = forwardRef<ModalAPIRef>((_, ref) => {
                     size={80}
                     color={estatus ? Colores.textoExito : Colores.textoError}
                 />
-                <Text style={styles.titulo}>
+                <Text allowFontScaling={false} style={styles.titulo}>
                     {estatus ? "¡Todo listo!" : "¡Algo salió mal!"}
                 </Text>
-                <Text style={styles.mensaje}>
+                <Text allowFontScaling={false} style={styles.mensaje}>
                     {mensajePartes.map((parte, index) => {
                         if (correoRegex.test(parte)) {
                             return (
-                                <Text key={`p-${index}`} style={{ color: estatus ? Colores.textoInfo : Colores.textoError }}>
+                                <Text allowFontScaling={false} key={`p-${index}`} style={{ color: estatus ? Colores.textoInfo : Colores.textoError }}>
                                     {parte}
                                 </Text>
                             );
@@ -65,7 +65,7 @@ const ModalAPI = forwardRef<ModalAPIRef>((_, ref) => {
 
                 {onDetalles && (
                     <Pressable onPress={onDetalles} style={styles.linkWrap}>
-                        <Text style={styles.link}>Ver detalles</Text>
+                        <Text allowFontScaling={false} style={styles.link}>Ver detalles</Text>
                     </Pressable>
                 )}
             </View>

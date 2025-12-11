@@ -51,15 +51,15 @@ export default function ResetPassword() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>
-          <Text style={styles.titulo}>Restablecer contraseña</Text>
-
+          <Text allowFontScaling={false} style={styles.titulo}>Restablecer contraseña</Text>
+          <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 20 }}>Ingrese su correo electrónico institucional para recuperar su contraseña.</Text>
           <View style={{ marginBottom: error.includes("@") || error === "" ? 25 : 10 }}>
             <Controller
               control={control}
               name="correo"
               render={({ field: { onChange, value } }) => (
                 <Entrada
-                  label="Correo Electrónico Institucional"
+                  label="Correo electrónico institucional"
                   value={value}
                   onChangeText={(text) => {
                     setError("");
@@ -74,7 +74,7 @@ export default function ResetPassword() {
           </View>
 
           {!error.includes("@") && error != '' && (
-            <Text style={styles.errorRestablecerContrasena}>{error}</Text>
+            <Text allowFontScaling={false} style={styles.errorRestablecerContrasena}>{error}</Text>
           )}
 
           <Boton
@@ -86,8 +86,8 @@ export default function ResetPassword() {
           <View style={styles.separador} />
 
           <View style={styles.restrablecerTexto}>
-            <Text style={{ fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>¿Ya recordaste tu contraseña?</Text>
-            <Link href="/(auth)/iniciar-sesion" style={styles.restablecerLink}>
+            <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoSecundario }}>¿Ya recordaste tu contraseña?</Text>
+            <Link allowFontScaling={false} href="/(auth)/iniciar-sesion" style={styles.restablecerLink}>
               Inicia sesión aquí
             </Link>
           </View>

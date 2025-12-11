@@ -53,11 +53,12 @@ export default function EntradaMultilinea({
           },
         ]}
       >
-        <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
+        <Animated.Text style={estiloEtiqueta} allowFontScaling={false}>{label}</Animated.Text>
         <TextInput
           {...props}
           editable={editable}
           value={value}
+          allowFontScaling={false}
           onFocus={(e) => {
             setFocused(true);
             onFocus?.(e);

@@ -61,7 +61,7 @@ export default function Selector({
           },
         ]}
       >
-        <Animated.Text style={estiloEtiqueta}>{label}</Animated.Text>
+        <Animated.Text style={estiloEtiqueta} allowFontScaling={false}>{label}</Animated.Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -80,7 +80,7 @@ export default function Selector({
 
       </Pressable>
 
-      {error && <Text style={styles.errorTexto}>{error}</Text>}
+      {error && <Text allowFontScaling={false} style={styles.errorTexto}>{error}</Text>}
 
       {editable && (
         <Modal visible={modalVisible} transparent animationType="fade">
@@ -111,6 +111,7 @@ export default function Selector({
                           styles.textoOpcion,
                           seleccionado && styles.textoSeleccionado
                         ]}
+                         allowFontScaling={false}
                       >
                         {item.label}
                       </Text>
@@ -123,7 +124,7 @@ export default function Selector({
                 onPress={() => setModalVisible(false)}
                 style={[styles.opcion, styles.cancelarOpcion]}
               >
-                <Text style={styles.cancelarTexto}>Cancelar</Text>
+                <Text allowFontScaling={false} style={styles.cancelarTexto}>Cancelar</Text>
               </Pressable>
             </View>
           </View>

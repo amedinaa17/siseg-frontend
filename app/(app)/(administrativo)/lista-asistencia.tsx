@@ -36,7 +36,7 @@ const formatearFecha = (isoString: string) => {
 
 export default function CursoInduccion() {
   const { width } = useWindowDimensions();
-  const esPantallaPequeña = width < 600;
+  const esPantallaPequeña = width < 790;
   const { sesion, verificarToken } = useAuth();
   const modalAPI = useRef<ModalAPIRef>(null);
 
@@ -168,7 +168,7 @@ export default function CursoInduccion() {
       return (
         <>
           <View style={styles.controlesTablaMobile}>
-            <View style={styles.selectorFilasWrapperMobile}>
+            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
               <Selector
                 label=""
                 selectedValue={String(filasPorPagina)}
@@ -437,8 +437,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subtitulo: {
-    fontSize: Fuentes.cuerpo,
+    fontSize: Fuentes.subtitulo,
     color: Colores.textoSecundario,
+    fontWeight: 600,
     textAlign: "center",
     paddingHorizontal: 12,
     marginBottom: 8,

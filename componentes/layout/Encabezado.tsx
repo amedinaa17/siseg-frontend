@@ -21,9 +21,9 @@ export default function Encabezado() {
             <View style={[styles.logoTail, { marginTop: esMovil ? 80 : 91.5 }]} />
           </View>
         </Link>
-        <Text style={styles.titulo}>SISEG </Text>
+        <Text allowFontScaling={false} style={styles.titulo}>SISEG </Text>
         {!esMovil && !esPantallaPequeña && (
-          <Text style={styles.subtitulo}>
+          <Text allowFontScaling={false} style={styles.subtitulo}>
             Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
           </Text>
         )}
