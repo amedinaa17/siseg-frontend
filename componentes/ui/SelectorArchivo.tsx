@@ -146,6 +146,7 @@ export default function SelectorArchivo({
               color: archivo ? Colores.textoPrincipal : Colores.textoClaro,
               fontSize: 15,
             }}
+            allowFontScaling={false}
             numberOfLines={1}
           >
             {archivo?.name}

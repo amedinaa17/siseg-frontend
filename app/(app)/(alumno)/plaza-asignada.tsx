@@ -1,4 +1,5 @@
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Entrada from "@/componentes/ui/Entrada";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
@@ -59,37 +60,40 @@ export default function PlazaAsignada() {
                 </View>
             )}
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                    <Text style={styles.titulo}>Plaza asignada</Text>
+                <View style={{ flex: 1 }}>
+                    <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                        <Text allowFontScaling={false} style={styles.titulo}>Plaza asignada</Text>
 
-                    <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                        <View style={{ flex: 1 }}>
-                            <Entrada label="Programa" value={datosAlumno?.PROGRAMA ?? ""} editable={false} />
+                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                            <View style={{ flex: 1 }}>
+                                <Entrada label="Programa" value={datosAlumno?.PROGRAMA ?? ""} editable={false} />
+                            </View>
+
+                            <View style={{ flex: 1 }}>
+                                <Entrada label="Promoción" value={datosAlumno?.promocion ?? ""} editable={false} />
+                            </View>
                         </View>
 
-                        <View style={{ flex: 1 }}>
-                            <Entrada label="Promoción" value={datosAlumno?.promocion ?? ""} editable={false} />
+                        <View style={{ marginBottom: 15 }}>
+                            <Entrada label="Sede" value={datosAlumno?.sede ?? ""} editable={false} />
                         </View>
-                    </View>
 
-                    <View style={{ marginBottom: 15 }}>
-                        <Entrada label="Sede" value={datosAlumno?.sede ?? ""} editable={false} />
-                    </View>
-
-                    <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                        <View style={{ flex: 1, marginBottom: 0 }}>
-                            <Entrada label="Tarjeta" value={String(datosAlumno?.tarjetaDisponible) ?? ""} editable={false} />
+                        <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
+                            <View style={{ flex: 1, marginBottom: 0 }}>
+                                <Entrada label="Tarjeta" value={String(datosAlumno?.tarjetaDisponible) ?? ""} editable={false} />
+                            </View>
+                            <View style={{ flex: 1, marginBottom: 0 }}>
+                                <Entrada label="Beca" value={datosAlumno?.tipoBeca ?? ""} editable={false} />
+                            </View>
                         </View>
-                        <View style={{ flex: 1, marginBottom: 0 }}>
-                            <Entrada label="Beca" value={datosAlumno?.tipoBeca ?? ""} editable={false} />
-                        </View>
-                    </View>
 
-                    <View style={{ marginBottom: 15 }}>
-                        <Entrada label="Ubicación" value={datosAlumno?.ubicacion ?? ""} editable={false} />
+                        <View style={{ marginBottom: 15 }}>
+                            <Entrada label="Ubicación" value={datosAlumno?.ubicacion ?? ""} editable={false} />
+                        </View>
                     </View>
                 </View>
                 <ModalAPI ref={modalAPI} />
+                <PiePagina />
             </ScrollView>
         </>
     );

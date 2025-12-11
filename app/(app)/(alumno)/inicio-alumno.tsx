@@ -1,5 +1,6 @@
 import ModalAvisoPrivacidad from '@/componentes/layout/AvisoPrivacidad';
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
@@ -55,32 +56,34 @@ export default function InicioAlumno() {
       )}
       <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View style={styles.contenedorFormulario}>
-            <View style={styles.sisegContenedor}>
-              <Text style={styles.sisegSiglas}>SISEG</Text>
-              {!esMovil && (
-                <Text style={styles.siseg}>
-                  Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
+          <View style={{ flex: 1 }}>
+            <View style={[styles.contenedorFormulario, esPantallaPequeña && { flex: 1 }]}>
+              <View style={styles.sisegContenedor}>
+                <Text allowFontScaling={false} style={styles.sisegSiglas}>SISEG</Text>
+                {!esMovil && (
+                  <Text allowFontScaling={false} style={styles.siseg}>
+                    Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
+                  </Text>
+                )}
+              </View>
+              <View style={styles.sisegContenedor}>
+                <Text allowFontScaling={false} style={[styles.sisegDescripcion, esMovil || esPantallaPequeña ? { textAlign: "justify" } : { textAlign: "right", width: "60%" }]}>
+                  Es una herramienta informática diseñada para dar seguimiento al servicio social de la <Text style={{ fontWeight: '600' }}>Escuela Nacional de Medicina y Homeopatía</Text>.
                 </Text>
-              )}
-            </View>
-            <View style={styles.sisegContenedor}>
-              <Text style={[styles.sisegDescripcion, esMovil || esPantallaPequeña ? { textAlign: "justify" } : { textAlign: "right", width: "60%" }]}>
-                Es una herramienta informática diseñada para dar seguimiento al servicio social de la <Text style={{ fontWeight: '600' }}>Escuela Nacional de Medicina y Homeopatía</Text>.
-              </Text>
-            </View>
-            <Text style={styles.titulo}>Bienvenido</Text>
-            <Text style={styles.nombreAlumno}>{sesion?.nombre + " " + alumno?.apellido_paterno + " " + alumno?.apellido_materno}</Text>
-            <Text style={styles.boleta}>{sesion?.boleta || ""}</Text>
-            <Text style={styles.carrera}>{alumno?.carrera || ""}</Text>
+              </View>
+              <Text allowFontScaling={false} style={styles.titulo}>Bienvenido</Text>
+              <Text allowFontScaling={false} style={styles.nombreAlumno}>{sesion?.nombre + " " + alumno?.apellido_paterno + " " + alumno?.apellido_materno}</Text>
+              <Text allowFontScaling={false} style={styles.boleta}>{sesion?.boleta || ""}</Text>
+              <Text allowFontScaling={false} style={styles.carrera}>{alumno?.carrera || ""}</Text>
 
-            <View style={styles.piePagina}>
-              <View style={styles.avisoContenedor}>
-                <Text style={styles.avisoTexto}>AVISO</Text>
-                <View style={styles.separador} />
-                <Text style={styles.piePaginaTexto} onPress={() => setVisibleAviso(true)}>
-                  Tus datos personales son protegidos conforme a lo establecido por la Ley General de Protección de Datos Personales en Posesión de los Particulares.
-                </Text>
+              <View style={styles.piePagina}>
+                <View style={styles.avisoContenedor}>
+                  <Text allowFontScaling={false} style={styles.avisoTexto}>AVISO</Text>
+                  <View style={styles.separador} />
+                  <Text allowFontScaling={false} style={styles.piePaginaTexto} onPress={() => setVisibleAviso(true)}>
+                    Tus datos personales son protegidos conforme a lo establecido por la Ley General de Protección de Datos Personales en Posesión de los Particulares.
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
@@ -89,6 +92,7 @@ export default function InicioAlumno() {
             visible={visibleAviso}
             onClose={() => setVisibleAviso(false)}
           />
+          <PiePagina />
         </ScrollView>
       </View>
     </>
@@ -99,8 +103,6 @@ const styles = StyleSheet.create({
   contenedorFormulario: {
     width: "90%",
     maxWidth: 1000,
-    height: "auto",
-    minHeight: "90%",
     margin: "auto",
     padding: 24,
     marginVertical: 20,

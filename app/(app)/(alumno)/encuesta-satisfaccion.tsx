@@ -1,4 +1,5 @@
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Likert from "@/componentes/ui/BotonRadio";
 import { useAuth } from "@/context/AuthProvider";
@@ -22,10 +23,10 @@ type Question = {
 type Answers = Record<string, ScaleValue | undefined>;
 
 const LABELS = {
-  FREQ: ["Nunca", "Rara vez", "Algunas veces", "A menudo", "Siempre"],
-  AGREE: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"],
-  QUALI: ["Muy malo", "Malo", "Regular", "Bueno", "Muy bueno"],
-  SATIS: ["Muy insatisfecho", "Insatisfecho", "Neutro", "Satisfecho", "Muy satisfecho"]
+    FREQ: ["Nunca", "Rara vez", "Algunas veces", "A menudo", "Siempre"],
+    AGREE: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"],
+    QUALI: ["Muy malo", "Malo", "Regular", "Bueno", "Muy bueno"],
+    SATIS: ["Muy insatisfecho", "Insatisfecho", "Neutro", "Satisfecho", "Muy satisfecho"]
 };
 
 const QUESTIONS: Question[] = [
@@ -44,7 +45,7 @@ const QUESTIONS: Question[] = [
 ];
 
 function SectionHeader({ title }: { title: string }) {
-    return <Text style={styles.seccion}>{title}</Text>;
+    return <Text allowFontScaling={false} style={styles.seccion}>{title}</Text>;
 }
 
 export default function EncuestaSatisfaccion() {
@@ -156,99 +157,101 @@ export default function EncuestaSatisfaccion() {
                 </View>
             )}
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={[styles.contenedor, esPantallaPequeña && { maxWidth: "95%" }]}>
-                    {mensaje ? (
-                        <View style={[styles.contenedorCompletada]}>
-                            <Ionicons name="checkmark-circle-outline" size={65} color={Colores.textoExito} />
-                            <Text style={styles.titulo}>Encuesta completada</Text>
-                            <Text style={styles.textoCompletada}>Ya enviaste la encuesta de este mes. Podrás volver a contestarla a partir del {mensaje}</Text>
-                            <Boton title="Regresar al inicio" onPress={() => router.replace("/inicio-alumno")} />
-                        </View>
-                    ) : (
-                        <>
-                            <Text style={styles.titulo}>Encuesta de satisfacción</Text>
-                            <Text style={styles.texto}>
-                                Responde a esta breve encuesta de satisfacción sobre tu servicio social. Tus respuestas son
-                                completamente confidenciales y nos ayudarán a identificar áreas donde podemos mejorar para ofrecer
-                                una mejor experiencia en el futuro.
-                            </Text>
-
-                            <SectionHeader title="Ambiente y condiciones" />
-                            {sections.Ambiente.map((q) => (
-                                <View key={q.id} style={styles.tarjeta}>
-                                    <Text style={styles.tarjetaTitulo}>
-                                        <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
-                                        {q.text}
-                                    </Text>
-                                    <Likert
-                                        valor={answers[q.id]}
-                                        onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                                        etiquetas={LABELS[q.scale] || []}
-                                    />
-                                    {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
-                                </View>
-                            ))}
-
-                            <SectionHeader title="Actividades" />
-                            {sections.Actividades.map((q) => (
-                                <View key={q.id} style={styles.tarjeta}>
-                                    <Text style={styles.tarjetaTitulo}>
-                                        <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
-                                        {q.text}
-                                    </Text>
-                                    <Likert
-                                        valor={answers[q.id]}
-                                        onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                                        etiquetas={LABELS[q.scale] || []}
-                                    />
-                                    {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
-                                </View>
-                            ))}
-
-                            <SectionHeader title="Supervisión y comunicación" />
-                            {sections.Supervision.map((q) => (
-                                <View key={q.id} style={styles.tarjeta}>
-                                    <Text style={styles.tarjetaTitulo}>
-                                        <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
-                                        {q.text}
-                                    </Text>
-                                    <Likert
-                                        valor={answers[q.id]}
-                                        onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                                        etiquetas={LABELS[q.scale] || []}
-                                    />
-                                    {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
-                                </View>
-                            ))}
-
-                            <SectionHeader title="Valoración general" />
-                            {sections.Valoracion.map((q) => (
-                                <View key={q.id} style={styles.tarjeta}>
-                                    <Text style={styles.tarjetaTitulo}>
-                                        <Text style={{ fontWeight: "700" }}>{q.index}. </Text>
-                                        {q.text}
-                                    </Text>
-                                    <Likert
-                                        valor={answers[q.id]}
-                                        onChange={(v: ScaleValue) => setAnswer(q.id, v)}
-                                        etiquetas={LABELS[q.scale] || []}
-                                    />
-                                    {errors[q.id] && <Text style={styles.error}>Esta pregunta es obligatoria</Text>}
-                                </View>
-                            ))}
-
-                            <View style={{ marginTop: 20, alignItems: "center" }}>
-                                <Boton
-                                    title={loading ? "Enviando…" : "Enviar encuesta"}
-                                    onPress={handleSubmit}
-                                    disabled={loading}
-                                />
+                <View style={{ flex: 1 }}>
+                    <View style={[styles.contenedor, esPantallaPequeña && { maxWidth: "95%" }]}>
+                        {mensaje ? (
+                            <View style={[styles.contenedorCompletada]}>
+                                <Ionicons name="checkmark-circle-outline" size={65} color={Colores.textoExito} />
+                                <Text allowFontScaling={false} style={styles.titulo}>Encuesta completada</Text>
+                                <Text allowFontScaling={false} style={styles.textoCompletada}>Ya enviaste la encuesta de este mes. Podrás volver a contestarla a partir del {mensaje}</Text>
+                                <Boton title="Regresar al inicio" onPress={() => router.replace("/inicio-alumno")} />
                             </View>
-                        </>
-                    )}
-                </View>
+                        ) : (
+                            <>
+                                <Text allowFontScaling={false} style={styles.titulo}>Encuesta de satisfacción</Text>
+                                <Text allowFontScaling={false} style={styles.texto}>
+                                    Responde a esta breve encuesta de satisfacción sobre tu servicio social. Tus respuestas son
+                                    completamente confidenciales y nos ayudarán a identificar áreas donde podemos mejorar para ofrecer
+                                    una mejor experiencia en el futuro.
+                                </Text>
 
+                                <SectionHeader title="Ambiente y condiciones" />
+                                {sections.Ambiente.map((q) => (
+                                    <View key={q.id} style={styles.tarjeta}>
+                                        <Text allowFontScaling={false} style={styles.tarjetaTitulo}>
+                                            <Text allowFontScaling={false} style={{ fontWeight: "700" }}>{q.index}. </Text>
+                                            {q.text}
+                                        </Text>
+                                        <Likert
+                                            valor={answers[q.id]}
+                                            onChange={(v: ScaleValue) => setAnswer(q.id, v)}
+                                            etiquetas={LABELS[q.scale] || []}
+                                        />
+                                        {errors[q.id] && <Text allowFontScaling={false} style={styles.error}>Esta pregunta es obligatoria</Text>}
+                                    </View>
+                                ))}
+
+                                <SectionHeader title="Actividades" />
+                                {sections.Actividades.map((q) => (
+                                    <View key={q.id} style={styles.tarjeta}>
+                                        <Text allowFontScaling={false} style={styles.tarjetaTitulo}>
+                                            <Text allowFontScaling={false} style={{ fontWeight: "700" }}>{q.index}. </Text>
+                                            {q.text}
+                                        </Text>
+                                        <Likert
+                                            valor={answers[q.id]}
+                                            onChange={(v: ScaleValue) => setAnswer(q.id, v)}
+                                            etiquetas={LABELS[q.scale] || []}
+                                        />
+                                        {errors[q.id] && <Text allowFontScaling={false} style={styles.error}>Esta pregunta es obligatoria</Text>}
+                                    </View>
+                                ))}
+
+                                <SectionHeader title="Supervisión y comunicación" />
+                                {sections.Supervision.map((q) => (
+                                    <View key={q.id} style={styles.tarjeta}>
+                                        <Text allowFontScaling={false} style={styles.tarjetaTitulo}>
+                                            <Text allowFontScaling={false} style={{ fontWeight: "700" }}>{q.index}. </Text>
+                                            {q.text}
+                                        </Text>
+                                        <Likert
+                                            valor={answers[q.id]}
+                                            onChange={(v: ScaleValue) => setAnswer(q.id, v)}
+                                            etiquetas={LABELS[q.scale] || []}
+                                        />
+                                        {errors[q.id] && <Text allowFontScaling={false} style={styles.error}>Esta pregunta es obligatoria</Text>}
+                                    </View>
+                                ))}
+
+                                <SectionHeader title="Valoración general" />
+                                {sections.Valoracion.map((q) => (
+                                    <View key={q.id} style={styles.tarjeta}>
+                                        <Text allowFontScaling={false} style={styles.tarjetaTitulo}>
+                                            <Text allowFontScaling={false} style={{ fontWeight: "700" }}>{q.index}. </Text>
+                                            {q.text}
+                                        </Text>
+                                        <Likert
+                                            valor={answers[q.id]}
+                                            onChange={(v: ScaleValue) => setAnswer(q.id, v)}
+                                            etiquetas={LABELS[q.scale] || []}
+                                        />
+                                        {errors[q.id] && <Text allowFontScaling={false} style={styles.error}>Esta pregunta es obligatoria</Text>}
+                                    </View>
+                                ))}
+
+                                <View style={{ marginTop: 20, alignItems: "center" }}>
+                                    <Boton
+                                        title={loading ? "Enviando…" : "Enviar encuesta"}
+                                        onPress={handleSubmit}
+                                        disabled={loading}
+                                    />
+                                </View>
+                            </>
+                        )}
+                    </View>
+                </View>
                 <ModalAPI ref={modalAPI} />
+                <PiePagina />
             </ScrollView>
         </>
     );
@@ -256,7 +259,6 @@ export default function EncuestaSatisfaccion() {
 
 const styles = StyleSheet.create({
     contenedor: {
-        flex: 1,
         width: "90%",
         maxWidth: 1050,
         margin: "auto",

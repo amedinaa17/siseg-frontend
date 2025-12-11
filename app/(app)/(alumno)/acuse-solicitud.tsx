@@ -2,6 +2,7 @@ import lugarFoto from "@/activos/imagenes/LugarFoto.png";
 import cabezaCarta from "@/activos/imagenes/cabezacarta.png";
 import pieCarta from "@/activos/imagenes/piecarta.png";
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
@@ -211,13 +212,12 @@ export default function AcuseSolicitud() {
         </tbody>
       </table>
 
-      ${
-        includePrintButton
+      ${includePrintButton
           ? `<div align="center">
               <input type="button" name="imprimir" value="Imprimir" class="nover" onclick="window.print();">
             </div>`
           : ``
-      }
+        }
     </body>
     </html>`;
     },
@@ -269,58 +269,61 @@ export default function AcuseSolicitud() {
         </View>
       )}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View
-          style={[
-            styles.contenedorFormulario,
-            esPantallaPequeña && { maxWidth: "95%" },
-          ]}
-        >
-          <Text style={styles.titulo}>
-            Acuse de solicitud de registro al servicio social
-          </Text>
+        <View style={{ flex: 1 }}>
+          <View
+            style={[
+              styles.contenedorFormulario,
+              esPantallaPequeña && { maxWidth: "95%" },
+            ]}
+          >
+            <Text allowFontScaling={false} style={styles.titulo}>
+              Acuse de solicitud de registro al servicio social
+            </Text>
 
-          <Text style={styles.subtitulo}>
-            Descarga e imprime tu Acuse de Solicitud de Registro al Servicio Social. Deberás pegar en el lado superior izquierdo una fotografía tamaño infantil actual a color y firmarlo.
-          </Text>
+            <Text allowFontScaling={false} style={styles.subtitulo}>
+              Descarga e imprime tu Acuse de Solicitud de Registro al Servicio Social. Deberás pegar en el lado superior izquierdo una fotografía tamaño infantil actual a color y firmarlo antes de cargarlo en tu expediente digital.
+            </Text>
 
-          <Text style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>Importante: Verifica que tu información sea correcta antes de imprimir o descargar el acuse.</Text>
+            <Text allowFontScaling={false} style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>
+              Importante: Verifica que tu información sea correcta antes de imprimir o descargar el acuse.
+            </Text>
 
-
-          {Platform.OS !== "web" && (
-            <View style={{ alignItems: "center", marginTop: 12 }}>
-              <TouchableOpacity
-                onPress={onDescargarPDF}
-                style={styles.botonPrimario}
-              >
-                <Text style={styles.botonPrimarioTexto}>Descargar</Text>
-              </TouchableOpacity>
+            <View style={{ marginTop: 30, flex: 1, minHeight: esPantallaPequeña ? 450 : 800 }}>
+              {Platform.OS === "web" ? (
+                <iframe
+                  srcDoc={generarHTML(true)}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    border: "1px solid #ccc",
+                    borderRadius: 8,
+                  }}
+                />
+              ) : (
+                <WebView
+                  ref={webViewRef}
+                  originWhitelist={["*"]}
+                  source={{ html: generarHTML(false) }}
+                  style={{ flex: 1, borderRadius: 8 }}
+                  scalesPageToFit={true}
+                  automaticallyAdjustContentInsets={false}
+                />
+              )}
             </View>
-          )}
-
-          <View style={{ marginTop: 30, flex: 1, minHeight: 600 }}>
-            {Platform.OS === "web" ? (
-              <iframe
-                srcDoc={generarHTML(true)}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  border: "1px solid #ccc",
-                  borderRadius: 8,
-                }}
-              />
-            ) : (
-              <WebView
-                ref={webViewRef}
-                originWhitelist={["*"]}
-                source={{ html: generarHTML(false) }}
-                style={{ flex: 1, borderRadius: 8 }}
-                scalesPageToFit={true}
-                automaticallyAdjustContentInsets={false}
-              />
+            {Platform.OS !== "web" && (
+              <View style={{ alignItems: "center", marginTop: 12 }}>
+                <TouchableOpacity
+                  onPress={onDescargarPDF}
+                  style={styles.botonPrimario}
+                >
+                  <Text allowFontScaling={false} style={styles.botonPrimarioTexto}>Descargar</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
         </View>
         <ModalAPI ref={modalAPI} />
+        <PiePagina />
       </ScrollView>
     </>
   );

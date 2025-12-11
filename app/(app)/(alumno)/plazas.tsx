@@ -1,4 +1,5 @@
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Entrada from "@/componentes/ui/Entrada";
 import Paginacion from "@/componentes/ui/Paginacion";
 import Selector from "@/componentes/ui/Selector";
@@ -109,120 +110,108 @@ export default function CatalogoPlazas() {
         </View>
       )}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View
-          style={[
-            styles.contenedorFormulario,
-            esPantallaPequeña && { maxWidth: "95%" },
-          ]}
-        >
-          <Text style={styles.titulo}>Plazas</Text>
-          <Text style={styles.subtitulo}>Promoción {plazas[0]?.promocion}</Text>
-          <Text style={styles.carrera}>{alumno?.carrera ?? ""}</Text>
-          <Text style={styles.aviso}>
-            “SUJETAS A CAMBIO SIN PREVIO AVISO DE LAS AUTORIDADES”
-          </Text>
+        <View style={{ flex: 1 }}>
+          <View
+            style={[
+              styles.contenedorFormulario,
+              esPantallaPequeña && { maxWidth: "95%" },
+            ]}
+          >
+            <Text allowFontScaling={false} style={styles.titulo}>Plazas</Text>
+            <Text allowFontScaling={false} style={styles.subtitulo}>Promoción {plazas[0]?.promocion}</Text>
+            <Text allowFontScaling={false} style={styles.carrera}>{alumno?.carrera ?? ""}</Text>
+            <Text allowFontScaling={false} style={styles.aviso}>
+              “SUJETAS A CAMBIO SIN PREVIO AVISO DE LAS AUTORIDADES”
+            </Text>
 
-          <View style={styles.controlesSuperiores}>
-            <View
-              style={[
-                { flexDirection: "row", alignItems: "center", gap: 8 },
-                esPantallaPequeña && { marginBottom: 15, width: "100%" },
-              ]}
-            >
-              <View
-                style={[
-                  esPantallaPequeña && [
-                    filasPorPagina === 10
-                      ? { minWidth: 42.8 }
-                      : filasPorPagina === 15
-                        ? { minWidth: 48.8 }
-                        : { minWidth: 52.8 },
-                  ],
+            <View style={styles.controlesSuperiores}>
+              <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 5, width: "100%" }]}>
+                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                  <Selector
+                    label=""
+                    selectedValue={String(filasPorPagina)}
+                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                    items={[
+                      { label: "5", value: "5" },
+                      { label: "10", value: "10" },
+                      { label: "20", value: "20" },
+                    ]}
+                  />
+                </View>
+
+                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>
+                  por página
+                </Text>
+              </View>
+
+              <View style={{ width: esPantallaPequeña ? "100%" : "40%", marginBottom: 15 }}>
+                <Entrada
+                  label="Buscar"
+                  value={busqueda}
+                  onChangeText={(text) => {
+                    setBusqueda(text);
+                    setPaginaActual(1);
+                  }}
+                />
+              </View>
+            </View>
+
+            {/* Tabla */}
+            <ScrollView horizontal={esPantallaPequeña}>
+              <Tabla
+                columnas={[
+                  {
+                    key: "PROGRAMA",
+                    titulo: "Programa",
+                    multilinea: true,
+                    ancho: 240
+                  },
+                  {
+                    key: "sede",
+                    titulo: "Sede",
+                    multilinea: true,
+                    ...(esPantallaPequeña && { ancho: 350 })
+                  },
+                  {
+                    key: "tipoBeca",
+                    titulo: "Beca",
+                    ancho: 100
+                  },
+                  {
+                    key: "tarjetaDisponible",
+                    titulo: "Tarjeta",
+                    ancho: 100
+                  },
                 ]}
-              >
-                <Selector
-                  label=""
-                  selectedValue={String(filasPorPagina)}
-                  onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                  items={[
-                    { label: "10", value: "10" },
-                    { label: "15", value: "15" },
-                    { label: "20", value: "20" },
-                  ]}
+                datos={plazasMostradas}
+              />
+            </ScrollView>
+
+            {/* Paginación */}
+            <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+              <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                <Paginacion
+                  paginaActual={paginaActual}
+                  totalPaginas={totalPaginas}
+                  setPaginaActual={setPaginaActual}
                 />
               </View>
 
-              <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>
-                por página
+              <Text
+                style={{
+                  color: Colores.textoClaro,
+                  fontSize: Fuentes.caption,
+                  marginTop: 15,
+                }}
+                allowFontScaling={false}
+              >
+                {`Mostrando ${plazasMostradas.length} de ${plazas.length} resultados`}
               </Text>
             </View>
-
-            <View style={{ width: esPantallaPequeña ? "100%" : "40%" }}>
-              <Entrada
-                label="Buscar"
-                value={busqueda}
-                onChangeText={(text) => {
-                  setBusqueda(text);
-                  setPaginaActual(1);
-                }}
-              />
-            </View>
-          </View>
-
-          {/* Tabla */}
-          <ScrollView horizontal={esPantallaPequeña}>
-            <Tabla
-              columnas={[
-                {
-                  key: "PROGRAMA",
-                  titulo: "Programa",
-                  multilinea: true,
-                  ancho: 170
-                },
-                {
-                  key: "sede",
-                  titulo: "Sede",
-                  multilinea: true,
-                  ...(esPantallaPequeña && { ancho: 350 })
-                },
-                {
-                  key: "tipoBeca",
-                  titulo: "Beca",
-                  ancho: 100
-                },
-                {
-                  key: "tarjetaDisponible",
-                  titulo: "Tarjeta",
-                  ancho: 100
-                },
-              ]}
-              datos={plazasMostradas}
-            />
-          </ScrollView>
-
-          {/* Paginación */}
-          <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-              <Paginacion
-                paginaActual={paginaActual}
-                totalPaginas={totalPaginas}
-                setPaginaActual={setPaginaActual}
-              />
-            </View>
-
-            <Text
-              style={{
-                color: Colores.textoClaro,
-                fontSize: Fuentes.caption,
-                marginTop: 15,
-              }}
-            >
-              {`Mostrando ${plazasMostradas.length} de ${plazas.length} resultados`}
-            </Text>
           </View>
         </View>
-
         <ModalAPI ref={modalAPI} />
+        <PiePagina />
       </ScrollView>
     </>
   );
@@ -251,7 +240,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: Colores.textoPrincipal,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 15,
   },
   carrera: {
     fontSize: Fuentes.titulo,

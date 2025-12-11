@@ -1,5 +1,6 @@
 import Modal from "@/componentes/layout/Modal";
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import EntradaMultilinea from "@/componentes/ui/EntradaMultilinea";
@@ -16,7 +17,8 @@ import * as DocumentPicker from "expo-document-picker";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { ActivityIndicator, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { WebView } from "react-native-webview";
 
 type ArchivoInfo = {
     name: string;
@@ -37,6 +39,8 @@ export default function ReportesRiesgo() {
 
     const [reportes, setReportes] = useState<any[]>([]);
     const [reporteSeleccionado, setReporteSeleccionado] = useState<any | null>(null);
+    const [verDetallesReporte, setVerDetallesReporte] = useState(false);
+    const [verEvidencia, setVerEvidencia] = useState<any | null>(null);
 
     const modalAPI = useRef<ModalAPIRef>(null);
     const [modalAgregar, setModalAgregar] = useState(false);
@@ -208,7 +212,7 @@ export default function ReportesRiesgo() {
     const renderModalAgregar = () => {
         return (
             <Modal
-                visible={modalAgregar} titulo="Agregar Reporte" maxWidth={600}
+                visible={modalAgregar} titulo="Agregar reporte" maxWidth={600}
                 onClose={handleCancelar}
                 textoAceptar={isSubmitting ? "Enviando…" : "Enviar reporte"} onAceptar={handleSubmit(onSubmit)}
                 cancelar deshabilitado={isSubmitting}
@@ -240,7 +244,7 @@ export default function ReportesRiesgo() {
 
                     {evidenciasNueva.length > 0 &&
                         <>
-                            <Text style={styles.seccionTitulo}>Evidencias</Text>
+                            <Text allowFontScaling={false} style={styles.seccionTitulo}>Evidencias</Text>
                             <View style={{ marginBottom: 5 }}>
                                 {evidenciasNueva.map((evi, idx) => (
                                     <View key={idx} style={styles.evidenciaFila}>
@@ -260,10 +264,11 @@ export default function ReportesRiesgo() {
                                             style={styles.evidenciaTexto}
                                             numberOfLines={1}
                                             ellipsizeMode="middle"
+                                            allowFontScaling={false}
                                         >
                                             {evi.name}
                                         </Text>
-                                        <Text style={styles.evidenciaPeso}>{(evi.size / 1024).toFixed(0)} KB</Text>
+                                        <Text allowFontScaling={false} style={styles.evidenciaPeso}>{(evi.size / 1024).toFixed(0)} KB</Text>
                                         <Pressable
                                             onPress={() => {
                                                 setEvidenciasNueva((prev) =>
@@ -278,7 +283,7 @@ export default function ReportesRiesgo() {
                                 ))}</View>
                         </>
                     }
-                    <Text style={{ fontSize: Fuentes.caption, color: Colores.textoError }}>{errorEvidenciaNueva}</Text>
+                    <Text allowFontScaling={false} style={{ fontSize: Fuentes.caption, color: Colores.textoError }}>{errorEvidenciaNueva}</Text>
                 </ScrollView>
             </Modal>
         );
@@ -290,13 +295,13 @@ export default function ReportesRiesgo() {
 
         return (
             <Modal
-                visible={!!reporteSeleccionado}
+                visible={verDetallesReporte}
                 onClose={() => { setReporteSeleccionado(null) }}
-                titulo="Detalle del Reporte"
+                titulo="Detalle del reporte"
                 maxWidth={750}
             >
                 <View>
-                    <Text style={{ marginBottom: 20, fontWeight: "600", fontSize: 15 }}>Estatus:
+                    <Text allowFontScaling={false} style={{ marginBottom: 20, fontWeight: "600", fontSize: 15 }}>Estatus:
                         <Text
                             style={[
                                 estatus === 1 && { color: Colores.textoAdvertencia },
@@ -336,7 +341,7 @@ export default function ReportesRiesgo() {
 
                 {evidencias && evidencias.length > 0 && (
                     <View style={{ marginTop: 15, marginBottom: 20 }}>
-                        <Text style={styles.seccionTitulo}>Evidencias</Text>
+                        <Text allowFontScaling={false} style={styles.seccionTitulo}>Evidencias</Text>
                         {evidencias.map((evidencia: any, idx: number) => (
                             <View key={idx} style={styles.evidenciaFila} >
                                 <Ionicons
@@ -347,12 +352,13 @@ export default function ReportesRiesgo() {
                                     color={Colores.textoClaro}
                                     style={{ marginRight: 8 }}
                                 />
-                                <Pressable onPress={() => Linking.openURL(evidencia.URL_ARCHIVO)}>
+                                <Pressable onPress={() => { setVerDetallesReporte(false); setVerEvidencia(evidencia.URL_ARCHIVO) }}>
                                     <Text
                                         style={[
                                             styles.evidenciaTexto,
                                             { textDecorationLine: "none" }
                                         ]}
+                                        allowFontScaling={false}
                                         numberOfLines={1}
                                         ellipsizeMode="middle"
                                     >
@@ -365,13 +371,13 @@ export default function ReportesRiesgo() {
                 )}
                 {observaciones && observaciones.length > 0 && (
                     <View>
-                        <Text style={styles.seccionTitulo}>Observaciones</Text>
+                        <Text allowFontScaling={false} style={styles.seccionTitulo}>Observaciones</Text>
                         <ScrollView horizontal={esPantallaPequeña}>
                             <Tabla
                                 columnas={[
-                                    { key: "fecha", titulo: "Fecha", ancho: 105 },
-                                    { key: "admin", titulo: "Revisado por", ancho: 250, multilinea: true },
-                                    { key: "descripcion", titulo: "Observación", ...(esPantallaPequeña && { ancho: 350 }), multilinea: true },
+                                    { key: "fecha", titulo: "Fecha", ancho: 120 },
+                                    { key: "admin", titulo: "Revisado por", ancho: 280, multilinea: true },
+                                    { key: "descripcion", titulo: "Observación", ...(esPantallaPequeña && { ancho: 390 }), multilinea: true },
                                 ]}
                                 datos={observaciones.map((observacion: any) => ({
                                     fecha: new Date(observacion.FECHA_DATETIME).toLocaleDateString(),
@@ -386,6 +392,51 @@ export default function ReportesRiesgo() {
         );
     };
 
+    const renderModalEvidencia = () => {
+        if (!reporteSeleccionado) return null;
+        const { adminEncargado, fechaRegistro, fechaModificacion, fechaFinalizado, descripcion, estatus, evidencias, observaciones } = reporteSeleccionado;
+
+        return (
+            <Modal visible={!!verEvidencia} onClose={() => { setVerEvidencia(null); setVerDetallesReporte(true) }} titulo={verEvidencia?.split('/').pop()}
+                aceptar={true}
+                cancelar={false}
+                maxWidth={800}>
+                <View style={{ height: esPantallaPequeña ? 320 : 520, borderWidth: 1, borderColor: Colores.borde, borderRadius: 8, overflow: "hidden" }}>
+                    {Platform.OS === "web" ? (
+                        verEvidencia?.toLowerCase().endsWith(".pdf") ? (
+                            <iframe
+                                src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(verEvidencia)}`}
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    border: "none",
+                                }}
+                                title="Vista previa PDF"
+                            />
+                        ) : (
+                            <img
+                                src={verEvidencia}
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "contain",
+                                }}
+                                alt="Evidencia"
+                            />
+                        )
+                    ) : (
+                        <WebView
+                            source={{ uri: verEvidencia || "" }}
+                            style={{ flex: 1 }}
+                            scalesPageToFit={true}
+                        />
+
+                    )}
+                </View>
+            </Modal>
+        );
+    };
+
     return (
         <>
             {cargando && (
@@ -394,120 +445,126 @@ export default function ReportesRiesgo() {
                 </View>
             )}
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View
-                    style={[
-                        styles.contenedorFormulario,
-                        esPantallaPequeña && { maxWidth: "95%" },
-                    ]}
-                >
-                    <Text style={styles.titulo}>Reportes de situación de riesgo</Text>
+                <View style={{ flex: 1 }}>
+                    <View
+                        style={[
+                            styles.contenedorFormulario,
+                            esPantallaPequeña && { maxWidth: "95%" },
+                        ]}
+                    >
+                        <Text allowFontScaling={false} style={styles.titulo}>Reportes de situación de riesgo</Text>
 
-                    <View style={{ marginBottom: 15, alignItems: "flex-start" }}>
-                        <Boton title="Agregar reporte" onPress={() => setModalAgregar(true)} />
-                    </View>
-                    <View style={styles.controlesSuperiores}>
-                        <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 15, width: "100%" }]}>
-                            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                                <Selector
-                                    label=""
-                                    selectedValue={String(filasPorPagina)}
-                                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                    items={[
-                                        { label: "5", value: "5" },
-                                        { label: "10", value: "10" },
-                                        { label: "20", value: "20" },
-                                    ]}
-                                />
+                        <View style={{ marginBottom: 15, alignItems: "flex-start" }}>
+                            <Boton title="Agregar reporte" onPress={() => setModalAgregar(true)} />
+                        </View>
+                        <View style={styles.controlesSuperiores}>
+                            <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 15, width: "100%" }]}>
+                                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                                    <Selector
+                                        label=""
+                                        selectedValue={String(filasPorPagina)}
+                                        onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                                        items={[
+                                            { label: "5", value: "5" },
+                                            { label: "10", value: "10" },
+                                            { label: "20", value: "20" },
+                                        ]}
+                                    />
+                                </View>
+                                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
                             </View>
-                            <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+
+                            <View style={[{ flexDirection: "row", gap: 8, justifyContent: "space-between" }, esPantallaPequeña ? { width: "100%" } : { width: "40%" }]}>
+                                <View style={[esPantallaPequeña ? { width: "60%", marginBottom: 15 } : { width: "60%" }]}>
+                                    <Entrada
+                                        label="Buscar"
+                                        value={busqueda}
+                                        onChangeText={(text) => { setBusqueda(text); setPaginaActual(1); }}
+                                    />
+                                </View>
+                                <View style={[esPantallaPequeña ? { width: "40%" } : { width: "40%" }]}>
+                                    <Selector
+                                        label="Estatus"
+                                        selectedValue={filtroEstatus}
+                                        onValueChange={setFiltroEstatus}
+                                        items={[
+                                            { label: "Todos", value: "Todos" },
+                                            { label: "Pendiente", value: "Pendiente" },
+                                            { label: "En revisión", value: "En revisión" },
+                                            { label: "Finalizado", value: "Finalizado" },
+                                        ]}
+                                    />
+                                </View>
+                            </View>
                         </View>
 
-                        <View style={[{ flexDirection: "row", gap: 8, justifyContent: "space-between" }, esPantallaPequeña ? { width: "100%" } : { width: "40%" }]}>
-                            <View style={[esPantallaPequeña ? { width: "60%", marginBottom: 15 } : { width: "60%" }]}>
-                                <Entrada
-                                    label="Buscar"
-                                    value={busqueda}
-                                    onChangeText={(text) => { setBusqueda(text); setPaginaActual(1); }}
-                                />
-                            </View>
-                            <View style={[esPantallaPequeña ? { width: "40%" } : { width: "40%" }]}>
-                                <Selector
-                                    label="Estatus"
-                                    selectedValue={filtroEstatus}
-                                    onValueChange={setFiltroEstatus}
-                                    items={[
-                                        { label: "Todos", value: "Todos" },
-                                        { label: "Pendiente", value: "Pendiente" },
-                                        { label: "En revisión", value: "En revisión" },
-                                        { label: "Finalizado", value: "Finalizado" },
-                                    ]}
-                                />
-                            </View>
-                        </View>
-                    </View>
-
-                    <ScrollView horizontal={esPantallaPequeña}>
-                        <Tabla
-                            columnas={[
-                                { key: "descripcion", titulo: "Descripción", ...(esPantallaPequeña && { ancho: 250 }) },
-                                { key: "fecha", titulo: "Fecha de envío", ancho: 150 },
-                                {
-                                    key: "estatus",
-                                    titulo: "Estatus",
-                                    ancho: 150,
-                                    render: (valor) => (
-                                        <Text
-                                            style={[
-                                                styles.texto,
-                                                valor === 2 && { color: Colores.textoInfo },
-                                                valor === 1 && { color: Colores.textoAdvertencia },
-                                                valor === 3 && { color: Colores.textoExito },
-                                            ]}
-                                        >
-                                            {valor === 1 ? "Pendiente" : valor === 2 ? "En revisión" : "Finalizado"}
-                                        </Text>
-                                    ),
-                                },
-                                {
-                                    key: "observacion",
-                                    titulo: "Observaciones",
-                                    ...(esPantallaPequeña && { ancho: 250 }),
-                                }
-                            ]}
-                            datos={reportesMostrados.map((fila) => {
-                                const observacion = Array.isArray(fila.observaciones) && fila.observaciones.length > 0 ? fila.observaciones.sort((a: any, b: any) => new Date(b.FECHA_DATETIME).getTime() - new Date(a.FECHA_DATETIME).getTime())[0] : null
-                                return {
-                                    ...fila,
-                                    fecha: new Date(fila.fechaRegistro).toLocaleDateString(),
-                                    observacion: observacion?.DESCRIPCION ? observacion.DESCRIPCION : "En espera de revisión.",
-                                    onPress: () => setReporteSeleccionado(fila),
-                                };
-                            })}
-                        />
-                    </ScrollView>
-                    <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                        <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                            <Paginacion
-                                paginaActual={paginaActual}
-                                totalPaginas={totalPaginas}
-                                setPaginaActual={setPaginaActual}
+                        <ScrollView horizontal={esPantallaPequeña}>
+                            <Tabla
+                                columnas={[
+                                    { key: "descripcion", titulo: "Descripción", ...(esPantallaPequeña && { ancho: 250 }) },
+                                    { key: "fecha", titulo: "Fecha de envío", ancho: 140 },
+                                    {
+                                        key: "estatus",
+                                        titulo: "Estatus",
+                                        ancho: 150,
+                                        render: (valor) => (
+                                            <Text
+                                                style={[
+                                                    styles.texto,
+                                                    valor === 2 && { color: Colores.textoInfo },
+                                                    valor === 1 && { color: Colores.textoAdvertencia },
+                                                    valor === 3 && { color: Colores.textoExito },
+                                                ]}
+                                                allowFontScaling={false}
+                                            >
+                                                {valor === 1 ? "Pendiente" : valor === 2 ? "En revisión" : "Finalizado"}
+                                            </Text>
+                                        ),
+                                    },
+                                    {
+                                        key: "observacion",
+                                        titulo: "Observaciones",
+                                        ...(esPantallaPequeña && { ancho: 250 }),
+                                    }
+                                ]}
+                                datos={reportesMostrados.map((fila) => {
+                                    const observacion = Array.isArray(fila.observaciones) && fila.observaciones.length > 0 ? fila.observaciones.sort((a: any, b: any) => new Date(b.FECHA_DATETIME).getTime() - new Date(a.FECHA_DATETIME).getTime())[0] : null
+                                    return {
+                                        ...fila,
+                                        fecha: new Date(fila.fechaRegistro).toLocaleDateString(),
+                                        observacion: observacion?.DESCRIPCION ? observacion.DESCRIPCION : "En espera de revisión.",
+                                        onPress: () => { setReporteSeleccionado(fila); setVerDetallesReporte(true) },
+                                    };
+                                })}
                             />
-                        </View>
+                        </ScrollView>
+                        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                                <Paginacion
+                                    paginaActual={paginaActual}
+                                    totalPaginas={totalPaginas}
+                                    setPaginaActual={setPaginaActual}
+                                />
+                            </View>
 
-                        <Text
-                            style={{
-                                color: Colores.textoClaro,
-                                fontSize: Fuentes.caption,
-                                marginTop: 15,
-                            }}
-                        >
-                            {`Mostrando ${reportesMostrados.length} de ${reportesFiltrados.length} resultados`}
-                        </Text>
+                            <Text
+                                style={{
+                                    color: Colores.textoClaro,
+                                    fontSize: Fuentes.caption,
+                                    marginTop: 15,
+                                }}
+                                allowFontScaling={false}
+                            >
+                                {`Mostrando ${reportesMostrados.length} de ${reportesFiltrados.length} resultados`}
+                            </Text>
+                        </View>
                     </View>
                 </View>
                 {renderModalAgregar()}
                 {renderModalDetalle()}
+                {renderModalEvidencia()}
                 <ModalAPI ref={modalAPI} />
+                <PiePagina />
             </ScrollView>
         </>
     );

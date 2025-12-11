@@ -73,6 +73,7 @@ export default function Selector({
               { color: selectedValue ? Colores.texto : Colores.textoClaro },
             ]}
             numberOfLines={1}
+            allowFontScaling={false}
           >
             {selectedValue || ""}
           </Text>

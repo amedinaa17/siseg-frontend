@@ -1,4 +1,5 @@
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
@@ -92,36 +93,38 @@ export default function CursoInduccion() {
         </View>
       )}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View
-          style={[
-            styles.contenedorFormulario,
-            esPantallaPequeña && { maxWidth: "95%" },
-          ]}
-        >
-          <Text style={styles.titulo}>Curso de inducción</Text>
+        <View style={{ flex: 1 }}>
+          <View
+            style={[
+              styles.contenedorFormulario,
+              esPantallaPequeña && { maxWidth: "95%" },
+            ]}
+          >
+            <Text allowFontScaling={false} style={styles.titulo}>Curso de inducción</Text>
 
-          <Text style={styles.subtitulo}>
-            Este código QR es único y personal para cada alumno. Se utilizará para registrar su asistencia al curso de inducción del servicio social.
-          </Text>
-
-          <Text style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>
-            Importante: Presenta este código en el momento de ingresar al curso. No debe ser compartido ni reutilizado.
-          </Text>
-
-          {codigoQR ? (
-            <Image source={{ uri: codigoQR }} style={styles.logo} />
-          ) : (
-            <Text style={{ textAlign: "center", marginVertical: 20 }}>
-              Generando tu código QR...
+            <Text allowFontScaling={false} style={styles.subtitulo}>
+              Este código QR es único y personal. Se utilizará para registrar tu asistencia al curso de inducción del servicio social.
             </Text>
-          )}
 
-          <View style={{ marginTop: 15, alignItems: "center" }}>
-            <Boton title="Descargar QR" onPress={() => descargarQR(codigoQR!)} />
+            <Text allowFontScaling={false} style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>
+              Importante: Presenta este código desde tu celular al momento de ingresar al curso. No debe ser compartido ni reutilizado.
+            </Text>
+
+            {codigoQR ? (
+              <Image source={{ uri: codigoQR }} style={styles.logo} />
+            ) : (
+              <Text allowFontScaling={false} style={{ textAlign: "center", marginVertical: 20 }}>
+                Generando tu código QR...
+              </Text>
+            )}
+
+            <View style={{ marginTop: 15, alignItems: "center" }}>
+              <Boton title="Descargar QR" onPress={() => descargarQR(codigoQR!)} />
+            </View>
           </View>
         </View>
-
         <ModalAPI ref={modalRef} />
+        <PiePagina />
       </ScrollView>
     </>
   );

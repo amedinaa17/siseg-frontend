@@ -106,7 +106,7 @@ export default function AlumnoMenuWeb() {
                           activoItem === "/acuse-solicitud" && styles.activoSubmenuItem,
                         ]}
                       >
-                        Acuse de Solicitud
+                        Acuse de solicitud
                       </Text>
                     </Pressable>
                   </Link>
@@ -124,7 +124,7 @@ export default function AlumnoMenuWeb() {
                           activoItem === "/expediente-digital" && styles.activoSubmenuItem,
                         ]}
                       >
-                        Ver Expediente
+                        Ver expediente
                       </Text>
                     </Pressable>
                   </Link>
@@ -207,7 +207,7 @@ export default function AlumnoMenuWeb() {
                           activoItem === "/plaza-asignada" && styles.activoSubmenuItem,
                         ]}
                       >
-                        Plaza Asignada
+                        Plaza asignada
                       </Text>
                     </Pressable>
                   </Link>
@@ -250,7 +250,7 @@ export default function AlumnoMenuWeb() {
                           activoItem === "/reportes-riesgo" && styles.activoSubmenuItem,
                         ]}
                       >
-                        Situación de Riesgo
+                        Situación de riesgo
                       </Text>
                     </Pressable>
                   </Link>
@@ -268,7 +268,7 @@ export default function AlumnoMenuWeb() {
                           activoItem === "/encuesta-satisfaccion" && styles.activoSubmenuItem,
                         ]}
                       >
-                        Encuesta de Satisfacción
+                        Encuesta de satisfacción
                       </Text>
                     </Pressable>
                   </Link>

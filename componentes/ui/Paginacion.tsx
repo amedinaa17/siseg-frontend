@@ -76,6 +76,7 @@ const Paginacion: React.FC<PaginacionProps> = ({ paginaActual, totalPaginas, set
                 styles.btnTexto,
                 paginaActual === page && styles.btnTextoActivo,
               ]}
+              allowFontScaling={false}
             >
               {page}
             </Text>
