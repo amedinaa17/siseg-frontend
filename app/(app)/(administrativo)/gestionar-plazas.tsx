@@ -1,5 +1,6 @@
 import Modal from "@/componentes/layout/Modal";
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Paginacion from "@/componentes/ui/Paginacion";
@@ -251,7 +252,12 @@ export default function GestionPlazas() {
                             name="sede"
                             defaultValue=""
                             render={({ field: { onChange, value } }) => (
-                                <Entrada label="Sede" value={value} onChangeText={onChange} error={errorsAgregar.sede?.message} />
+                                <Entrada
+                                    label="Sede"
+                                    value={value}
+                                    maxLength={100}
+                                    onChangeText={onChange}
+                                    error={errorsAgregar.sede?.message} />
                             )}
                         />
                     </View>
@@ -262,7 +268,12 @@ export default function GestionPlazas() {
                             name="ubicacion"
                             defaultValue=""
                             render={({ field: { onChange, value } }) => (
-                                <Entrada label="Ubicación" value={value} onChangeText={onChange} error={errorsAgregar.ubicacion?.message} />
+                                <Entrada
+                                    label="Ubicación"
+                                    value={value}
+                                    maxLength={100}
+                                    onChangeText={onChange}
+                                    error={errorsAgregar.ubicacion?.message} />
                             )}
                         />
                     </View>
@@ -274,7 +285,12 @@ export default function GestionPlazas() {
                                 name="programa"
                                 defaultValue=""
                                 render={({ field: { onChange, value } }) => (
-                                    <Entrada label="Programa" value={value} onChangeText={onChange} error={errorsAgregar.programa?.message} />
+                                    <Entrada
+                                        label="Programa"
+                                        value={value}
+                                        maxLength={45}
+                                        onChangeText={onChange}
+                                        error={errorsAgregar.programa?.message} />
                                 )}
                             />
                         </View>
@@ -287,7 +303,12 @@ export default function GestionPlazas() {
                                     <Entrada
                                         label="Tarjeta"
                                         keyboardType="numeric"
-                                        value={value} onChangeText={onChange}
+                                        value={value}
+                                        maxLength={2}
+                                        onChangeText={(text) => {
+                                            const digitos = text.replace(/[^0-9]/g, "");
+                                            onChange(digitos);
+                                        }}
                                         error={errorsAgregar.tarjeta?.message}
                                     />
                                 )}
@@ -302,7 +323,15 @@ export default function GestionPlazas() {
                                 name="beca"
                                 defaultValue=""
                                 render={({ field: { onChange, value } }) => (
-                                    <Entrada label="Beca" value={value} onChangeText={onChange} error={errorsAgregar.beca?.message} />
+                                    <Entrada
+                                        label="Beca"
+                                        value={value}
+                                        maxLength={1}
+                                        onChangeText={(text) => {
+                                            const alfabetico = text.replace(/[^a-zA-Z]/g, "");
+                                            onChange(alfabetico.toUpperCase());
+                                        }}
+                                        error={errorsAgregar.beca?.message} />
                                 )}
                             />
                         </View>
@@ -354,7 +383,12 @@ export default function GestionPlazas() {
                                 name="promocion"
                                 defaultValue=""
                                 render={({ field: { onChange, value } }) => (
-                                    <Entrada label="Promoción" value={value} onChangeText={onChange} error={errorsAgregar.promocion?.message} />
+                                    <Entrada
+                                        label="Promoción"
+                                        value={value}
+                                        maxLength={45}
+                                        onChangeText={onChange}
+                                        error={errorsAgregar.promocion?.message} />
                                 )}
                             />
                         </View>
@@ -386,7 +420,6 @@ export default function GestionPlazas() {
                     behavior={Platform.OS === "web" ? undefined : "padding"}
                     keyboardVerticalOffset={80}
                 >
-                    {/* SEDE */}
                     <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlEditar}
@@ -395,14 +428,15 @@ export default function GestionPlazas() {
                             render={({ field: { onChange, value } }) => (
                                 <Entrada
                                     label="Sede"
-                                    value={value} onChangeText={onChange}
+                                    value={value}
+                                    maxLength={100}
+                                    onChangeText={onChange}
                                     error={errorsEditar.sede?.message}
                                 />
                             )}
                         />
                     </View>
 
-                    {/* UBICACION */}
                     <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlEditar}
@@ -411,14 +445,15 @@ export default function GestionPlazas() {
                             render={({ field: { onChange, value } }) => (
                                 <Entrada
                                     label="Ubicación"
-                                    value={value} onChangeText={onChange}
+                                    value={value}
+                                    maxLength={100}
+                                    onChangeText={onChange}
                                     error={errorsEditar.ubicacion?.message}
                                 />
                             )}
                         />
                     </View>
 
-                    {/* PROGRAMA / TARJETA */}
                     <View
                         style={
                             esPantallaPequeña
@@ -434,7 +469,9 @@ export default function GestionPlazas() {
                                 render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Programa"
-                                        value={value} onChangeText={onChange}
+                                        value={value}
+                                        maxLength={45}
+                                        onChangeText={onChange}
                                         error={errorsEditar.programa?.message}
                                     />
                                 )}
@@ -454,7 +491,12 @@ export default function GestionPlazas() {
                                     <Entrada
                                         label="Tarjeta"
                                         keyboardType="numeric"
-                                        value={value} onChangeText={onChange}
+                                        value={value}
+                                        maxLength={2}
+                                        onChangeText={(text) => {
+                                            const digitos = text.replace(/[^0-9]/g, "");
+                                            onChange(digitos);
+                                        }}
                                         error={errorsEditar.tarjeta?.message}
                                     />
                                 )}
@@ -462,7 +504,6 @@ export default function GestionPlazas() {
                         </View>
                     </View>
 
-                    {/* BECA */}
                     <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlEditar}
@@ -471,14 +512,18 @@ export default function GestionPlazas() {
                             render={({ field: { onChange, value } }) => (
                                 <Entrada
                                     label="Beca"
-                                    value={value} onChangeText={onChange}
+                                    value={value}
+                                    maxLength={1}
+                                    onChangeText={(text) => {
+                                        const alfabetico = text.replace(/[^a-zA-Z]/g, "");
+                                        onChange(alfabetico.toUpperCase());
+                                    }}
                                     error={errorsEditar.beca?.message}
                                 />
                             )}
                         />
                     </View>
 
-                    {/* CARRERA / PROMOCION */}
                     <View
                         style={
                             esPantallaPequeña
@@ -524,7 +569,9 @@ export default function GestionPlazas() {
                                 render={({ field: { onChange, value } }) => (
                                     <Entrada
                                         label="Promoción"
-                                        value={value} onChangeText={onChange}
+                                        value={value}
+                                        maxLength={45}
+                                        onChangeText={onChange}
                                         error={errorsEditar.promocion?.message}
                                     />
                                 )}
@@ -541,10 +588,10 @@ export default function GestionPlazas() {
         if (!modalDarBaja) return null;
 
         return (
-            <Modal visible={modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de baja plaza" maxWidth={500}
+            <Modal visible={!!modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de baja plaza" maxWidth={500}
                 cancelar deshabilitado={isSubmittingDarBaja}
                 textoAceptar={isSubmittingDarBaja ? "Enviando…" : "Dar de baja"} onAceptar={() => { handleSubmitDarBaja(() => eliminarPlaza(modalDarBaja.ID))(); }}>
-                <Text style={{ marginBottom: 20 }}>
+                <Text allowFontScaling={false} style={{ marginBottom: 20 }}>
                     ¿Estás seguro de que deseas dar de baja la plaza {" "}
                     <Text style={{ fontWeight: "700" }}>{modalDarBaja.sede}</Text>?
                 </Text>
@@ -566,149 +613,152 @@ export default function GestionPlazas() {
                 </View>
             )}
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                    <Text style={styles.titulo}>Gestionar plazas</Text>
-                    <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
-                        <View>
-                            <Boton title="Agregar plaza" onPress={() => { setModalAgregar(true) }} />
-                        </View>
-                    </View>
-
-                    <View style={styles.controlesSuperiores}>
-                        <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                                <Selector
-                                    label=""
-                                    selectedValue={String(filasPorPagina)}
-                                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                    items={[
-                                        { label: "5", value: "5" },
-                                        { label: "10", value: "10" },
-                                        { label: "20", value: "20" },
-                                    ]}
-                                />
+                <View style={{ flex: 1 }}>
+                    <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                        <Text allowFontScaling={false} style={styles.titulo}>Gestionar plazas</Text>
+                        <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
+                            <View>
+                                <Boton title="Agregar plaza" onPress={() => { setModalAgregar(true) }} />
                             </View>
-                            <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
                         </View>
 
-                        <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
-                            <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
-                                <Entrada
-                                    label="Buscar"
-                                    value={busqueda}
-                                    onChangeText={setBusqueda}
-                                />
-                            </View>
-
-                            <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
-                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                        <View style={styles.controlesSuperiores}>
+                            <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+                                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
                                     <Selector
-                                        label="Carrera"
-                                        selectedValue={filtroCarrera}
-                                        onValueChange={setFiltroCarrera}
+                                        label=""
+                                        selectedValue={String(filasPorPagina)}
+                                        onValueChange={(valor) => setFilasPorPagina(Number(valor))}
                                         items={[
-                                            { label: "Todos", value: "Todos" },
-                                            { label: "Médico Cirujano y Partero", value: "Partero" },
-                                            { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
+                                            { label: "5", value: "5" },
+                                            { label: "10", value: "10" },
+                                            { label: "20", value: "20" },
                                         ]}
                                     />
                                 </View>
+                                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+                            </View>
 
-                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
-                                    <Selector
-                                        label="Estatus"
-                                        selectedValue={filtroEstatus}
-                                        onValueChange={setFiltroEstatus}
-                                        items={[
-                                            { label: "Todos", value: "Todos" },
-                                            { label: "Baja", value: "Baja" },
-                                            { label: "Alta", value: "Alta" },
-                                        ]}
+                            <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
+                                <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
+                                    <Entrada
+                                        label="Buscar"
+                                        value={busqueda}
+                                        onChangeText={setBusqueda}
                                     />
                                 </View>
-                            </View>
-                        </View>
-                    </View>
 
-                    <ScrollView horizontal={esPantallaPequeña}>
-                        <Tabla
-                            columnas={[
-                                { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 350 }) },
-                                { key: "carrera", titulo: "Carrera", ancho: 250 },
-                                { key: "promocion", titulo: "Promoción", ancho: 150 },
-                                {
-                                    key: "estatus",
-                                    titulo: "Estatus",
-                                    ancho: 150,
-                                    render: (valor) => (
-                                        <Text
-                                            style={[
-                                                styles.texto,
-                                                valor === 0 && { color: Colores.textoError },
-                                                valor === 1 && { color: Colores.textoInfo },
+                                <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
+                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                                        <Selector
+                                            label="Carrera"
+                                            selectedValue={filtroCarrera}
+                                            onValueChange={setFiltroCarrera}
+                                            items={[
+                                                { label: "Todos", value: "Todos" },
+                                                { label: "Médico Cirujano y Partero", value: "Partero" },
+                                                { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
                                             ]}
-                                        >
-                                            {valor === 0 ? "Baja" : "Alta"}
-                                        </Text>
-                                    ),
-                                },
-                                {
-                                    key: "acciones",
-                                    titulo: "Acciones",
-                                    ancho: 100,
-                                    render: (_: any, fila: any) => (
-                                        <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
-                                            <Boton
-                                                onPress={() => { setPlazaSeleccion(fila); setModalEditar(true); }}
-                                                icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                color={Colores.textoInfo}
-                                            />
-                                            <Boton
-                                                onPress={() => { setModalDarBaja(fila) }}
-                                                icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                color={Colores.textoError}
-                                                disabled={Number(fila.estatus) === 0}
-                                            />
-                                        </View>
-                                    ),
-                                },
-                            ]}
-                            datos={plazasMostradas.map((p) => ({
-                                ...p,
-                                carrera: p.carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Partero",
-                                onPress: () => { setPlazaSeleccion(p); setModalDetalle(true); },
-                            }))}
-                        />
+                                        />
+                                    </View>
 
-
-                    </ScrollView>
-
-                    <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                        <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                            <Paginacion
-                                paginaActual={paginaActual}
-                                totalPaginas={totalPaginas}
-                                setPaginaActual={setPaginaActual}
-                            />
+                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
+                                        <Selector
+                                            label="Estatus"
+                                            selectedValue={filtroEstatus}
+                                            onValueChange={setFiltroEstatus}
+                                            items={[
+                                                { label: "Todos", value: "Todos" },
+                                                { label: "Baja", value: "Baja" },
+                                                { label: "Alta", value: "Alta" },
+                                            ]}
+                                        />
+                                    </View>
+                                </View>
+                            </View>
                         </View>
 
-                        <Text
-                            style={{
-                                color: Colores.textoClaro,
-                                fontSize: Fuentes.caption,
-                                marginTop: 15,
-                            }}
-                        >
-                            {`Mostrando ${plazasMostradas.length} de ${plazasFiltradas.length} resultados`}
-                        </Text>
-                    </View>
+                        <ScrollView horizontal={esPantallaPequeña}>
+                            <Tabla
+                                columnas={[
+                                    { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 250 }) },
+                                    { key: "carrera", titulo: "Carrera", ancho: 230 },
+                                    { key: "promocion", titulo: "Promoción", ancho: 110 },
+                                    {
+                                        key: "estatus",
+                                        titulo: "Estatus",
+                                        ancho: 100,
+                                        render: (valor) => (
+                                            <Text
+                                                style={[
+                                                    styles.texto,
+                                                    valor === 0 && { color: Colores.textoError },
+                                                    valor === 1 && { color: Colores.textoInfo },
+                                                ]}
+                                                allowFontScaling={false}
+                                            >
+                                                {valor === 0 ? "Baja" : "Alta"}
+                                            </Text>
+                                        ),
+                                    },
+                                    {
+                                        key: "acciones",
+                                        titulo: "Acciones",
+                                        ancho: 100,
+                                        render: (_: any, fila: any) => (
+                                            <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                                                <Boton
+                                                    onPress={() => { setPlazaSeleccion(fila); setModalEditar(true); }}
+                                                    icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                    color={Colores.textoInfo}
+                                                />
+                                                <Boton
+                                                    onPress={() => { setModalDarBaja(fila) }}
+                                                    icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                    color={Colores.textoError}
+                                                    disabled={Number(fila.estatus) === 0}
+                                                />
+                                            </View>
+                                        ),
+                                    },
+                                ]}
+                                datos={plazasMostradas.map((p) => ({
+                                    ...p,
+                                    carrera: p.carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Partero",
+                                    onPress: () => { setPlazaSeleccion(p); setModalDetalle(true); },
+                                }))}
+                            />
+                        </ScrollView>
 
+                        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                                <Paginacion
+                                    paginaActual={paginaActual}
+                                    totalPaginas={totalPaginas}
+                                    setPaginaActual={setPaginaActual}
+                                />
+                            </View>
+
+                            <Text
+                                style={{
+                                    color: Colores.textoClaro,
+                                    fontSize: Fuentes.caption,
+                                    marginTop: 15,
+                                }}
+                                allowFontScaling={false}
+                            >
+                                {`Mostrando ${plazasMostradas.length} de ${plazasFiltradas.length} resultados`}
+                            </Text>
+                        </View>
+
+                    </View>
                 </View>
                 {renderModalDetalle()}
                 {renderModalEditar()}
                 {renderModalAgregar()}
                 {renderModalDarBaja()}
                 <ModalAPI ref={modalAPI} />
+                <PiePagina />
             </ScrollView >
         </>
     );

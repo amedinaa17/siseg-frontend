@@ -227,6 +227,7 @@ export default function ReportesRiesgo() {
                                     <EntradaMultilinea
                                         label="Descripción"
                                         value={value}
+                                        maxLength={200}
                                         onChangeText={(text) => {
                                             onChange(text);
                                             setDescripcionNueva(text);
@@ -327,7 +328,7 @@ export default function ReportesRiesgo() {
                         </View>
                         <View style={{ flex: 1, marginBottom: 0 }}>
 
-                            <Entrada label="Revisado por" value={adminEncargado} editable={false} />
+                            <Entrada label="Revisado por" value={reporteSeleccionado.adminEncargado.nombre + " " + reporteSeleccionado.adminEncargado.APELLIDO_PATERNO + " " + reporteSeleccionado.adminEncargado.APELLIDO_MATERNO} editable={false} />
                         </View>
                     </View>
                 )}
@@ -479,6 +480,7 @@ export default function ReportesRiesgo() {
                                     <Entrada
                                         label="Buscar"
                                         value={busqueda}
+                                        maxLength={45}
                                         onChangeText={(text) => { setBusqueda(text); setPaginaActual(1); }}
                                     />
                                 </View>

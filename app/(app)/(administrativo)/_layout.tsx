@@ -77,6 +77,7 @@ function AdministrativoDrawerContent(props) {
       </View>
       <DrawerItem
         label="INICIO"
+        allowFontScaling={false}
         labelStyle={{ color: Colores.onPrimario }}
         style={activoItem === "/inicio-administrativo" && drawerStyles.activo}
         onPress={() => { toggleCerrar(); router.push("/(app)/(administrativo)/inicio-administrativo") }}
@@ -86,7 +87,7 @@ function AdministrativoDrawerContent(props) {
         onPress={() => { toggleCerrar(); setMostrarSubmenuAlumnos(!mostrarSubmenuAlumnos) }}
         style={[drawerStyles.seccionEncabezado, activoItem === "/validar-documentos" || activoItem === "/lista-asistencia" || activoItem === "/gestionar-alumnos" ? drawerStyles.activo : []]}
       >
-        <Text style={drawerStyles.seccionEncabezadoTexto}>
+        <Text allowFontScaling={false} style={drawerStyles.seccionEncabezadoTexto}>
           ALUMNOS {mostrarSubmenuAlumnos ? "▴" : "▾"}
         </Text>
       </TouchableOpacity>
@@ -96,25 +97,26 @@ function AdministrativoDrawerContent(props) {
             style={[drawerStyles.mostrarSubmenuItem, activoItem === "/validar-documentos" && drawerStyles.activoSubmenuItem]}
             onPress={() => { toggleCerrar(); router.push("/validar-documentos") }}
           >
-            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/validar-documentos" && { color: Colores.onPrimario }]}>Validar Documentos</Text>
+            <Text allowFontScaling={false} style={[drawerStyles.mostrarSubmenuText, activoItem === "/validar-documentos" && { color: Colores.onPrimario }]}>Validar documentos</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[drawerStyles.mostrarSubmenuItem, activoItem === "/lista-asistencia" && drawerStyles.activoSubmenuItem]}
             onPress={() => { toggleCerrar(); router.push("/lista-asistencia") }}
           >
-            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/lista-asistencia" && { color: Colores.onPrimario }]}>Asistencia al Curso de Inducción</Text>
+            <Text allowFontScaling={false} style={[drawerStyles.mostrarSubmenuText, activoItem === "/lista-asistencia" && { color: Colores.onPrimario }]}>Asistencia al curso de inducción</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[drawerStyles.mostrarSubmenuItem, activoItem === "/gestionar-alumnos" && drawerStyles.activoSubmenuItem]}
             onPress={() => { toggleCerrar(); router.push("/gestionar-alumnos") }}
           >
-            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/gestionar-alumnos" && { color: Colores.onPrimario }]}>Gestionar Alumnos</Text>
+            <Text allowFontScaling={false} style={[drawerStyles.mostrarSubmenuText, activoItem === "/gestionar-alumnos" && { color: Colores.onPrimario }]}>Gestionar alumnos</Text>
           </TouchableOpacity>
         </View>
       )}
 
       <DrawerItem
         label="PERSONAL ADMINISTRATIVO"
+        allowFontScaling={false}
         labelStyle={{ color: Colores.onPrimario }}
         style={activoItem === "/gestionar-personal" && drawerStyles.activo}
         onPress={() => { toggleCerrar(); router.push("/gestionar-personal") }}
@@ -124,7 +126,7 @@ function AdministrativoDrawerContent(props) {
         onPress={() => { toggleCerrar(); setMostrarSubmenuPlazas(!mostrarSubmenuPlazas) }}
         style={[drawerStyles.seccionEncabezado, activoItem === "/gestionar-plazas" || activoItem === "/asignar-plaza" || activoItem === "/mapa-plazas" ? drawerStyles.activo : []]}
       >
-        <Text style={drawerStyles.seccionEncabezadoTexto}>
+        <Text allowFontScaling={false} style={drawerStyles.seccionEncabezadoTexto}>
           PLAZAS {mostrarSubmenuPlazas ? "▴" : "▾"}
         </Text>
       </TouchableOpacity>
@@ -134,19 +136,19 @@ function AdministrativoDrawerContent(props) {
             style={[drawerStyles.mostrarSubmenuItem, activoItem === "/gestionar-plazas" && drawerStyles.activoSubmenuItem]}
             onPress={() => { toggleCerrar(); router.push("/gestionar-plazas") }}
           >
-            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/gestionar-plazas" && { color: Colores.onPrimario }]}>Gestionar plazas</Text>
+            <Text allowFontScaling={false} style={[drawerStyles.mostrarSubmenuText, activoItem === "/gestionar-plazas" && { color: Colores.onPrimario }]}>Gestionar plazas</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[drawerStyles.mostrarSubmenuItem, activoItem === "/asignar-plaza" && drawerStyles.activoSubmenuItem]}
             onPress={() => { toggleCerrar(); router.push("/asignar-plaza") }}
           >
-            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/asignar-plaza" && { color: Colores.onPrimario }]}>Asignar Plaza</Text>
+            <Text allowFontScaling={false} style={[drawerStyles.mostrarSubmenuText, activoItem === "/asignar-plaza" && { color: Colores.onPrimario }]}>Asignar plaza</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[drawerStyles.mostrarSubmenuItem, activoItem === "/mapa-plazas" && drawerStyles.activoSubmenuItem]}
             onPress={() => { toggleCerrar(); router.push("/mapa-plazas") }}
           >
-            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/mapa-plazas" && { color: Colores.onPrimario }]}>Mapa de Plazas</Text>
+            <Text allowFontScaling={false} style={[drawerStyles.mostrarSubmenuText, activoItem === "/mapa-plazas" && { color: Colores.onPrimario }]}>Mapa de plazas</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -155,7 +157,7 @@ function AdministrativoDrawerContent(props) {
         onPress={() => { toggleCerrar(); setMostrarSubmenuReportes(!mostrarSubmenuReportes) }}
         style={[drawerStyles.seccionEncabezado, activoItem === "/revisar-reportes-riesgo" || activoItem === "/reportes-encuestas" ? drawerStyles.activo : []]}
       >
-        <Text style={drawerStyles.seccionEncabezadoTexto}>
+        <Text allowFontScaling={false} style={drawerStyles.seccionEncabezadoTexto}>
           REPORTES {mostrarSubmenuReportes ? "▴" : "▾"}
         </Text>
       </TouchableOpacity>
@@ -165,28 +167,30 @@ function AdministrativoDrawerContent(props) {
             style={[drawerStyles.mostrarSubmenuItem, activoItem === "/revisar-reportes-riesgo" && drawerStyles.activoSubmenuItem]}
             onPress={() => { toggleCerrar(); router.push("/revisar-reportes-riesgo") }}
           >
-            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/revisar-reportes-riesgo" && { color: Colores.onPrimario }]}>Situación de Riesgo</Text>
+            <Text allowFontScaling={false} style={[drawerStyles.mostrarSubmenuText, activoItem === "/revisar-reportes-riesgo" && { color: Colores.onPrimario }]}>Situación de riesgo</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[drawerStyles.mostrarSubmenuItem, activoItem === "/reportes-encuestas" && drawerStyles.activoSubmenuItem]}
             onPress={() => { toggleCerrar(); router.push("/reportes-encuestas") }}
           >
-            <Text style={[drawerStyles.mostrarSubmenuText, activoItem === "/reportes-encuestas" && { color: Colores.onPrimario }]}>Encuestas de Satisfacción</Text>
+            <Text allowFontScaling={false} style={[drawerStyles.mostrarSubmenuText, activoItem === "/reportes-encuestas" && { color: Colores.onPrimario }]}>Encuestas de satisfacción</Text>
           </TouchableOpacity>
         </View>
       )}
 
       <DrawerItem
         label="MI PERFIL"
+        allowFontScaling={false}
         labelStyle={{ color: Colores.onPrimario }}
         style={activoItem === "/perfil" && drawerStyles.activo}
         onPress={() => { toggleCerrar(); router.push("/perfil") }}
       />
 
-      <View><Text style={{ width: "100%", borderBottomColor: Colores.onPrimario, borderBottomWidth: 1 }}></Text></View>
+      <View><Text allowFontScaling={false} style={{ width: "100%", borderBottomColor: Colores.onPrimario, borderBottomWidth: 1 }}></Text></View>
 
       <DrawerItem
         label="CERRAR SESIÓN"
+        allowFontScaling={false}
         labelStyle={{ color: Colores.onPrimario, fontWeight: "700" }}
         onPress={handleLogout}
       />

@@ -1,5 +1,6 @@
 import Modal from "@/componentes/layout/Modal";
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Entrada from "@/componentes/ui/Entrada";
 import Paginacion from "@/componentes/ui/Paginacion";
 import Selector from "@/componentes/ui/Selector";
@@ -247,113 +248,117 @@ export default function EncuestasAdmin() {
         </View>
       )}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-          <Text style={styles.titulo}>Encuestas de satisfacción</Text>
+        <View style={{ flex: 1 }}>
+          <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%", flex: 1 }]}>
+            <Text allowFontScaling={false} style={styles.titulo}>Encuestas de satisfacción</Text>
 
-          <View style={styles.controlesSuperiores}>
-            <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-              <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                <Selector
-                  label=""
-                  selectedValue={String(filasPorPagina)}
-                  onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                  items={[
-                    { label: "5", value: "5" },
-                    { label: "10", value: "10" },
-                    { label: "20", value: "20" },
-                  ]}
-                />
+            <View style={styles.controlesSuperiores}>
+              <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                  <Selector
+                    label=""
+                    selectedValue={String(filasPorPagina)}
+                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                    items={[
+                      { label: "5", value: "5" },
+                      { label: "10", value: "10" },
+                      { label: "20", value: "20" },
+                    ]}
+                  />
+                </View>
+                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
               </View>
-              <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+
+              <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "50%" }]}>
+                <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "70%" }]}>
+                  <Entrada
+                    label="Buscar"
+                    value={busqueda}
+                    allowFontScaling={false}
+                    maxLength={45}
+                    onChangeText={setBusqueda}
+                  />
+                </View>
+
+                <View style={[esPantallaPequeña ? { width: "100%" } : { width: "30%" }]}>
+                  <Selector
+                    label="Carrera"
+                    selectedValue={filtroCarrera}
+                    onValueChange={setFiltroCarrera}
+                    items={[
+                      { label: "Todos", value: "Todos" },
+                      ...Array.from(new Set(alumnos.map((a) => carreraTexto(a.carrera)))).map((c) => ({
+                        label: c,
+                        value: c,
+                      })),
+                    ]}
+                  />
+                </View>
+              </View>
             </View>
 
-            <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "50%" }]}>
-              <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "70%" }]}>
-                <Entrada
-                  label="Buscar"
-                  value={busqueda}
-                  onChangeText={setBusqueda}
-                />
-              </View>
-
-              <View style={[esPantallaPequeña ? { width: "100%" } : { width: "30%" }]}>
-                <Selector
-                  label="Carrera"
-                  selectedValue={filtroCarrera}
-                  onValueChange={setFiltroCarrera}
-                  items={[
-                    { label: "Todos", value: "Todos" },
-                    ...Array.from(new Set(alumnos.map((a) => carreraTexto(a.carrera)))).map((c) => ({
-                      label: c,
-                      value: c,
-                    })),
-                  ]}
-                />
-              </View>
-            </View>
-          </View>
-
-          <ScrollView horizontal={esPantallaPequeña}>
-            <Tabla
-              columnas={[
-                { key: "boleta", titulo: "Boleta", ancho: 150 },
-                { key: "nombre", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
-                { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
-                { key: "fechaUltima", titulo: "Período", ancho: 200 },
-                {
-                  key: "estatus",
-                  titulo: "Estatus",
-                  ancho: 140,
-                  render: (valor) => (
-                    <Text
-                      style={[
-                        styles.texto,
-                        valor === "Completada" && { color: Colores.textoExito },
-                        valor === "Pendiente" && { color: Colores.textoAdvertencia },
-                      ]}
-                    >
-                      {valor}
-                    </Text>
-                  ),
-                },
-              ]}
-              datos={filasPaginadas.map((f) => ({
-                ...f,
-                onPress: () => abrirDetalle(f),
-              }))}
-            />
-          </ScrollView>
-
-          <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-              <Paginacion
-                paginaActual={paginaActual}
-                totalPaginas={totalPaginas}
-                setPaginaActual={setPaginaActual}
+            <ScrollView horizontal={esPantallaPequeña}>
+              <Tabla
+                columnas={[
+                  { key: "boleta", titulo: "Boleta", ancho: 120 },
+                  { key: "nombre", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 200 }) },
+                  { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 200 }) },
+                  { key: "fechaUltima", titulo: "Período", ancho: 150 },
+                  {
+                    key: "estatus",
+                    titulo: "Estatus",
+                    ancho: 120,
+                    render: (valor) => (
+                      <Text
+                        style={[
+                          styles.texto,
+                          valor === "Completada" && { color: Colores.textoExito },
+                          valor === "Pendiente" && { color: Colores.textoAdvertencia },
+                        ]}
+                        allowFontScaling={false}
+                      >
+                        {valor}
+                      </Text>
+                    ),
+                  },
+                ]}
+                datos={filasPaginadas.map((f) => ({
+                  ...f,
+                  onPress: () => abrirDetalle(f),
+                }))}
               />
-            </View>
+            </ScrollView>
 
-            <Text
-              style={{
-                color: Colores.textoClaro,
-                fontSize: Fuentes.caption,
-                marginTop: 15,
-              }}
-            >
-              {`Mostrando ${filasPaginadas.length} de ${filas.length} resultados`}
-            </Text>
+            <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+              <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                <Paginacion
+                  paginaActual={paginaActual}
+                  totalPaginas={totalPaginas}
+                  setPaginaActual={setPaginaActual}
+                />
+              </View>
+
+              <Text
+                style={{
+                  color: Colores.textoClaro,
+                  fontSize: Fuentes.caption,
+                  marginTop: 15,
+                }}
+              >
+                {`Mostrando ${filasPaginadas.length} de ${filas.length} resultados`}
+              </Text>
+            </View>
           </View>
         </View>
-
         <Modal
           visible={modalOpen}
           onClose={() => setModalOpen(false)}
           titulo="Encuesta de satisfacción mensual"
           maxWidth={900}
         >
-          <Text style={{ fontSize: Fuentes.subtitulo, marginBottom: 15, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Período: </Text> {modalFecha}</Text>
-          <Text style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{modalAlumno}</Text>
-          <Text style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, fontWeight: "600", marginBottom: 20 }}>{modalBoleta}</Text>
+          <Text allowFontScaling={false} style={{ fontSize: Fuentes.subtitulo, marginBottom: 15, textAlign: "right" }}><Text style={{ fontWeight: "600" }}>Período: </Text> {modalFecha}</Text>
+          <Text allowFontScaling={false} style={{ fontSize: 15, color: Colores.textoSecundario, fontWeight: "600", marginBottom: 10 }}>{modalAlumno}</Text>
+          <Text allowFontScaling={false} style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, fontWeight: "600", marginBottom: 20 }}>{modalBoleta}</Text>
           <ScrollView horizontal={esPantallaPequeña}>
             <Tabla
               columnas={[
@@ -368,7 +373,7 @@ export default function EncuestasAdmin() {
                     const valor = modalValores[q!.index - 1] ?? 0;
 
                     return (
-                      <Text style={[styles.texto, colorRespuesta(valor)]}>
+                      <Text allowFontScaling={false} style={[styles.texto, colorRespuesta(valor)]}>
                         {valueToLabel(q!, valor)}
                       </Text>
                     );
@@ -382,9 +387,8 @@ export default function EncuestasAdmin() {
             />
           </ScrollView>
         </Modal>
-
-
         <ModalAPI ref={modalAPI} />
+        <PiePagina />
       </ScrollView>
     </>
   );

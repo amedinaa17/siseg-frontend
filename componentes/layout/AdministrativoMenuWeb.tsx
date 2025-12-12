@@ -97,7 +97,7 @@ export default function AdministrativoMenuWeb() {
                         menuItemHoverSubItem === "validar-documentos" && styles.submenuItemHover,
                         activoItem === "/validar-documentos" && styles.activoSubmenuItem,
                       ]}>
-                        Validar Documentos</Text>
+                        Validar documentos</Text>
                     </Pressable>
                   </Link>
                   <Link href="/lista-asistencia" asChild>
@@ -111,7 +111,7 @@ export default function AdministrativoMenuWeb() {
                         menuItemHoverSubItem === "lista-asistencia" && styles.submenuItemHover,
                         activoItem === "/lista-asistencia" && styles.activoSubmenuItem,
                       ]}>
-                        Asistencia al Curso de Inducción
+                        Asistencia al curso de inducción
                       </Text>
                     </Pressable>
                   </Link>
@@ -125,7 +125,7 @@ export default function AdministrativoMenuWeb() {
                         styles.submenuItem,
                         menuItemHoverSubItem === "gestionar-alumnos" && styles.submenuItemHover,
                         activoItem === "/gestionar-alumnos" && styles.activoSubmenuItem,
-                      ]}>Gestionar Alumnos</Text>
+                      ]}>Gestionar alumnos</Text>
                     </Pressable>
                   </Link>
                 </View>
@@ -182,7 +182,7 @@ export default function AdministrativoMenuWeb() {
                         styles.submenuItem,
                         menuItemHoverSubItem === "gestionar-plazas" && styles.submenuItemHover,
                         activoItem === "/gestionar-plazas" && styles.activoSubmenuItem,
-                      ]}>Gestionar Plazas</Text>
+                      ]}>Gestionar plazas</Text>
                     </Pressable>
                   </Link>
                   <Link href="/asignar-plaza" asChild>
@@ -195,7 +195,7 @@ export default function AdministrativoMenuWeb() {
                         styles.submenuItem,
                         menuItemHoverSubItem === "asignar-plaza" && styles.submenuItemHover,
                         activoItem === "/asignar-plaza" && styles.activoSubmenuItem,
-                      ]}>Asignar Plaza</Text>
+                      ]}>Asignar plaza</Text>
                     </Pressable>
                   </Link>
                   <Link href="/mapa-plazas" asChild>
@@ -208,7 +208,7 @@ export default function AdministrativoMenuWeb() {
                         styles.submenuItem,
                         menuItemHoverSubItem === "mapa-plazas" && styles.submenuItemHover,
                         activoItem === "/mapa-plazas" && styles.activoSubmenuItem,
-                      ]}>Mapa de Plazas</Text>
+                      ]}>Mapa de plazas</Text>
                     </Pressable>
                   </Link>
                 </View>
@@ -246,7 +246,7 @@ export default function AdministrativoMenuWeb() {
                         menuItemHoverSubItem === "revisar-reportes-riesgo" && styles.submenuItemHover,
                         activoItem === "/revisar-reportes-riesgo" && styles.activoSubmenuItem,
                       ]}>
-                        Reportes de Situación de Riesgo
+                        Reportes de situación de riesgo
                       </Text>
                     </Pressable>
                   </Link>
@@ -260,7 +260,7 @@ export default function AdministrativoMenuWeb() {
                         styles.submenuItem,
                         menuItemHoverSubItem === "reportes-encuestas" && styles.submenuItemHover,
                         activoItem === "/reportes-encuestas" && styles.activoSubmenuItem,
-                      ]}>Encuestas de Satisfacción</Text>
+                      ]}>Encuestas de satisfacción</Text>
                     </Pressable>
                   </Link>
                 </View>

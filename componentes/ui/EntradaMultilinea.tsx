@@ -79,7 +79,7 @@ export default function EntradaMultilinea({
         />
       </View>
 
-      {error && <Text style={styles.errorTexto}>{error}</Text>}
+      {error && <Text allowFontScaling={false} style={styles.errorTexto}>{error}</Text>}
     </View>
   );
 }

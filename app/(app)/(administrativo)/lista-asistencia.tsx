@@ -1,4 +1,5 @@
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Paginacion from "@/componentes/ui/Paginacion";
@@ -35,10 +36,12 @@ const formatearFecha = (isoString: string) => {
 };
 
 export default function CursoInduccion() {
+  const { sesion, verificarToken } = useAuth();
+
+  const modalAPI = useRef<ModalAPIRef>(null);
+
   const { width } = useWindowDimensions();
   const esPantallaPequeña = width < 790;
-  const { sesion, verificarToken } = useAuth();
-  const modalAPI = useRef<ModalAPIRef>(null);
 
   const [permission, requestPermission] = useCameraPermissions();
   const [escaneando, setEscaneando] = useState(false);
@@ -161,242 +164,153 @@ export default function CursoInduccion() {
   const totalPaginas = Math.max(1, Math.ceil(registrosFiltrados.length / filasPorPagina));
   const registrosMostrados = registrosFiltrados.slice((paginaActual - 1) * filasPorPagina, paginaActual * filasPorPagina);
 
-  const mostrarLayoutDosColumnas = Platform.OS === "web" && !esPantallaPequeña;
-
-  const renderControlesTabla = () => {
-    if (esPantallaPequeña) {
-      return (
-        <>
-          <View style={styles.controlesTablaMobile}>
-            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-              <Selector
-                label=""
-                selectedValue={String(filasPorPagina)}
-                onValueChange={(valor) => {
-                  setPaginaActual(1);
-                  setFilasPorPagina(Number(valor));
-                }}
-                items={[
-                  { label: "5", value: "5" },
-                  { label: "10", value: "10" },
-                  { label: "20", value: "20" },
-                ]}
-              />
-            </View>
-            <Text
-              style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}
-            >
-              por página
-            </Text>
-          </View>
-
-          <View style={{ width: "100%", marginBottom: 8 }}>
-            <Entrada
-              label="Buscar"
-              value={busqueda}
-              onChangeText={setBusqueda}
-            />
-          </View>
-        </>
-      );
-    }
-
-    return (
-      <View style={styles.controlesTabla}>
-        <View style={{ flex: 1 }}>
-          <Entrada
-            label="Buscar"
-            value={busqueda}
-            onChangeText={setBusqueda}
-          />
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 8,
-            marginLeft: 12,
-          }}
-        >
-          <View style={styles.selectorFilasWrapperWeb}>
-            <Selector
-              label=""
-              selectedValue={String(filasPorPagina)}
-              onValueChange={(valor) => {
-                setPaginaActual(1);
-                setFilasPorPagina(Number(valor));
-              }}
-              items={[
-                { label: "5", value: "5" },
-                { label: "10", value: "10" },
-                { label: "20", value: "20" },
-              ]}
-            />
-          </View>
-          <Text
-            style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}
-          >
-            por página
-          </Text>
-        </View>
-      </View>
-    );
-  };
-
-  const renderTablaRegistros = () => (
-    <>
-      <Text style={styles.subtitulo}>Registros de asistencia</Text>
-
-      {renderControlesTabla()}
-
-      {cargandoRegistros ? (
-        <View style={{ marginTop: 20, alignItems: "center" }}>
-          <ActivityIndicator size="small" color={Colores.primario} />
-        </View>
-      ) : registros.length === 0 ? (
-        <Text
-          style={{
-            marginTop: 16,
-            textAlign: "center",
-            color: Colores.textoClaro,
-          }}
-        >
-          Aún no hay asistencias registradas.
-        </Text>
-      ) : (
-        <>
-          <ScrollView
-            horizontal={esPantallaPequeña}
-            style={{ marginTop: 16, width: "100%" }}
-          >
-            <View style={{ flex: 1, minWidth: "100%" }}>
-              <Tabla
-                columnas={[
-                  {
-                    key: "alumnoBoleta",
-                    titulo: "Boleta",
-                  },
-                  {
-                    key: "fechaLectura",
-                    titulo: "Fecha y hora",
-                  },
-                ]}
-                datos={registrosMostrados}
-              />
-            </View>
-          </ScrollView>
-
-          <View
-            style={{
-              flexDirection: esPantallaPequeña ? "column" : "row",
-              justifyContent: "space-between",
-              alignItems: esPantallaPequeña ? "flex-start" : "center",
-              marginTop: 10,
-              gap: 8,
-            }}
-          >
-            <View style={{ flexDirection: "row", gap: 6, marginTop: 5 }}>
-              <Paginacion
-                paginaActual={paginaActual}
-                totalPaginas={totalPaginas}
-                setPaginaActual={setPaginaActual}
-              />
-            </View>
-
-            <Text
-              style={{
-                fontSize: Fuentes.caption,
-                color: Colores.textoClaro,
-                marginTop: esPantallaPequeña ? 8 : 0,
-              }}
-            >
-              {`Mostrando ${registrosMostrados.length} de ${registrosFiltrados.length} registros`}
-            </Text>
-          </View>
-        </>
-      )}
-    </>
-  );
-
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View
-        style={[
-          styles.contenedorFormulario,
-          esPantallaPequeña && { maxWidth: "95%" },
-        ]}
-      >
-        <Text style={styles.titulo}>Registrar asistencia al curso de inducción</Text>
-        <Text style={styles.subtitulo}>Escanea el código QR del alumno para registrar su asistencia al curso de inducción.</Text>
-        <Text
-          style={{
-            fontSize: Fuentes.caption,
-            color: Colores.textoClaro,
-            marginBottom: 20,
-            textAlign: "center",
-          }}
-        >
-          Nota: Habilita el acceso a la cámara de tu dispositivo.
-        </Text>
-
-        <View
-          style={[
-            styles.contenidoResponsive,
-            mostrarLayoutDosColumnas
-              ? { flexDirection: "row", alignItems: "flex-start" }
-              : { flexDirection: "column" },
-          ]}
-        >
-          <View
-            style={[
-              styles.seccionEscaneo,
-              mostrarLayoutDosColumnas && { flex: 1, marginRight: 16 },
-            ]}
+      <View style={{ flex: 1 }}>
+        <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+          <Text allowFontScaling={false} style={styles.titulo}>Registrar asistencia al curso de inducción</Text>
+          <Text allowFontScaling={false} style={styles.subtitulo}>Escanea el código QR del alumno para registrar su asistencia al curso de inducción.</Text>
+          <Text
+            style={{
+              fontSize: Fuentes.caption,
+              color: Colores.textoClaro,
+              marginBottom: 20,
+              textAlign: "center",
+            }}
+            allowFontScaling={false}
           >
-            <View style={styles.marcoEscaneo}>
-              {escaneando ? (
-                <CameraView
-                  style={StyleSheet.absoluteFillObject}
-                  facing={facing}
-                  enableTorch={torch}
-                  barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-                  onBarcodeScanned={onBarcodeScanned}
-                />
-              ) : (
-                <View style={styles.placeholderCamara}>
-                  <Text style={styles.emojiCamara}>📷</Text>
+            Nota: Habilita el acceso a la cámara de tu dispositivo.
+          </Text>
+          <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+            <View style={{ flex: 1, marginBottom: esPantallaPequeña ? 30 : 15 }}>
+              <View
+                style={[
+                  styles.seccionEscaneo,
+                ]}
+              >
+                <View style={styles.marcoEscaneo}>
+                  {escaneando ? (
+                    <CameraView
+                      style={StyleSheet.absoluteFillObject}
+                      facing={facing}
+                      enableTorch={torch}
+                      barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+                      onBarcodeScanned={onBarcodeScanned}
+                    />
+                  ) : (
+                    <View style={styles.placeholderCamara}>
+                      <Text allowFontScaling={false} style={styles.emojiCamara}>📷</Text>
+                    </View>
+                  )}
                 </View>
-              )}
-            </View>
 
-            <View style={{ marginTop: 18, alignItems: "center", gap: 10 }}>
-              {!escaneando ? (
-                <Boton title="Escanear" onPress={iniciarEscaneo} />
-              ) : (
-                <Boton title="Detener" onPress={detenerEscaneo} />
-              )}
+                <View style={{ marginTop: 18, alignItems: "center", gap: 10 }}>
+                  {!escaneando ? (
+                    <Boton title="Escanear" onPress={iniciarEscaneo} />
+                  ) : (
+                    <Boton title="Detener" onPress={detenerEscaneo} />
+                  )}
+                </View>
+              </View>
+            </View>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <View>
+                <Text allowFontScaling={false} style={[styles.subtitulo, { fontSize: Fuentes.subtitulo, fontWeight: "600" }]}>Registros de asistencia</Text>
+                <View style={styles.controlesSuperiores}>
+                  <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 5, width: "100%" }]}>
+                    <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }], { marginBottom: 15 }]}>
+                      <Selector
+                        label=""
+                        selectedValue={String(filasPorPagina)}
+                        onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                        items={[
+                          { label: "5", value: "5" },
+                          { label: "10", value: "10" },
+                          { label: "20", value: "20" },
+                        ]}
+                      />
+                    </View>
+                    <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>
+                      por página
+                    </Text>
+                  </View>
+                  <View style={{ width: esPantallaPequeña ? "100%" : "40%", marginBottom: 22 }}>
+                    <Entrada
+                      label="Buscar"
+                      value={busqueda}
+                      maxLength={45}
+                      onChangeText={(text) => {
+                        setBusqueda(text);
+                        setPaginaActual(1);
+                      }}
+                    />
+                  </View>
+                </View>
+
+                {cargandoRegistros ? (
+                  <View style={{ marginTop: 20, alignItems: "center" }}>
+                    <ActivityIndicator size="small" color={Colores.primario} />
+                  </View>
+                ) : registros.length === 0 ? (
+                  <Text
+                    style={{
+                      marginTop: 16,
+                      textAlign: "center",
+                      color: Colores.textoClaro,
+                    }}
+                  >
+                    Aún no hay asistencias registradas.
+                  </Text>
+                ) : (
+                  <>
+                    <ScrollView>
+                      <Tabla
+                        columnas={[
+                          {
+                            key: "alumnoBoleta",
+                            titulo: "Boleta",
+                            ...(esPantallaPequeña && { ancho: 150 }),
+                            multilinea: true
+                          },
+                          {
+                            key: "fechaLectura",
+                            titulo: "Fecha y hora",
+                            multilinea: true
+                          },
+                        ]}
+                        datos={registrosMostrados}
+                      />
+                    </ScrollView>
+
+                    <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                      <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                        <Paginacion
+                          paginaActual={paginaActual}
+                          totalPaginas={totalPaginas}
+                          setPaginaActual={setPaginaActual}
+                        />
+                      </View>
+
+                      <Text
+                        style={{
+                          color: Colores.textoClaro,
+                          fontSize: Fuentes.caption,
+                          marginTop: 15,
+                        }}
+                        allowFontScaling={false}
+                      >
+                        {`Mostrando ${registrosMostrados.length} de ${registrosFiltrados.length} resultados`}
+                      </Text>
+                    </View>
+                  </>
+                )}
+              </View>
             </View>
           </View>
-
-          {mostrarLayoutDosColumnas && (
-            <View
-              style={[
-                styles.seccionTabla,
-                { flex: 1, marginLeft: 16, marginTop: 0 },
-              ]}
-            >
-              {renderTablaRegistros()}
-            </View>
-          )}
         </View>
-
-        {!mostrarLayoutDosColumnas && (
-          <View style={{ marginTop: 30 }}>{renderTablaRegistros()}</View>
-        )}
       </View>
-
       <ModalAPI ref={modalAPI} />
+      <PiePagina />
     </ScrollView>
   );
 }
@@ -437,22 +351,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subtitulo: {
-    fontSize: Fuentes.subtitulo,
+    fontSize: Fuentes.cuerpo,
     color: Colores.textoSecundario,
-    fontWeight: 600,
     textAlign: "center",
     paddingHorizontal: 12,
     marginBottom: 8,
   },
-  contenidoResponsive: {
-    width: "100%",
-    marginTop: 16,
-  },
   seccionEscaneo: {
     alignItems: "center",
-  },
-  seccionTabla: {
-    marginTop: 30,
   },
   marcoEscaneo: {
     alignSelf: "center",
@@ -479,24 +385,9 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     marginBottom: 6,
   },
-  controlesTabla: {
+  controlesSuperiores: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-end",
-    gap: 12,
-    marginBottom: 8,
     flexWrap: "wrap",
-  },
-  selectorFilasWrapperWeb: {
-    minWidth: 50,
-  },
-  controlesTablaMobile: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 4,
-  },
-  selectorFilasWrapperMobile: {
-    width: 60,
   },
 });

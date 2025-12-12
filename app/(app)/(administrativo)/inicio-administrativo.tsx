@@ -1,5 +1,6 @@
 import ModalAvisoPrivacidad from '@/componentes/layout/AvisoPrivacidad';
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from '@/temas/colores';
@@ -89,60 +90,63 @@ export default function InicioPersonalAdministrativo() {
       )}
       <View style={{ flex: 1, backgroundColor: Colores.fondo }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View style={styles.contenedorFormulario}>
-            <View style={styles.sisegContenedor}>
-              <Text style={styles.sisegSiglas}>SISEG</Text>
-              {!esMovil && (
-                <Text style={styles.siseg}>
-                  Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
+          <View style={{ flex: 1 }}>
+            <View style={styles.contenedorFormulario}>
+              <View style={styles.sisegContenedor}>
+                <Text allowFontScaling={false} style={styles.sisegSiglas}>SISEG</Text>
+                {!esMovil && (
+                  <Text allowFontScaling={false} style={styles.siseg}>
+                    Sistema de Seguimiento del Servicio Social para la Escuela Nacional de Medicina y Homeopatía
+                  </Text>
+                )}
+              </View>
+              <View style={styles.sisegContenedor}>
+                <Text allowFontScaling={false} style={[styles.sisegDescripcion, esMovil || esPantallaPequeña ? { textAlign: "justify" } : { textAlign: "right", width: "50%" }]}>
+                  Es una herramienta informática diseñada para dar seguimiento al servicio social de la <Text style={{ fontWeight: '600' }}>Escuela Nacional de Medicina y Homeopatía</Text>.
                 </Text>
-              )}
-            </View>
-            <View style={styles.sisegContenedor}>
-              <Text style={[styles.sisegDescripcion, esMovil || esPantallaPequeña ? { textAlign: "justify" } : { textAlign: "right", width: "50%" }]}>
-                Es una herramienta informática diseñada para dar seguimiento al servicio social de la <Text style={{ fontWeight: '600' }}>Escuela Nacional de Medicina y Homeopatía</Text>.
-              </Text>
-            </View>
-            <Text style={styles.titulo}>Bienvenido</Text>
-            <Text style={styles.nombreAdmin}>{sesion?.nombre + " " + administrativo?.apellido_paterno + " " + administrativo?.apellido_materno}</Text>
-            <Text style={styles.boleta}>{sesion?.boleta || ""}</Text>
+              </View>
+              <Text allowFontScaling={false} style={styles.titulo}>Bienvenido</Text>
+              <Text allowFontScaling={false} style={styles.nombreAdmin}>{sesion?.nombre + " " + administrativo?.apellido_paterno + " " + administrativo?.apellido_materno}</Text>
+              <Text allowFontScaling={false} style={styles.boleta}>{sesion?.boleta || ""}</Text>
 
-            <View style={[styles.tarjetaContenedor, { flexDirection: esMovil ? "column" : "row" }]}>
-              <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { width: "100%", marginBottom: 15 }}>
-                <View style={[styles.tarjeta, esMovil && { width: "100%", minWidth: "auto", margin: "auto" }]}>
-                  <Text style={styles.tarjetaTitulo}>Alumnos registrados</Text>
-                  <Text style={styles.tarjetaValor}>{kpis.alumnosRegistrados}</Text>
-                </View>
-              </Link>
-              <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { width: "100%", marginBottom: 15 }}>
-                <View style={[styles.tarjeta, esMovil && { width: "100%", minWidth: "auto", margin: "auto" }]}>
-                  <Text style={styles.tarjetaTitulo}>Alumnos realizando su servicio social</Text>
-                  <Text style={styles.tarjetaValor}>{kpis.alumnosRealizandoSS}</Text>
-                </View>
-              </Link>
-              <Link href="/(app)/(administrativo)/revisar-reportes-riesgo" style={esMovil && { width: "100%", marginBottom: 15 }}>
-                <View style={[styles.tarjeta, esMovil && { width: "100%", minWidth: "auto", margin: "auto" }]}>
-                  <Text style={styles.tarjetaTitulo}>Reportes de incidencia nuevos</Text>
-                  <Text style={styles.tarjetaValor}>{kpis.reportesdeIncidencias}</Text>
-                </View>
-              </Link>
-            </View>
+              <View style={[styles.tarjetaContenedor, { flexDirection: esMovil ? "column" : "row" }]}>
+                <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { width: "100%", marginBottom: 15 }}>
+                  <View style={[styles.tarjeta, esMovil && { width: "100%", minWidth: "auto", margin: "auto" }]}>
+                    <Text allowFontScaling={false} style={styles.tarjetaTitulo}>Alumnos registrados</Text>
+                    <Text allowFontScaling={false} style={styles.tarjetaValor}>{kpis.alumnosRegistrados}</Text>
+                  </View>
+                </Link>
+                <Link href="/(app)/(administrativo)/gestionar-alumnos" style={esMovil && { width: "100%", marginBottom: 15 }}>
+                  <View style={[styles.tarjeta, esMovil && { width: "100%", minWidth: "auto", margin: "auto" }]}>
+                    <Text allowFontScaling={false} style={styles.tarjetaTitulo}>Alumnos realizando su servicio social</Text>
+                    <Text allowFontScaling={false} style={styles.tarjetaValor}>{kpis.alumnosRealizandoSS}</Text>
+                  </View>
+                </Link>
+                <Link href="/(app)/(administrativo)/revisar-reportes-riesgo" style={esMovil && { width: "100%", marginBottom: 15 }}>
+                  <View style={[styles.tarjeta, esMovil && { width: "100%", minWidth: "auto", margin: "auto" }]}>
+                    <Text allowFontScaling={false} style={styles.tarjetaTitulo}>Reportes de incidencia nuevos</Text>
+                    <Text allowFontScaling={false} style={styles.tarjetaValor}>{kpis.reportesdeIncidencias}</Text>
+                  </View>
+                </Link>
+              </View>
 
-            <View style={styles.piePagina}>
-              <View style={styles.avisoContainer}>
-                <Text style={styles.avisoTexto}>AVISO</Text>
-                <View style={styles.separacion} />
-                <Text style={styles.piePaginaTexto} onPress={() => setVisibleAviso(true)}>
-                  Tus datos personales son protegidos conforme a lo establecido por la Ley General de Protección de Datos Personales en Posesión de los Particulares.
-                </Text>
+              <View style={styles.piePagina}>
+                <View style={styles.avisoContainer}>
+                  <Text allowFontScaling={false} style={styles.avisoTexto}>AVISO</Text>
+                  <View style={styles.separacion} />
+                  <Text allowFontScaling={false} style={styles.piePaginaTexto} onPress={() => setVisibleAviso(true)}>
+                    Tus datos personales son protegidos conforme a lo establecido por la Ley General de Protección de Datos Personales en Posesión de los Particulares.
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-          <ModalAPI ref={modalAPI} />
-          <ModalAvisoPrivacidad
-            visible={visibleAviso}
-            onClose={() => setVisibleAviso(false)}
-          />
+            <ModalAPI ref={modalAPI} />
+            <ModalAvisoPrivacidad
+              visible={visibleAviso}
+              onClose={() => setVisibleAviso(false)}
+            />
+            <PiePagina />
         </ScrollView>
       </View>
     </>

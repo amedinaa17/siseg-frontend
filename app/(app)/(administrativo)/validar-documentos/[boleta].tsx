@@ -1,5 +1,6 @@
 import Modal from "@/componentes/layout/Modal";
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import EntradaMultilinea from "@/componentes/ui/EntradaMultilinea";
@@ -12,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { ActivityIndicator, Linking, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { WebView } from "react-native-webview";
 
 export default function RevisarExpediente() {
@@ -29,7 +30,8 @@ export default function RevisarExpediente() {
 
   const [documentos, setDocumentos] = useState<any[]>([]);
   const [docSeleccionado, setDocSeleccionado] = useState<any | null>(null);
-  const [modalDetalle, setModalDetalle] = useState(false);
+  const [verDetallesDocumento, setVerDetallesDocumento] = useState(false);
+  const [verDocumento, setVerDocumento] = useState(false);
 
   const [estatus, setEstatus] = useState<"aprobado" | "rechazado" | null>(null);
   const [modalConfirmacionVisible, setModalConfirmacionVisible] = useState(false);
@@ -96,13 +98,13 @@ export default function RevisarExpediente() {
       observacion, rutaArchivo, color } = docSeleccionado;
 
     return (
-      <Modal visible={modalDetalle} onClose={() => { setModalDetalle(false); setDocSeleccionado(null) }} titulo={nombreArchivo}
+      <Modal visible={verDetallesDocumento} onClose={() => { setVerDetallesDocumento(false); setDocSeleccionado(null) }} titulo={nombreArchivo}
         aceptar={estatus === "Pendiente" ? false : true}
         cancelar={estatus === "Pendiente" ? true : false}
         maxWidth={estatus === "Pendiente" ? 700 : undefined}>
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 18 }}>
-          <Text style={{ fontSize: 15, fontWeight: "600", color: color }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 20 }}>
+          <Text allowFontScaling={false} style={{ fontSize: 15, fontWeight: "600", color: color }}>
             {estatus}
           </Text>
           {estatus === "Pendiente" && (
@@ -111,7 +113,7 @@ export default function RevisarExpediente() {
                 title="Aprobar"
                 onPress={() => {
                   setEstatus("aprobado");
-                  setModalDetalle(false);
+                  setVerDetallesDocumento(false);
                   setModalConfirmacionVisible(true);
                 }}
                 color={Colores.textoExito}
@@ -120,13 +122,19 @@ export default function RevisarExpediente() {
                 title="Rechazar"
                 onPress={() => {
                   setEstatus("rechazado");
-                  setModalDetalle(false);
+                  setVerDetallesDocumento(false);
                   setModalConfirmacionVisible(true);
                 }}
                 color={Colores.textoError}
               />
             </View>)}
         </View>
+
+        {estatus === "Sin cargar" && (
+          <View>
+            <Text style={{ color: Colores.textoPrincipal, fontSize: Fuentes.cuerpo }}>El alumno no ha cargado ningún documento para su validación.</Text>
+          </View>
+        )}
 
         {estatus === "Pendiente" && (
           <>
@@ -136,20 +144,20 @@ export default function RevisarExpediente() {
               </View>
               <Boton
                 title=""
-                onPress={() => Linking.openURL(rutaArchivo)}
+                onPress={() => { setVerDetallesDocumento(false); setVerDocumento(true); }}
                 icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} style={{ paddingHorizontal: 10 }} />}
               />
             </View>
-            <View style={{ marginBottom: 15 }} >
+            <View>
               <Entrada label="Fecha de envío" value={new Date(fechaRegistro).toLocaleDateString()} editable={false} />
             </View>
             {adminEncargado && (
               <>
-                <Text style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, marginBottom: 15, textAlign: "right" }}>Nota: Este documento fue rechazado anteriormente.</Text>
+                <Text allowFontScaling={false} style={{ fontSize: Fuentes.caption, color: Colores.textoClaro, marginVertical: 15, textAlign: "right" }}>Nota: Este documento fue rechazado anteriormente.</Text>
                 <View style={{ marginBottom: 15 }} >
                   <Entrada label="Revisado anteriormente por" value={adminEncargado.nombre + " " + adminEncargado.APELLIDO_PATERNO + " " + adminEncargado.APELLIDO_MATERNO} editable={false} />
                 </View>
-                <View style={{ marginBottom: 20 }}>
+                <View>
                   <EntradaMultilinea
                     label="Observación"
                     value={observacion || "Sin observación."}
@@ -160,28 +168,6 @@ export default function RevisarExpediente() {
                 </View>
               </>
             )}
-
-            <View style={{ height: 520, borderWidth: 1, borderColor: Colores.borde, borderRadius: 8, overflow: "hidden" }}>
-              {Platform.OS === "web" ? (
-                <iframe
-                  src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(rutaArchivo)}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    border: "none",
-                  }}
-                  title="Vista previa PDF"
-                />
-              ) : (
-                <WebView
-                  source={{
-                    uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(rutaArchivo)}`,
-                  }}
-                  style={{ flex: 1 }}
-                  startInLoadingState
-                />
-              )}
-            </View>
           </>
         )}
 
@@ -193,7 +179,7 @@ export default function RevisarExpediente() {
               </View>
               <Boton
                 title=""
-                onPress={() => Linking.openURL(rutaArchivo)}
+                onPress={() => { setVerDetallesDocumento(false); setVerDocumento(true); }}
                 icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} style={{ paddingHorizontal: 10 }} />}
               />
             </View>
@@ -221,7 +207,7 @@ export default function RevisarExpediente() {
               </View>
               <Boton
                 title=""
-                onPress={() => Linking.openURL(rutaArchivo)}
+                onPress={() => { setVerDetallesDocumento(false); setVerDocumento(true); }}
                 icon={<Ionicons name="eye-outline" size={20} color={Colores.onPrimario} style={{ paddingHorizontal: 10 }} />}
               />
             </View>
@@ -244,6 +230,41 @@ export default function RevisarExpediente() {
     );
   };
 
+  const renderModalDocumento = () => {
+    if (!docSeleccionado) return null;
+    const { adminEncargado, estatus, fechaRegistro, nombreArchivo,
+      observacion, rutaArchivo, color } = docSeleccionado;
+
+    return (
+      <Modal visible={verDocumento} onClose={() => { setVerDocumento(false); setVerDetallesDocumento(true) }} titulo={nombreArchivo}
+        aceptar={true}
+        cancelar={false}
+        maxWidth={800}>
+        <View style={{ height: esPantallaPequeña ? 320 : 520, borderWidth: 1, borderColor: Colores.borde, borderRadius: 8, overflow: "hidden" }}>
+          {Platform.OS === "web" ? (
+            <iframe
+              src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(rutaArchivo)}`}
+              style={{
+                width: "100%",
+                height: "100%",
+                border: "none",
+              }}
+              title="Vista previa PDF"
+            />
+          ) : (
+            <WebView
+              source={{
+                uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(rutaArchivo)}`,
+              }}
+              style={{ flex: 1 }}
+              startInLoadingState
+            />
+          )}
+        </View>
+      </Modal>
+    );
+  };
+
   const renderModalDetalleValidar = () => {
     if (!docSeleccionado) return null;
 
@@ -251,18 +272,19 @@ export default function RevisarExpediente() {
       <Modal
         visible={modalConfirmacionVisible}
         titulo={docSeleccionado.nombreArchivo}
-        onClose={() => { setModalConfirmacionVisible(false); setModalDetalle(true); setEstatus(null); setObservacion("") }} cancelar
+        onClose={() => { setModalConfirmacionVisible(false); setVerDetallesDocumento(true); setEstatus(null); setObservacion("") }} cancelar
         deshabilitado={isSubmitting} textoAceptar={isSubmitting ? "Guardando…" : "Guardar"}
         onAceptar={handleSubmit(enviarValidacion)}
       >
         <View style={{ marginBottom: 15 }}>
-          <Text style={{ marginBottom: 15 }}>El documento será <Text style={{ fontWeight: "600", color: estatus === "aprobado" ? Colores.textoExito : Colores.textoError }}>
+          <Text allowFontScaling={false} style={{ marginBottom: 15 }}>El documento será <Text allowFontScaling={false} style={{ fontWeight: "600", color: estatus === "aprobado" ? Colores.textoExito : Colores.textoError }}>
             {estatus}
           </Text>. ¿Tienes algúna observación que agregar?
           </Text>
           <EntradaMultilinea
             label="Observaciones (opcional)"
             value={observacion}
+            maxLength={200}
             onChangeText={setObservacion}
           />
         </View>
@@ -278,81 +300,85 @@ export default function RevisarExpediente() {
         </View>
       )}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-          <View style={[{ flexDirection: "row", justifyContent: "flex-end" }, esPantallaPequeña && { marginBottom: 5 }]}>
-            {esPantallaPequeña ?
-              <Boton
-                onPress={() => router.push("/validar-documentos")}
-                icon={<Ionicons name="arrow-back-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+        <View style={{ flex: 1 }}>
+          <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+            <View style={[{ flexDirection: "row", justifyContent: "flex-end" }, esPantallaPequeña && { marginBottom: 5 }]}>
+              {esPantallaPequeña ?
+                <Boton
+                  onPress={() => router.push("/validar-documentos")}
+                  icon={<Ionicons name="arrow-back-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                />
+                :
+                <Boton
+                  title="Regresar"
+                  onPress={() => router.push("/validar-documentos")}
+                />
+              }
+            </View>
+            <Text allowFontScaling={false} style={styles.titulo}>Expediente digital</Text>
+            <Text allowFontScaling={false} style={styles.alumno}>{boleta}</Text>
+
+            <Text allowFontScaling={false} style={styles.subtitulo}>Registro al servicio social</Text>
+            <ScrollView horizontal={esPantallaPequeña}>
+              <Tabla
+                columnas={[
+                  { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 300 }) },
+                  {
+                    key: "estatus",
+                    titulo: "Estatus",
+                    render: (valor, fila) => (
+                      <Text allowFontScaling={false} style={[styles.texto, { color: fila.color }]}>
+                        {valor}
+                      </Text>
+                    ),
+                    ...(esPantallaPequeña && { ancho: 190 })
+                  },
+                  { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 300 }) },
+                ]}
+                datos={documentos
+                  .filter((d) => d.tipo === 1)
+                  .map((fila) => ({
+                    ...fila,
+                    observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
+                    onPress: () => { setVerDetallesDocumento(true), setDocSeleccionado(fila) },
+                  }))}
               />
-              :
-              <Boton
-                title="Regresar"
-                onPress={() => router.push("/validar-documentos")}
+            </ScrollView>
+
+            <Text allowFontScaling={false} style={styles.subtitulo}>Término del servicio social</Text>
+
+            <ScrollView horizontal={esPantallaPequeña}>
+              <Tabla
+                columnas={[
+                  { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
+                  {
+                    key: "estatus",
+                    titulo: "Estatus",
+                    render: (valor, fila) => (
+                      <Text allowFontScaling={false} style={[styles.texto, { color: fila.color }]}>
+                        {valor}
+                      </Text>
+                    ),
+                    ...(esPantallaPequeña && { ancho: 150 })
+                  },
+                  { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
+                ]}
+                datos={documentos
+                  .filter((d) => d.tipo === 2)
+                  .map((fila) => ({
+                    ...fila,
+                    observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
+                    onPress: () => { setVerDetallesDocumento(true); setDocSeleccionado(fila) },
+                  }))}
               />
-            }
+            </ScrollView>
           </View>
-          <Text style={styles.titulo}>Expediente digital</Text>
-          <Text style={styles.alumno}>{boleta}</Text>
-
-          <Text style={styles.subtitulo}>Registro al servicio social</Text>
-          <ScrollView horizontal={esPantallaPequeña}>
-            <Tabla
-              columnas={[
-                { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
-                {
-                  key: "estatus",
-                  titulo: "Estatus",
-                  render: (valor, fila) => (
-                    <Text style={[styles.texto, { color: fila.color }]}>
-                      {valor}
-                    </Text>
-                  ),
-                  ...(esPantallaPequeña && { ancho: 150 })
-                },
-                { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
-              ]}
-              datos={documentos
-                .filter((d) => d.tipo === 1)
-                .map((fila) => ({
-                  ...fila,
-                  observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
-                  onPress: () => { setModalDetalle(true), setDocSeleccionado(fila) },
-                }))}
-            />
-          </ScrollView>
-
-          <Text style={styles.subtitulo}>Término del servicio social</Text>
-
-          <ScrollView horizontal={esPantallaPequeña}>
-            <Tabla
-              columnas={[
-                { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
-                {
-                  key: "estatus",
-                  titulo: "Estatus",
-                  render: (valor, fila) => (
-                    <Text style={[styles.texto, { color: fila.color }]}>
-                      {valor}
-                    </Text>
-                  ),
-                  ...(esPantallaPequeña && { ancho: 150 })
-                },
-                { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
-              ]}
-              datos={documentos
-                .filter((d) => d.tipo === 2)
-                .map((fila) => ({
-                  ...fila,
-                  observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
-                  onPress: () => { setModalDetalle(true); setDocSeleccionado(fila) },
-                }))}
-            />
-          </ScrollView>
         </View>
         {renderModalDetalle()}
+        {renderModalDocumento()}
         {renderModalDetalleValidar()}
         <ModalAPI ref={modalAPI} />
+        <PiePagina />
       </ScrollView>
     </>
   );

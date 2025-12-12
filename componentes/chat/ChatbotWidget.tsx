@@ -95,7 +95,7 @@ const ChatbotWidget: React.FC<{
         >
           <View style={[styles.popup, { width: esPantallaPequeña ? "100%" : 360 }]}>
             <View style={styles.header}>
-              <Text style={styles.headerTitle}>{title}</Text>
+              <Text allowFontScaling={false} style={styles.headerTitle}>{title}</Text>
               <TouchableOpacity onPress={() => setOpen(false)}>
                 <Ionicons name="close" size={20} color={Colores.textoPrincipal} />
               </TouchableOpacity>
@@ -120,6 +120,7 @@ const ChatbotWidget: React.FC<{
                       styles.bubbleText,
                       m.role === "user" ? styles.userBubbleText : styles.botBubbleText,
                     ]}
+                    allowFontScaling={false}
                   >
                     {m.text}
                   </Text>
@@ -127,7 +128,7 @@ const ChatbotWidget: React.FC<{
               ))}
               {loading && (
                 <View style={[styles.bubble, styles.botBubble]}>
-                  <Text style={[styles.bubbleText, styles.botBubbleText]}>Pensando…</Text>
+                  <Text allowFontScaling={false} style={[styles.bubbleText, styles.botBubbleText]}>Pensando…</Text>
                 </View>
               )}
             </ScrollView>
@@ -140,6 +141,7 @@ const ChatbotWidget: React.FC<{
                 multiline
                 onKeyPress={onKeyPress}
                 style={styles.textInput}
+                allowFontScaling={false}
                 placeholderTextColor={Colores.textoClaro}
               />
               <TouchableOpacity

@@ -1,5 +1,6 @@
 import Modal from "@/componentes/layout/Modal";
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Paginacion from "@/componentes/ui/Paginacion";
@@ -35,7 +36,7 @@ export default function AsignarPlaza() {
 
     const [busqueda, setBusqueda] = useState("");
     const [filtroCarrera, setFiltroCarrera] = useState("Todos");
-    const [filtroEstatus, setFiltroEstatus] = useState("Todos");
+    const [filtroEstatus, setFiltroEstatus] = useState("Sin asignar");
     const [paginaActual, setPaginaActual] = useState(1);
     const [filasPorPagina, setFilasPorPagina] = useState(5);
 
@@ -266,141 +267,146 @@ export default function AsignarPlaza() {
                 </View>
             )}
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                    <Text style={styles.titulo}>Asignar plaza</Text>
+                <View style={{ flex: 1 }}>
+                    <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                        <Text allowFontScaling={false} style={styles.titulo}>Asignar plaza</Text>
 
-                    <View style={styles.controlesSuperiores}>
-                        <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                                <Selector
-                                    label=""
-                                    selectedValue={String(filasPorPagina)}
-                                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                    items={[
-                                        { label: "5", value: "5" },
-                                        { label: "10", value: "10" },
-                                        { label: "20", value: "20" },
-                                    ]}
-                                />
-                            </View>
-                            <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
-                        </View>
-
-                        <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
-                            <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
-                                <Entrada
-                                    label="Buscar"
-                                    value={busqueda}
-                                    onChangeText={setBusqueda}
-                                />
-                            </View>
-
-                            <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
-                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                        <View style={styles.controlesSuperiores}>
+                            <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+                                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
                                     <Selector
-                                        label="Carrera"
-                                        selectedValue={filtroCarrera}
-                                        onValueChange={setFiltroCarrera}
+                                        label=""
+                                        selectedValue={String(filasPorPagina)}
+                                        onValueChange={(valor) => setFilasPorPagina(Number(valor))}
                                         items={[
-                                            { label: "Todos", value: "Todos" },
-                                            { label: "Médico Cirujano y Partero", value: "Partero" },
-                                            { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
+                                            { label: "5", value: "5" },
+                                            { label: "10", value: "10" },
+                                            { label: "20", value: "20" },
                                         ]}
                                     />
                                 </View>
-                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
-                                    <Selector
-                                        label="Estatus"
-                                        selectedValue={filtroEstatus}
-                                        onValueChange={setFiltroEstatus}
-                                        items={[
-                                            { label: "Todos", value: "Todos" },
-                                            { label: "Asignado", value: "Asignado" },
-                                            { label: "Sin asignar", value: "Sin asignar" },
-                                        ]}
+                                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+                            </View>
+
+                            <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
+                                <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
+                                    <Entrada
+                                        label="Buscar"
+                                        value={busqueda}
+                                        maxLength={45}
+                                        onChangeText={setBusqueda}
                                     />
                                 </View>
-                            </View>
-                        </View>
-                    </View>
 
-                    <ScrollView horizontal={esPantallaPequeña}>
-                        <Tabla
-                            columnas={[
-                                { key: "boleta", titulo: "Boleta", ancho: 130 },
-                                { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }), multilinea: true },
-                                { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }), multilinea: true },
-                                { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 350 }), multilinea: true },
-                                {
-                                    key: "estatusAsignacion",
-                                    titulo: "Estatus",
-                                    ancho: 150,
-                                    render: (valor) => (
-                                        <Text
-                                            style={[
-                                                styles.texto,
-                                                valor === "Asignado" ? { color: Colores.textoExito } : { color: Colores.textoError },
+                                <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
+                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                                        <Selector
+                                            label="Carrera"
+                                            selectedValue={filtroCarrera}
+                                            onValueChange={setFiltroCarrera}
+                                            items={[
+                                                { label: "Todos", value: "Todos" },
+                                                { label: "Médico Cirujano y Partero", value: "Partero" },
+                                                { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
                                             ]}
-                                        >
-                                            {valor}
-                                        </Text>
-                                    ),
-                                },
-                                {
-                                    key: "acciones",
-                                    titulo: "Acciones",
-                                    ancho: 110,
-                                    render: (_valor, fila) => {
-                                        const asignado = !!Number(fila.sede);
-                                        return (
-                                            <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
-                                                <Boton
-                                                    onPress={async () => {
-                                                        await abrirModalAsignar(fila);
-                                                    }}
-                                                    icon={<Ionicons name="add-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                    color={Colores.textoInfo}
-                                                    disabled={asignado}
-                                                />
-                                            </View>
-                                        );
-                                    },
-                                },
-                            ]}
-                            datos={alumnosMostrados.map(fila => ({
-                                ...fila,
-                                nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
-                                carrera: fila.carrera?.NOMBRE ?? "",
-                                sede: plazas?.find((p) => p.ID === fila.sede)?.sede || "-",
-                                estatusAsignacion: fila.sede ? "Asignado" : "Sin asignar"
-
-                            }))}
-                        />
-                    </ScrollView>
-
-                    <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                        <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                            <Paginacion
-                                paginaActual={paginaActual}
-                                totalPaginas={totalPaginas}
-                                setPaginaActual={setPaginaActual}
-                            />
+                                        />
+                                    </View>
+                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
+                                        <Selector
+                                            label="Estatus"
+                                            selectedValue={filtroEstatus}
+                                            onValueChange={setFiltroEstatus}
+                                            items={[
+                                                { label: "Todos", value: "Todos" },
+                                                { label: "Asignado", value: "Asignado" },
+                                                { label: "Sin asignar", value: "Sin asignar" },
+                                            ]}
+                                        />
+                                    </View>
+                                </View>
+                            </View>
                         </View>
 
-                        <Text
-                            style={{
-                                color: Colores.textoClaro,
-                                fontSize: Fuentes.caption,
-                                marginTop: 15,
-                            }}
-                        >
-                            {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
-                        </Text>
+                        <ScrollView horizontal={esPantallaPequeña}>
+                            <Tabla
+                                columnas={[
+                                    { key: "boleta", titulo: "Boleta", ancho: 120 },
+                                    { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 200 }) },
+                                    { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 130 }) },
+                                    { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 130 }) },
+                                    {
+                                        key: "estatusAsignacion",
+                                        titulo: "Estatus",
+                                        ancho: 110,
+                                        render: (valor) => (
+                                            <Text
+                                                style={[
+                                                    styles.texto,
+                                                    valor === "Asignado" ? { color: Colores.textoExito } : { color: Colores.textoError },
+                                                ]}
+                                                allowFontScaling={false}
+                                            >
+                                                {valor}
+                                            </Text>
+                                        ),
+                                    },
+                                    {
+                                        key: "acciones",
+                                        titulo: "Acciones",
+                                        ancho: 100,
+                                        render: (_valor, fila) => {
+                                            const asignado = !!Number(fila.sede);
+                                            return (
+                                                <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                                                    <Boton
+                                                        onPress={async () => {
+                                                            await abrirModalAsignar(fila);
+                                                        }}
+                                                        icon={<Ionicons name="add-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                        color={Colores.textoInfo}
+                                                        disabled={asignado}
+                                                    />
+                                                </View>
+                                            );
+                                        },
+                                    },
+                                ]}
+                                datos={alumnosMostrados.map(fila => ({
+                                    ...fila,
+                                    nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                                    carrera: fila.carrera?.NOMBRE ?? "",
+                                    sede: plazas?.find((p) => p.ID === fila.sede)?.sede || "-",
+                                    estatusAsignacion: fila.sede ? "Asignado" : "Sin asignar"
+
+                                }))}
+                            />
+                        </ScrollView>
+
+                        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                                <Paginacion
+                                    paginaActual={paginaActual}
+                                    totalPaginas={totalPaginas}
+                                    setPaginaActual={setPaginaActual}
+                                />
+                            </View>
+
+                            <Text
+                                style={{
+                                    color: Colores.textoClaro,
+                                    fontSize: Fuentes.caption,
+                                    marginTop: 15,
+                                }}
+                                allowFontScaling={false}
+                            >
+                                {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
+                            </Text>
+                        </View>
                     </View>
                 </View>
-
                 {renderModalAsignar()}
                 <ModalAPI ref={modalAPI} />
+                <PiePagina />
             </ScrollView>
         </>
     );

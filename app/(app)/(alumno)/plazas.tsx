@@ -148,6 +148,7 @@ export default function CatalogoPlazas() {
                 <Entrada
                   label="Buscar"
                   value={busqueda}
+                  maxLength={45}
                   onChangeText={(text) => {
                     setBusqueda(text);
                     setPaginaActual(1);

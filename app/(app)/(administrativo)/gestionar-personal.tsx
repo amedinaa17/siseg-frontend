@@ -1,5 +1,6 @@
 import Modal from "@/componentes/layout/Modal";
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Paginacion from "@/componentes/ui/Paginacion";
@@ -205,10 +206,10 @@ export default function GestionPersonalAdministrativo() {
 
                         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
                             <View style={{ flex: 1, marginBottom: 15 }}>
-                                <Entrada label="Apellido Paterno" value={persona.APELLIDO_PATERNO || ""} editable={false} />
+                                <Entrada label="Apellido paterno" value={persona.APELLIDO_PATERNO || ""} editable={false} />
                             </View>
                             <View style={{ flex: 1, marginBottom: 15 }}>
-                                <Entrada label="Apellido Materno" value={persona.APELLIDO_MATERNO || ""} editable={false} />
+                                <Entrada label="Apellido materno" value={persona.APELLIDO_MATERNO || ""} editable={false} />
                             </View>
                         </View>
 
@@ -231,7 +232,7 @@ export default function GestionPersonalAdministrativo() {
                         </View>
 
                         <View style={{ marginBottom: 15 }} >
-                            <Entrada label="No. Empleado" value={persona.boleta || ""} keyboardType="numeric" editable={false} />
+                            <Entrada label="No. empleado" value={persona.boleta || ""} keyboardType="numeric" editable={false} />
                         </View>
 
                         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
@@ -244,7 +245,7 @@ export default function GestionPersonalAdministrativo() {
                         </View>
 
                         <View style={{ marginBottom: 15 }} >
-                            <Entrada label="Correo Electrónico Institucional" value={persona.correo || ""} editable={false} />
+                            <Entrada label="Correo electrónico institucional" value={persona.correo || ""} editable={false} />
                         </View>
 
                         <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
@@ -252,7 +253,7 @@ export default function GestionPersonalAdministrativo() {
                                 <Entrada label="Celular" value={persona.telefonoMovil || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                             </View>
                             <View style={{ flex: 1, marginBottom: 25 }}>
-                                <Entrada label="Teléfono Local" value={persona.telefonoFijo || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+                                <Entrada label="Teléfono local" value={persona.telefonoFijo || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                             </View>
                         </View>
                     </ScrollView>
@@ -272,7 +273,15 @@ export default function GestionPersonalAdministrativo() {
                             name="nombre"
                             defaultValue=""
                             render={({ field: { onChange, value } }) => (
-                                <Entrada label="Nombre" value={value} onChangeText={onChange} error={errorsAgregar.nombre?.message} />
+                                <Entrada
+                                    label="Nombre"
+                                    value={value}
+                                    maxLength={45}
+                                    onChangeText={(text) => {
+                                        const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                        onChange(alfabetico);
+                                    }}
+                                    error={errorsAgregar.nombre?.message} />
                             )}
                         />
                     </View>
@@ -284,7 +293,15 @@ export default function GestionPersonalAdministrativo() {
                                 name="apellido_paterno"
                                 defaultValue=""
                                 render={({ field: { onChange, value } }) => (
-                                    <Entrada label="Apellido Paterno" value={value} onChangeText={onChange} error={errorsAgregar.apellido_paterno?.message} />
+                                    <Entrada
+                                        label="Apellido paterno"
+                                        value={value}
+                                        maxLength={45}
+                                        onChangeText={(text) => {
+                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            onChange(alfabetico);
+                                        }}
+                                        error={errorsAgregar.apellido_paterno?.message} />
                                 )}
                             />
                         </View>
@@ -294,7 +311,14 @@ export default function GestionPersonalAdministrativo() {
                                 name="apellido_materno"
                                 defaultValue=""
                                 render={({ field: { onChange, value } }) => (
-                                    <Entrada label="Apellido Materno" value={value} onChangeText={onChange} error={errorsAgregar.apellido_materno?.message} />
+                                    <Entrada label="Apellido materno"
+                                        value={value}
+                                        maxLength={45}
+                                        onChangeText={(text) => {
+                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            onChange(alfabetico);
+                                        }}
+                                        error={errorsAgregar.apellido_materno?.message} />
                                 )}
                             />
                         </View>
@@ -312,7 +336,10 @@ export default function GestionPersonalAdministrativo() {
                                         value={value}
                                         maxLength={18}
                                         onBlur={onBlur}
-                                        onChangeText={(text) => onChange(text.toUpperCase())}
+                                        onChangeText={(text) => {
+                                            const alfabetico = text.replace(/[^0-9a-zA-Z]/g, "");
+                                            onChange(alfabetico.toUpperCase());
+                                        }}
                                         error={errorsAgregar.curp?.message}
                                         autoCapitalize="characters"
                                     />
@@ -346,7 +373,16 @@ export default function GestionPersonalAdministrativo() {
                             name="numempleado"
                             defaultValue=""
                             render={({ field: { onChange, value } }) => (
-                                <Entrada label="No. Empleado" keyboardType="numeric" value={value} onChangeText={onChange} error={errorsAgregar.numempleado?.message} />
+                                <Entrada
+                                    label="No. empleado"
+                                    keyboardType="numeric"
+                                    value={value}
+                                    maxLength={10}
+                                    onChangeText={(text) => {
+                                        const digitos = text.replace(/[^0-9]/g, "");
+                                        onChange(digitos);
+                                    }}
+                                    error={errorsAgregar.numempleado?.message} />
                             )}
                         />
                     </View>
@@ -397,7 +433,12 @@ export default function GestionPersonalAdministrativo() {
                             name="correo"
                             defaultValue=""
                             render={({ field: { onChange, value } }) => (
-                                <Entrada label="Correo Electrónico" keyboardType="email-address" value={value} onChangeText={onChange} error={errorsAgregar.correo?.message} />
+                                <Entrada
+                                    label="Correo electrónico institucional"
+                                    keyboardType="email-address"
+                                    maxLength={100}
+                                    value={value} onChangeText={onChange}
+                                    error={errorsAgregar.correo?.message} />
                             )}
                         />
                     </View>
@@ -409,7 +450,16 @@ export default function GestionPersonalAdministrativo() {
                                 name="telcelular"
                                 defaultValue=""
                                 render={({ field: { onChange, value } }) => (
-                                    <Entrada label="Celular" keyboardType="phone-pad" maxLength={10} value={value} onChangeText={onChange} error={errorsAgregar.telcelular?.message} />
+                                    <Entrada
+                                        label="Celular"
+                                        keyboardType="phone-pad"
+                                        maxLength={10}
+                                        value={value}
+                                        onChangeText={(text) => {
+                                            const digitos = text.replace(/[^0-9]/g, "");
+                                            onChange(digitos);
+                                        }}
+                                        error={errorsAgregar.telcelular?.message} />
                                 )}
                             />
                         </View>
@@ -419,7 +469,16 @@ export default function GestionPersonalAdministrativo() {
                                 name="tellocal"
                                 defaultValue=""
                                 render={({ field: { onChange, value } }) => (
-                                    <Entrada label="Teléfono Local" keyboardType="phone-pad" maxLength={10} value={value} onChangeText={onChange} error={errorsAgregar.tellocal?.message} />
+                                    <Entrada
+                                        label="Teléfono local"
+                                        keyboardType="phone-pad"
+                                        maxLength={10}
+                                        value={value}
+                                        onChangeText={(text) => {
+                                            const digitos = text.replace(/[^0-9]/g, "");
+                                            onChange(digitos);
+                                        }}
+                                        error={errorsAgregar.tellocal?.message} />
                                 )}
                             />
                         </View>
@@ -446,7 +505,15 @@ export default function GestionPersonalAdministrativo() {
                             name="nombre"
                             defaultValue={persona.nombre || ""}
                             render={({ field: { onChange, value } }) => (
-                                <Entrada label="Nombre" value={value} onChangeText={onChange} error={errorsEditar.nombre?.message} />
+                                <Entrada
+                                    label="Nombre"
+                                    value={value}
+                                    maxLength={45}
+                                    onChangeText={(text) => {
+                                        const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                        onChange(alfabetico);
+                                    }}
+                                    error={errorsEditar.nombre?.message} />
                             )}
                         />
                     </View>
@@ -459,8 +526,13 @@ export default function GestionPersonalAdministrativo() {
                                 defaultValue={persona.APELLIDO_PATERNO || ""}
                                 render={({ field: { onChange, value } }) => (
                                     <Entrada
-                                        label="Apellido Paterno"
-                                        value={value} onChangeText={onChange}
+                                        label="Apellido paterno"
+                                        value={value}
+                                        maxLength={45}
+                                        onChangeText={(text) => {
+                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            onChange(alfabetico);
+                                        }}
                                         error={errorsEditar.apellido_paterno?.message}
                                     />
                                 )}
@@ -472,9 +544,13 @@ export default function GestionPersonalAdministrativo() {
                                 name="apellido_materno"
                                 defaultValue={persona.APELLIDO_MATERNO || ""}
                                 render={({ field: { onChange, value } }) => (
-                                    <Entrada
-                                        label="Apellido Materno"
-                                        value={value} onChangeText={onChange}
+                                    <Entrada label="Apellido materno"
+                                        value={value}
+                                        maxLength={45}
+                                        onChangeText={(text) => {
+                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            onChange(alfabetico);
+                                        }}
                                         error={errorsEditar.apellido_materno?.message}
                                     />
                                 )}
@@ -527,7 +603,7 @@ export default function GestionPersonalAdministrativo() {
                             defaultValue={persona.boleta || ""}
                             render={({ field: { onChange, value } }) => (
                                 <Entrada
-                                    label="No. Empleado"
+                                    label="No. empleado"
                                     keyboardType="numeric"
                                     value={value} onChangeText={onChange}
                                     editable={false}
@@ -584,9 +660,11 @@ export default function GestionPersonalAdministrativo() {
                             defaultValue={persona.correo || ""}
                             render={({ field: { onChange, value } }) => (
                                 <Entrada
-                                    label="Correo Electrónico"
+                                    label="Correo electrónico institucional"
                                     keyboardType="email-address"
-                                    value={value} onChangeText={onChange}
+                                    value={value}
+                                    maxLength={100}
+                                    onChangeText={onChange}
                                     error={errorsEditar.correo?.message}
                                 />
                             )}
@@ -604,7 +682,11 @@ export default function GestionPersonalAdministrativo() {
                                         label="Celular"
                                         keyboardType="phone-pad"
                                         maxLength={10}
-                                        value={value} onChangeText={onChange}
+                                        value={value}
+                                        onChangeText={(text) => {
+                                            const digitos = text.replace(/[^0-9]/g, "");
+                                            onChange(digitos);
+                                        }}
                                         error={errorsEditar.telcelular?.message}
                                         style={{ flex: 1 }}
                                     />
@@ -618,10 +700,14 @@ export default function GestionPersonalAdministrativo() {
                                 defaultValue={persona.telefonoFijo || ""}
                                 render={({ field: { onChange, value } }) => (
                                     <Entrada
-                                        label="Teléfono Local"
+                                        label="Teléfono local"
                                         keyboardType="phone-pad"
                                         maxLength={10}
-                                        value={value} onChangeText={onChange}
+                                        value={value}
+                                        onChangeText={(text) => {
+                                            const digitos = text.replace(/[^0-9]/g, "");
+                                            onChange(digitos);
+                                        }}
                                         error={errorsEditar.tellocal?.message}
                                         style={{ flex: 1 }}
                                     />
@@ -638,10 +724,10 @@ export default function GestionPersonalAdministrativo() {
         if (!modalDarBaja) return null;
 
         return (
-            <Modal visible={modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de baja personal" maxWidth={500}
+            <Modal visible={!!modalDarBaja} onClose={() => setModalDarBaja(false)} titulo="Dar de baja personal" maxWidth={500}
                 cancelar deshabilitado={isSubmittingDarBaja}
                 textoAceptar={isSubmittingDarBaja ? "Enviando…" : "Dar de baja"} onAceptar={() => { handleSubmitDarBaja(() => darBajaPersonal(modalDarBaja.boleta))(); }}>
-                <Text style={{ marginBottom: 20 }}>
+                <Text allowFontScaling={false} style={{ marginBottom: 20 }}>
                     ¿Estás seguro de que deseas dar de baja al personal administrativo con número de empleado{" "}
                     <Text style={{ fontWeight: "700" }}>{modalDarBaja.boleta}</Text>?
                 </Text>
@@ -657,145 +743,150 @@ export default function GestionPersonalAdministrativo() {
                 </View>
             )}
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                    <Text style={styles.titulo}>Gestionar personal administrativo</Text>
-                    {sesion?.perfil === 2 && (
-                        <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
-                            <View>
-                                <Boton title="Agregar personal" onPress={() => { setModalAgregar(true) }} />
+                <View style={{ flex: 1 }}>
+                    <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                        <Text allowFontScaling={false} style={styles.titulo}>Gestionar personal administrativo</Text>
+                        {sesion?.perfil === 2 && (
+                            <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
+                                <View>
+                                    <Boton title="Agregar personal" onPress={() => { setModalAgregar(true) }} />
+                                </View>
                             </View>
-                        </View>
-                    )}
+                        )}
 
-                    <View style={styles.controlesSuperiores}>
-                        <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                                <Selector
-                                    label=""
-                                    selectedValue={String(filasPorPagina)}
-                                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                    items={[
-                                        { label: "5", value: "5" },
-                                        { label: "10", value: "10" },
-                                        { label: "20", value: "20" },
-                                    ]}
-                                />
-                            </View>
-                            <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
-                        </View>
-
-                        <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
-                            <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
-                                <Entrada
-                                    label="Buscar"
-                                    value={busqueda}
-                                    onChangeText={setBusqueda}
-                                />
-                            </View>
-
-                            <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
-                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                        <View style={styles.controlesSuperiores}>
+                            <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+                                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
                                     <Selector
-                                        label="Perfil"
-                                        selectedValue={filtroPerfil}
-                                        onValueChange={setFiltroPerfil}
+                                        label=""
+                                        selectedValue={String(filasPorPagina)}
+                                        onValueChange={(valor) => setFilasPorPagina(Number(valor))}
                                         items={[
-                                            { label: "Todos", value: "Todos" },
-                                            { label: "Administrador general", value: "general" },
-                                            { label: "Administrador de seguimiento", value: "de seguimiento" },
+                                            { label: "5", value: "5" },
+                                            { label: "10", value: "10" },
+                                            { label: "20", value: "20" },
                                         ]}
                                     />
                                 </View>
+                                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+                            </View>
 
-                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
-                                    <Selector
-                                        label="Estatus"
-                                        selectedValue={filtroEstatus}
-                                        onValueChange={setFiltroEstatus}
-                                        items={[
-                                            { label: "Todos", value: "Todos" },
-                                            { label: "Activo", value: "Activo" },
-                                            { label: "Inactivo", value: "Inactivo" },
-                                        ]}
+                            <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
+                                <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
+                                    <Entrada
+                                        label="Buscar"
+                                        value={busqueda}
+                                        maxLength={45}
+                                        onChangeText={setBusqueda}
                                     />
                                 </View>
-                            </View>
-                        </View>
-                    </View>
 
-                    <ScrollView horizontal={esPantallaPequeña}>
-                        <Tabla
-                            columnas={[
-                                { key: "boleta", titulo: "No. Empleado", ancho: 150 },
-                                { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
-                                { key: "perfil", titulo: "Perfil", ...(esPantallaPequeña && { ancho: 250 }) },
-                                {
-                                    key: "estatus", titulo: "Estatus",
-                                    render: (valor) => (
-                                        <Text
-                                            style={[
-                                                styles.texto,
-                                                valor === "Inactivo" && { color: Colores.textoError },
-                                                valor === "Activo" && { color: Colores.textoInfo },
+                                <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
+                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                                        <Selector
+                                            label="Perfil"
+                                            selectedValue={filtroPerfil}
+                                            onValueChange={setFiltroPerfil}
+                                            items={[
+                                                { label: "Todos", value: "Todos" },
+                                                { label: "Administrador general", value: "general" },
+                                                { label: "Administrador de seguimiento", value: "de seguimiento" },
                                             ]}
-                                        >
-                                            {valor}
-                                        </Text>
-                                    ), ...(esPantallaPequeña && { ancho: 150 })
-                                },
-                                ...(sesion?.perfil === 2
-                                    ? [
-                                        {
-                                            key: "acciones",
-                                            titulo: "Acciones",
-                                            ancho: 110,
-                                            render: (_, fila) => (
-                                                <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
-                                                    <Boton
-                                                        onPress={() => { setPersonalSeleccionado(fila); setModalEditar(true); }}
-                                                        icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                        color={Colores.textoInfo}
-                                                    />
-                                                    <Boton
-                                                        onPress={() => { setModalDarBaja(fila) }}
-                                                        icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                        color={Colores.textoError}
-                                                        disabled={fila.estatus === "Baja" ? true : false}
-                                                    />
-                                                </View>
-                                            ),
-                                        },
-                                    ]
-                                    : []),
-                            ]}
-                            datos={personalMostrados.map((fila) => ({
-                                ...fila,
-                                boleta: fila.persona.boleta,
-                                nombre_completo: `${fila.persona.nombre} ${fila.persona.APELLIDO_PATERNO} ${fila.persona.APELLIDO_MATERNO}`,
-                                estatus: fila.estatus.DESCRIPCION,
-                                onPress: () => { setPersonalSeleccionado(fila); setModalDetalle(true); },
-                            }))}
-                        />
-                    </ScrollView>
+                                        />
+                                    </View>
 
-                    <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                        <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                            <Paginacion
-                                paginaActual={paginaActual}
-                                totalPaginas={totalPaginas}
-                                setPaginaActual={setPaginaActual}
-                            />
+                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
+                                        <Selector
+                                            label="Estatus"
+                                            selectedValue={filtroEstatus}
+                                            onValueChange={setFiltroEstatus}
+                                            items={[
+                                                { label: "Todos", value: "Todos" },
+                                                { label: "Activo", value: "Activo" },
+                                                { label: "Inactivo", value: "Inactivo" },
+                                            ]}
+                                        />
+                                    </View>
+                                </View>
+                            </View>
                         </View>
 
-                        <Text
-                            style={{
-                                color: Colores.textoClaro,
-                                fontSize: Fuentes.caption,
-                                marginTop: 15,
-                            }}
-                        >
-                            {`Mostrando ${personalMostrados.length} de ${personalFiltrados.length} resultados`}
-                        </Text>
+                        <ScrollView horizontal={esPantallaPequeña}>
+                            <Tabla
+                                columnas={[
+                                    { key: "boleta", titulo: "No. empleado", ancho: 130 },
+                                    { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: sesion?.perfil === 2 ? 215 : 265 }) },
+                                    { key: "perfil", titulo: "Perfil", ...(esPantallaPequeña && { ancho: sesion?.perfil === 2 ? 215 : 265 }) },
+                                    {
+                                        key: "estatus", titulo: "Estatus",
+                                        render: (valor) => (
+                                            <Text
+                                                style={[
+                                                    styles.texto,
+                                                    valor === "Inactivo" && { color: Colores.textoError },
+                                                    valor === "Activo" && { color: Colores.textoInfo },
+                                                ]}
+                                                allowFontScaling={false}
+                                            >
+                                                {valor}
+                                            </Text>
+                                        ), ...(esPantallaPequeña && { ancho: 130 })
+                                    },
+                                    ...(sesion?.perfil === 2
+                                        ? [
+                                            {
+                                                key: "acciones",
+                                                titulo: "Acciones",
+                                                ancho: 100,
+                                                render: (_, fila) => (
+                                                    <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                                                        <Boton
+                                                            onPress={() => { setPersonalSeleccionado(fila); setModalEditar(true); }}
+                                                            icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                            color={Colores.textoInfo}
+                                                        />
+                                                        <Boton
+                                                            onPress={() => { setModalDarBaja(fila) }}
+                                                            icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                            color={Colores.textoError}
+                                                            disabled={fila.estatus === "Baja" ? true : false}
+                                                        />
+                                                    </View>
+                                                ),
+                                            },
+                                        ]
+                                        : []),
+                                ]}
+                                datos={personalMostrados.map((fila) => ({
+                                    ...fila,
+                                    boleta: fila.persona.boleta,
+                                    nombre_completo: `${fila.persona.nombre} ${fila.persona.APELLIDO_PATERNO} ${fila.persona.APELLIDO_MATERNO}`,
+                                    estatus: fila.estatus.DESCRIPCION,
+                                    onPress: () => { setPersonalSeleccionado(fila); setModalDetalle(true); },
+                                }))}
+                            />
+                        </ScrollView>
+
+                        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                                <Paginacion
+                                    paginaActual={paginaActual}
+                                    totalPaginas={totalPaginas}
+                                    setPaginaActual={setPaginaActual}
+                                />
+                            </View>
+
+                            <Text
+                                style={{
+                                    color: Colores.textoClaro,
+                                    fontSize: Fuentes.caption,
+                                    marginTop: 15,
+                                }}
+                                allowFontScaling={false}
+                            >
+                                {`Mostrando ${personalMostrados.length} de ${personalFiltrados.length} resultados`}
+                            </Text>
+                        </View>
                     </View>
                 </View>
                 {renderModalDetalle()}
@@ -803,6 +894,7 @@ export default function GestionPersonalAdministrativo() {
                 {renderModalEditar()}
                 {renderModalDarBaja()}
                 <ModalAPI ref={modalAPI} />
+                <PiePagina />
             </ScrollView >
         </>
     );

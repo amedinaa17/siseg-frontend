@@ -61,6 +61,7 @@ export default function ResetPassword() {
                 <Entrada
                   label="Correo electrónico institucional"
                   value={value}
+                  maxLength={100}
                   onChangeText={(text) => {
                     setError("");
                     onChange(text);

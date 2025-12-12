@@ -42,10 +42,10 @@ export default function NativeMap({ puntos, puntoSeleccionado, onMarkerPress }: 
         <Marker key={`${p.sede}-${idx}`} coordinate={{ latitude: Number(p.latitude), longitude: Number(p.longitude) }} onPress={() => onMarkerPress?.(p)} title={p.sede} description={p.ubicacion}>
           <Callout onPress={() => onMarkerPress?.(p)}>
             <View style={{ maxWidth: 220 }}>
-              <Text style={{ fontWeight: "600" }}>{p.sede}</Text>
-              <Text style={{ marginTop: 4 }}>{p.ubicacion}</Text>
-              {!!p.plaza?.PROGRAMA && <Text style={{ marginTop: 6 }}>Programa: <Text style={{ fontWeight: "600" }}>{p.plaza.PROGRAMA}</Text></Text>}
-              {!!p.plaza?.CARRERA && <Text>Carrera: <Text style={{ fontWeight: "600" }}>{p.plaza.CARRERA}</Text></Text>}
+              <Text allowFontScaling={false} style={{ fontWeight: "600" }}>{p.sede}</Text>
+              <Text allowFontScaling={false} style={{ marginTop: 4 }}>{p.ubicacion}</Text>
+              {!!p.plaza?.PROGRAMA && <Text allowFontScaling={false} style={{ marginTop: 6 }}>Programa: <Text allowFontScaling={false} style={{ fontWeight: "600" }}>{p.plaza.PROGRAMA}</Text></Text>}
+              {!!p.plaza?.CARRERA && <Text>Carrera: <Text allowFontScaling={false} style={{ fontWeight: "600" }}>{p.plaza.CARRERA}</Text></Text>}
             </View>
           </Callout>
         </Marker>

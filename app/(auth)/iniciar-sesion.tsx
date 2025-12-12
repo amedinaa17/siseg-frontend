@@ -91,6 +91,7 @@ export default function IniciarSesion() {
                     label="Contraseña"
                     secureTextEntry
                     value={value}
+                    maxLength={45}
                     onChangeText={onChange}
                     error={errors.contraseña?.message}
                   />

@@ -1,4 +1,5 @@
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
+import PiePagina from "@/componentes/layout/PiePagina";
 import Boton from "@/componentes/ui/Boton";
 import Entrada from "@/componentes/ui/Entrada";
 import Paginacion from "@/componentes/ui/Paginacion";
@@ -82,144 +83,150 @@ export default function ValidarDocumentos() {
                 </View>
             )}
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                    <Text style={styles.titulo}>Validar documentos</Text>
-                    <View style={styles.controlesSuperiores}>
-                        <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                            <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                                <Selector
-                                    label=""
-                                    selectedValue={String(filasPorPagina)}
-                                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                    items={[
-                                        { label: "5", value: "5" },
-                                        { label: "10", value: "10" },
-                                        { label: "20", value: "20" },
-                                    ]}
-                                />
-                            </View>
-                            <Text style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
-                        </View>
-
-                        <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "50%" }]}>
-                            <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
-                                <Entrada
-                                    label="Buscar"
-                                    value={busqueda}
-                                    onChangeText={setBusqueda}
-                                />
-                            </View>
-
-                            <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
-                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                <View style={{ flex: 1 }}>
+                    <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                        <Text allowFontScaling={false} style={styles.titulo}>Validar documentos</Text>
+                        <View style={styles.controlesSuperiores}>
+                            <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+                                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
                                     <Selector
-                                        label="Carrera"
-                                        selectedValue={filtroCarrera}
-                                        onValueChange={setFiltroCarrera}
+                                        label=""
+                                        selectedValue={String(filasPorPagina)}
+                                        onValueChange={(valor) => setFilasPorPagina(Number(valor))}
                                         items={[
-                                            { label: "Todos", value: "Todos" },
-                                            { label: "Médico Cirujano y Partero", value: "Partero" },
-                                            { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
+                                            { label: "5", value: "5" },
+                                            { label: "10", value: "10" },
+                                            { label: "20", value: "20" },
                                         ]}
                                     />
                                 </View>
+                                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+                            </View>
 
-                                <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
-                                    <Selector
-                                        label="Estatus"
-                                        selectedValue={filtroEstatus}
-                                        onValueChange={setFiltroEstatus}
-                                        items={[
-                                            { label: "Todos", value: "Todos" },
-                                            { label: "Baja", value: "Baja" },
-                                            { label: "Aspirante", value: "Aspirante" },
-                                            { label: "Candidato", value: "Candidato" },
-                                            { label: "En proceso", value: "En proceso" },
-                                            { label: "Concluido", value: "Concluido" },
-                                        ]}
+                            <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "50%" }]}>
+                                <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
+                                    <Entrada
+                                        label="Buscar"
+                                        value={busqueda}
+                                        maxLength={45}
+                                        onChangeText={setBusqueda}
                                     />
                                 </View>
-                            </View>
-                        </View>
-                    </View>
 
-                    <ScrollView horizontal={esPantallaPequeña}>
-                        <Tabla
-                            columnas={[
-                                { key: "boleta", titulo: "Boleta", ancho: 150 },
-                                { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 250 }) },
-                                { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 250 }) },
-                                { key: "generacion", titulo: "Generación", ancho: 200 },
-                                {
-                                    key: "estatus",
-                                    titulo: "Estatus",
-                                    ancho: 150,
-                                    render: (valor) => (
-                                        <Text
-                                            style={[
-                                                styles.texto,
-                                                valor === "Baja" && { color: Colores.textoError },
-                                                valor === "Candidato" && { color: Colores.textoAdvertencia },
-                                                valor === "Aspirante" && { color: Colores.textoAdvertencia },
-                                                valor === "En proceso" && { color: Colores.textoInfo },
-                                                valor === "Concluido" && { color: Colores.textoExito },
+                                <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
+                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                                        <Selector
+                                            label="Carrera"
+                                            selectedValue={filtroCarrera}
+                                            onValueChange={setFiltroCarrera}
+                                            items={[
+                                                { label: "Todos", value: "Todos" },
+                                                { label: "Médico Cirujano y Partero", value: "Partero" },
+                                                { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
                                             ]}
-                                        >
-                                            {valor}
-                                        </Text>
-                                    ),
-                                },
-                                {
-                                    key: "acciones",
-                                    titulo: "Expediente",
-                                    ancho: 110,
-                                    render: (_, fila) => (
-                                        <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", margin: "auto" }}>
-                                            <Boton
-                                                onPress={() => {
-                                                    router.push({
-                                                        pathname: "/validar-documentos/[boleta]",
-                                                        params: { boleta: fila.boleta },
-                                                    });
-                                                }}
-                                                icon={<Ionicons name="eye-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                color={Colores.textoInfo}
-                                            />
-                                        </View>
-                                    ),
-                                },
-                            ]}
-                            datos={alumnosMostrados.map((fila) => ({
-                                ...fila,
-                                nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
-                                carrera: fila.carrera.NOMBRE,
-                                estatus: fila.estatus.DESCRIPCION,
-                                // onPress: () => { setAlumnoSeleccionado(fila); },
-                            }))}
-                        />
-                    </ScrollView>
+                                        />
+                                    </View>
 
-                    <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                        <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                            <Paginacion
-                                paginaActual={paginaActual}
-                                totalPaginas={totalPaginas}
-                                setPaginaActual={setPaginaActual}
-                            />
+                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
+                                        <Selector
+                                            label="Estatus"
+                                            selectedValue={filtroEstatus}
+                                            onValueChange={setFiltroEstatus}
+                                            items={[
+                                                { label: "Todos", value: "Todos" },
+                                                { label: "Baja", value: "Baja" },
+                                                { label: "Aspirante", value: "Aspirante" },
+                                                { label: "Candidato", value: "Candidato" },
+                                                { label: "En proceso", value: "En proceso" },
+                                                { label: "Concluido", value: "Concluido" },
+                                            ]}
+                                        />
+                                    </View>
+                                </View>
+                            </View>
                         </View>
 
-                        <Text
-                            style={{
-                                color: Colores.textoClaro,
-                                fontSize: Fuentes.caption,
-                                marginTop: 15,
-                            }}
-                        >
-                            {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
-                        </Text>
+                        <ScrollView horizontal={esPantallaPequeña}>
+                            <Tabla
+                                columnas={[
+                                    { key: "boleta", titulo: "Boleta", ancho: 150 },
+                                    { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 210 }) },
+                                    { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 210 }) },
+                                    { key: "generacion", titulo: "Generación", ancho: 150 },
+                                    {
+                                        key: "estatus",
+                                        titulo: "Estatus",
+                                        ancho: 110,
+                                        render: (valor) => (
+                                            <Text
+                                                style={[
+                                                    styles.texto,
+                                                    valor === "Baja" && { color: Colores.textoError },
+                                                    valor === "Candidato" && { color: Colores.textoAdvertencia },
+                                                    valor === "Aspirante" && { color: Colores.textoAdvertencia },
+                                                    valor === "En proceso" && { color: Colores.textoInfo },
+                                                    valor === "Concluido" && { color: Colores.textoExito },
+                                                ]}
+                                                allowFontScaling={false}
+                                            >
+                                                {valor}
+                                            </Text>
+                                        ),
+                                    },
+                                    {
+                                        key: "acciones",
+                                        titulo: "Expediente",
+                                        ancho: 110,
+                                        render: (_, fila) => (
+                                            <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", margin: "auto" }}>
+                                                <Boton
+                                                    onPress={() => {
+                                                        router.push({
+                                                            pathname: "/validar-documentos/[boleta]",
+                                                            params: { boleta: fila.boleta },
+                                                        });
+                                                    }}
+                                                    icon={<Ionicons name="eye-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                    color={Colores.textoInfo}
+                                                />
+                                            </View>
+                                        ),
+                                    },
+                                ]}
+                                datos={alumnosMostrados.map((fila) => ({
+                                    ...fila,
+                                    nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                                    carrera: fila.carrera.NOMBRE,
+                                    estatus: fila.estatus.DESCRIPCION,
+                                    // onPress: () => { setAlumnoSeleccionado(fila); },
+                                }))}
+                            />
+                        </ScrollView>
+
+                        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                                <Paginacion
+                                    paginaActual={paginaActual}
+                                    totalPaginas={totalPaginas}
+                                    setPaginaActual={setPaginaActual}
+                                />
+                            </View>
+
+                            <Text
+                                style={{
+                                    color: Colores.textoClaro,
+                                    fontSize: Fuentes.caption,
+                                    marginTop: 15,
+                                }}
+                                allowFontScaling={false}
+                            >
+                                {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
+                            </Text>
+                        </View>
                     </View>
                 </View>
                 <ModalAPI ref={modalAPI} />
+                <PiePagina />
             </ScrollView >
         </>
     );
