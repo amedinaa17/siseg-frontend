@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 export default function GestionAlumnos() {
     const { sesion, verificarToken } = useAuth();
@@ -407,7 +407,7 @@ export default function GestionAlumnos() {
                                     value={value}
                                     maxLength={45}
                                     onChangeText={(text) => {
-                                        const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                        const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                         onChange(alfabetico);
                                     }}
                                     error={errorsAgregar.nombre?.message} />
@@ -427,7 +427,7 @@ export default function GestionAlumnos() {
                                         value={value}
                                         maxLength={45}
                                         onChangeText={(text) => {
-                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                             onChange(alfabetico);
                                         }}
                                         error={errorsAgregar.apellido_paterno?.message} />
@@ -444,7 +444,7 @@ export default function GestionAlumnos() {
                                         value={value}
                                         maxLength={45}
                                         onChangeText={(text) => {
-                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                             onChange(alfabetico);
                                         }}
                                         error={errorsAgregar.apellido_materno?.message} />
@@ -620,7 +620,7 @@ export default function GestionAlumnos() {
                                     value={value}
                                     maxLength={45}
                                     onChangeText={(text) => {
-                                        const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                        const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                         onChange(alfabetico);
                                     }}
                                     error={errorsEditar.nombre?.message} />
@@ -640,7 +640,7 @@ export default function GestionAlumnos() {
                                         value={value}
                                         maxLength={45}
                                         onChangeText={(text) => {
-                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                             onChange(alfabetico);
                                         }}
                                         error={errorsEditar.apellido_paterno?.message}
@@ -658,7 +658,7 @@ export default function GestionAlumnos() {
                                         value={value}
                                         maxLength={45}
                                         onChangeText={(text) => {
-                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                             onChange(alfabetico);
                                         }}
                                         error={errorsEditar.apellido_materno?.message}
@@ -833,9 +833,15 @@ export default function GestionAlumnos() {
                 textoAceptar={isSubmittingCargar ? "Cargando…" : "Cargar archivo"}
                 cancelar onAceptar={handleSubirArchivo} deshabilitado={isSubmittingCargar}>
                 <Text allowFontScaling={false}>
-                    Para cargar alumnos al sistema, el archivo debe estar en formato Excel (.xls, .xlsx) y no puede exceder un tamaño de 2MB.
+                    El archivo para la carga de alumnos debe cumplir con el formato establecido en Excel (.xls, .xlsx) y no exceder un tamaño máximo de 2MB.
                 </Text>
-                <View style={{ marginTop: 20, marginBottom: 5 }}>
+                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption, marginVertical: 10 }}>
+                    Descargue el archivo de ejemplo con el formato correcto para la carga de alumnos{" "}
+                    <TouchableOpacity onPress={() => { }}>
+                        <Text allowFontScaling={false} style={{ color: Colores.textoInfo }}>aquí</Text>
+                    </TouchableOpacity>.
+                </Text>
+                <View style={{ marginTop: 10, marginBottom: 5 }}>
                     <SelectorArchivo
                         label="Archivo"
                         allowedTypes={[".xls", ".xlsx", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]}
@@ -869,7 +875,6 @@ export default function GestionAlumnos() {
                 <Tabla
                     columnas={[
                         { key: "boleta", titulo: "Boleta", ancho: 150 },
-
                         { key: "error", titulo: "Error" },
                     ]}
                     datos={detalleFilas.map((f) => ({

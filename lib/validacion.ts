@@ -252,7 +252,7 @@ export const alumnoEsquema = z.object({
     .string()
     .nonempty("La CURP es obligatoria")
     .regex(
-      /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/,
+      /^[A-ZÑ]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/,
       "Formato de CURP inválido"
     ),
 

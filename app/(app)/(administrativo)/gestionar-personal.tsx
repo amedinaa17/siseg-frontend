@@ -278,7 +278,7 @@ export default function GestionPersonalAdministrativo() {
                                     value={value}
                                     maxLength={45}
                                     onChangeText={(text) => {
-                                        const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                        const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                         onChange(alfabetico);
                                     }}
                                     error={errorsAgregar.nombre?.message} />
@@ -298,7 +298,7 @@ export default function GestionPersonalAdministrativo() {
                                         value={value}
                                         maxLength={45}
                                         onChangeText={(text) => {
-                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                             onChange(alfabetico);
                                         }}
                                         error={errorsAgregar.apellido_paterno?.message} />
@@ -315,7 +315,7 @@ export default function GestionPersonalAdministrativo() {
                                         value={value}
                                         maxLength={45}
                                         onChangeText={(text) => {
-                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                             onChange(alfabetico);
                                         }}
                                         error={errorsAgregar.apellido_materno?.message} />
@@ -510,7 +510,7 @@ export default function GestionPersonalAdministrativo() {
                                     value={value}
                                     maxLength={45}
                                     onChangeText={(text) => {
-                                        const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                        const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                         onChange(alfabetico);
                                     }}
                                     error={errorsEditar.nombre?.message} />
@@ -530,7 +530,7 @@ export default function GestionPersonalAdministrativo() {
                                         value={value}
                                         maxLength={45}
                                         onChangeText={(text) => {
-                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                             onChange(alfabetico);
                                         }}
                                         error={errorsEditar.apellido_paterno?.message}
@@ -548,7 +548,7 @@ export default function GestionPersonalAdministrativo() {
                                         value={value}
                                         maxLength={45}
                                         onChangeText={(text) => {
-                                            const alfabetico = text.replace(/[^a-zA-Zñ]/g, "");
+                                            const alfabetico = text.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s]/g, "");
                                             onChange(alfabetico);
                                         }}
                                         error={errorsEditar.apellido_materno?.message}
