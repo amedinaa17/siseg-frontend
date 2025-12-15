@@ -32,18 +32,16 @@ export default function IniciarSesion() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        {/* <GobMxHeader />
-        <IPNHeader /> */}
         <Encabezado />
-        <View style={[styles.contenedorPrincipal, esPantallaPequeña ? { flexDirection: 'column', marginVertical: 35 } : { flexDirection: 'row' }]}>
+        <View style={[styles.contenedorPrincipal, esPantallaPequeña ? { flexDirection: 'column', marginBottom: 15 } : { flexDirection: 'row' }]}>
           {!esMovil && (
             <>
-              <View style={[styles.textoContainer, { width: esPantallaPequeña ? '70%' : '30%' }]}>
+              <View style={[styles.textoContainer, esPantallaPequeña ? { width: '70%', marginTop: 35, marginBottom: 10 } : { width: "30%" }]}>
                 <Image
                   source={require('@/activos/imagenes/siseg.png')}
-                  style={{ width: esPantallaPequeña ? 70 : 150, height: esPantallaPequeña ? 70 : 150, marginBottom: 10 }}
+                  style={{ width: esPantallaPequeña ? 70 : 150, height: esPantallaPequeña ? 70 : 150, marginBottom: 15 }}
                   tintColor={Colores.primario}
                 />
 
@@ -68,6 +66,7 @@ export default function IniciarSesion() {
                 render={({ field: { onChange, value } }) => (
                   <Entrada
                     label="Boleta"
+                    id='Boleta'
                     value={value}
                     onChangeText={(text) => {
                       const digitos = text.replace(/[^0-9]/g, "");
@@ -89,6 +88,7 @@ export default function IniciarSesion() {
                 render={({ field: { onChange, value } }) => (
                   <Entrada
                     label="Contraseña"
+                    id='contraseña'
                     secureTextEntry
                     value={value}
                     maxLength={45}
@@ -101,7 +101,9 @@ export default function IniciarSesion() {
 
             {errorMessage ? (
               <Text allowFontScaling={false} style={styles.errorIniciarSesion}>{errorMessage}</Text>
-            ) : null}
+            ) : !esMovil
+              ? (localStorage.getItem("sesion_owner") && <Text allowFontScaling={false} style={styles.errorIniciarSesion}>La sesión ya está activa en otra pestaña.</Text>)
+              : null}
 
             <Link allowFontScaling={false} href="/(auth)/restablecer-contrasena" style={styles.olvidarContraseña}>¿Olvidaste tu contraseña?</Link>
 
@@ -122,8 +124,6 @@ export default function IniciarSesion() {
           </View>
         </View>
         <PiePagina />
-        {/* <IPNFooter />
-        <GobMxFooter /> */}
       </ScrollView>
     </KeyboardAvoidingView >
   );

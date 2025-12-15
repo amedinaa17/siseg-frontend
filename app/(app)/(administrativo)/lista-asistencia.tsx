@@ -10,7 +10,7 @@ import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 type RegistroQr = {
   id: number;
@@ -165,153 +165,155 @@ export default function CursoInduccion() {
   const registrosMostrados = registrosFiltrados.slice((paginaActual - 1) * filasPorPagina, paginaActual * filasPorPagina);
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={{ flex: 1 }}>
-        <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-          <Text allowFontScaling={false} style={styles.titulo}>Registrar asistencia al curso de inducción</Text>
-          <Text allowFontScaling={false} style={styles.subtitulo}>Escanea el código QR del alumno para registrar su asistencia al curso de inducción.</Text>
-          <Text
-            style={{
-              fontSize: Fuentes.caption,
-              color: Colores.textoClaro,
-              marginBottom: 20,
-              textAlign: "center",
-            }}
-            allowFontScaling={false}
-          >
-            Nota: Habilita el acceso a la cámara de tu dispositivo.
-          </Text>
-          <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-            <View style={{ flex: 1, marginBottom: esPantallaPequeña ? 30 : 15 }}>
-              <View
-                style={[
-                  styles.seccionEscaneo,
-                ]}
-              >
-                <View style={styles.marcoEscaneo}>
-                  {escaneando ? (
-                    <CameraView
-                      style={StyleSheet.absoluteFillObject}
-                      facing={facing}
-                      enableTorch={torch}
-                      barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-                      onBarcodeScanned={onBarcodeScanned}
-                    />
-                  ) : (
-                    <View style={styles.placeholderCamara}>
-                      <Text allowFontScaling={false} style={styles.emojiCamara}>📷</Text>
-                    </View>
-                  )}
-                </View>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={{ flex: 1 }}>
+          <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+            <Text allowFontScaling={false} style={styles.titulo}>Registrar asistencia al curso de inducción</Text>
+            <Text allowFontScaling={false} style={styles.subtitulo}>Escanea el código QR del alumno para registrar su asistencia al curso de inducción.</Text>
+            <Text
+              style={{
+                fontSize: Fuentes.caption,
+                color: Colores.textoClaro,
+                marginBottom: 20,
+                textAlign: "center",
+              }}
+              allowFontScaling={false}
+            >
+              Nota: Habilita el acceso a la cámara de tu dispositivo.
+            </Text>
+            <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+              <View style={{ flex: 1, marginBottom: esPantallaPequeña ? 30 : 15 }}>
+                <View
+                  style={[
+                    styles.seccionEscaneo,
+                  ]}
+                >
+                  <View style={styles.marcoEscaneo}>
+                    {escaneando ? (
+                      <CameraView
+                        style={StyleSheet.absoluteFillObject}
+                        facing={facing}
+                        enableTorch={torch}
+                        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+                        onBarcodeScanned={onBarcodeScanned}
+                      />
+                    ) : (
+                      <View style={styles.placeholderCamara}>
+                        <Text allowFontScaling={false} style={styles.emojiCamara}>📷</Text>
+                      </View>
+                    )}
+                  </View>
 
-                <View style={{ marginTop: 18, alignItems: "center", gap: 10 }}>
-                  {!escaneando ? (
-                    <Boton title="Escanear" onPress={iniciarEscaneo} />
-                  ) : (
-                    <Boton title="Detener" onPress={detenerEscaneo} />
-                  )}
+                  <View style={{ marginTop: 18, alignItems: "center", gap: 10 }}>
+                    {!escaneando ? (
+                      <Boton title="Escanear" onPress={iniciarEscaneo} />
+                    ) : (
+                      <Boton title="Detener" onPress={detenerEscaneo} />
+                    )}
+                  </View>
                 </View>
               </View>
-            </View>
-            <View style={{ flex: 1, marginBottom: 15 }}>
-              <View>
-                <Text allowFontScaling={false} style={[styles.subtitulo, { fontSize: Fuentes.subtitulo, fontWeight: "600" }]}>Registros de asistencia</Text>
-                <View style={styles.controlesSuperiores}>
-                  <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 5, width: "100%" }]}>
-                    <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }], { marginBottom: 15 }]}>
-                      <Selector
-                        label=""
-                        selectedValue={String(filasPorPagina)}
-                        onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                        items={[
-                          { label: "5", value: "5" },
-                          { label: "10", value: "10" },
-                          { label: "20", value: "20" },
-                        ]}
-                      />
-                    </View>
-                    <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>
-                      por página
-                    </Text>
-                  </View>
-                  <View style={{ width: esPantallaPequeña ? "100%" : "40%", marginBottom: 22 }}>
-                    <Entrada
-                      label="Buscar"
-                      value={busqueda}
-                      maxLength={45}
-                      onChangeText={(text) => {
-                        setBusqueda(text);
-                        setPaginaActual(1);
-                      }}
-                    />
-                  </View>
-                </View>
-
-                {cargandoRegistros ? (
-                  <View style={{ marginTop: 20, alignItems: "center" }}>
-                    <ActivityIndicator size="small" color={Colores.primario} />
-                  </View>
-                ) : registros.length === 0 ? (
-                  <Text
-                    style={{
-                      marginTop: 16,
-                      textAlign: "center",
-                      color: Colores.textoClaro,
-                    }}
-                  >
-                    Aún no hay asistencias registradas.
-                  </Text>
-                ) : (
-                  <>
-                    <ScrollView>
-                      <Tabla
-                        columnas={[
-                          {
-                            key: "alumnoBoleta",
-                            titulo: "Boleta",
-                            ...(esPantallaPequeña && { ancho: 150 }),
-                            multilinea: true
-                          },
-                          {
-                            key: "fechaLectura",
-                            titulo: "Fecha y hora",
-                            multilinea: true
-                          },
-                        ]}
-                        datos={registrosMostrados}
-                      />
-                    </ScrollView>
-
-                    <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                      <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                        <Paginacion
-                          paginaActual={paginaActual}
-                          totalPaginas={totalPaginas}
-                          setPaginaActual={setPaginaActual}
+              <View style={{ flex: 1, marginBottom: 15 }}>
+                <View>
+                  <Text allowFontScaling={false} style={[styles.subtitulo, { fontSize: Fuentes.subtitulo, fontWeight: "600" }]}>Registros de asistencia</Text>
+                  <View style={styles.controlesSuperiores}>
+                    <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 5, width: "100%" }]}>
+                      <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }], { marginBottom: 15 }]}>
+                        <Selector
+                          label=""
+                          selectedValue={String(filasPorPagina)}
+                          onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                          items={[
+                            { label: "5", value: "5" },
+                            { label: "10", value: "10" },
+                            { label: "20", value: "20" },
+                          ]}
                         />
                       </View>
-
-                      <Text
-                        style={{
-                          color: Colores.textoClaro,
-                          fontSize: Fuentes.caption,
-                          marginTop: 15,
-                        }}
-                        allowFontScaling={false}
-                      >
-                        {`Mostrando ${registrosMostrados.length} de ${registrosFiltrados.length} resultados`}
+                      <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>
+                        por página
                       </Text>
                     </View>
-                  </>
-                )}
+                    <View style={{ width: esPantallaPequeña ? "100%" : "40%", marginBottom: 22 }}>
+                      <Entrada
+                        label="Buscar"
+                        value={busqueda}
+                        maxLength={45}
+                        onChangeText={(text) => {
+                          setBusqueda(text);
+                          setPaginaActual(1);
+                        }}
+                      />
+                    </View>
+                  </View>
+
+                  {cargandoRegistros ? (
+                    <View style={{ marginTop: 20, alignItems: "center" }}>
+                      <ActivityIndicator size="small" color={Colores.primario} />
+                    </View>
+                  ) : registros.length === 0 ? (
+                    <Text
+                      style={{
+                        marginTop: 16,
+                        textAlign: "center",
+                        color: Colores.textoClaro,
+                      }}
+                    >
+                      Aún no hay asistencias registradas.
+                    </Text>
+                  ) : (
+                    <>
+                      <ScrollView>
+                        <Tabla
+                          columnas={[
+                            {
+                              key: "alumnoBoleta",
+                              titulo: "Boleta",
+                              ...(esPantallaPequeña && { ancho: 150 }),
+                              multilinea: true
+                            },
+                            {
+                              key: "fechaLectura",
+                              titulo: "Fecha y hora",
+                              multilinea: true
+                            },
+                          ]}
+                          datos={registrosMostrados}
+                        />
+                      </ScrollView>
+
+                      <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                          <Paginacion
+                            paginaActual={paginaActual}
+                            totalPaginas={totalPaginas}
+                            setPaginaActual={setPaginaActual}
+                          />
+                        </View>
+
+                        <Text
+                          style={{
+                            color: Colores.textoClaro,
+                            fontSize: Fuentes.caption,
+                            marginTop: 15,
+                          }}
+                          allowFontScaling={false}
+                        >
+                          {`Mostrando ${registrosMostrados.length} de ${registrosFiltrados.length} resultados`}
+                        </Text>
+                      </View>
+                    </>
+                  )}
+                </View>
               </View>
             </View>
           </View>
         </View>
-      </View>
-      <ModalAPI ref={modalAPI} />
-      <PiePagina />
-    </ScrollView>
+        <ModalAPI ref={modalAPI} />
+        <PiePagina />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

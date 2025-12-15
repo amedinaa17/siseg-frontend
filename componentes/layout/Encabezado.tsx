@@ -10,13 +10,13 @@ export default function Encabezado() {
   const esPantallaPequeña = width < 600;
 
   return (
-    <SafeAreaView edges={["top"]} style={styles.seguro}>
+    <SafeAreaView edges={["top"]} style={[styles.seguro, esMovil && {marginBottom: 40}]}>
       <View style={styles.encabezado}>
         <Link href="/(auth)/iniciar-sesion" style={{ marginLeft: "8%" }}>
           <View style={{ width: 80, height: 80, position: 'relative' }}>
             <Image
               source={require('@/activos/imagenes/enmyh.png')}
-              style={[styles.logo, { marginTop: esMovil ? 0 : 12 }]}
+              style={[styles.logo, { marginTop: esMovil ? 0 : 12 }]} tintColor= "transparent"
             />
             <View style={[styles.logoTail, { marginTop: esMovil ? 80 : 91.5 }]} />
           </View>

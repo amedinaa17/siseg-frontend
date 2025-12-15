@@ -24,6 +24,8 @@ jobs:
       - name: Set environment variables
         run: |
           echo "API_URL=${{ secrets.API_URL }}" >> $GITHUB_ENV
+          echo "MANUAL_URL=${{ secrets.MANUAL_URL }}" >> $GITHUB_ENV
+          echo "FORMATO_URL=${{ secrets.FORMATO_URL }}" >> $GITHUB_ENV
 
       # Instalar dependencias
       - name: Install dependencies

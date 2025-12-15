@@ -9,7 +9,7 @@ import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 type Plaza = {
   ID: number;
@@ -109,111 +109,113 @@ export default function CatalogoPlazas() {
           <ActivityIndicator size="large" color="#5a0839" />
         </View>
       )}
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ flex: 1 }}>
-          <View
-            style={[
-              styles.contenedorFormulario,
-              esPantallaPequeña && { maxWidth: "95%" },
-            ]}
-          >
-            <Text allowFontScaling={false} style={styles.titulo}>Plazas</Text>
-            <Text allowFontScaling={false} style={styles.subtitulo}>Promoción {plazas[0]?.promocion}</Text>
-            <Text allowFontScaling={false} style={styles.carrera}>{alumno?.carrera ?? ""}</Text>
-            <Text allowFontScaling={false} style={styles.aviso}>
-              “SUJETAS A CAMBIO SIN PREVIO AVISO DE LAS AUTORIDADES”
-            </Text>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={{ flex: 1 }}>
+            <View
+              style={[
+                styles.contenedorFormulario,
+                esPantallaPequeña && { maxWidth: "95%" },
+              ]}
+            >
+              <Text allowFontScaling={false} style={styles.titulo}>Plazas</Text>
+              <Text allowFontScaling={false} style={styles.subtitulo}>Promoción {plazas[0]?.promocion}</Text>
+              <Text allowFontScaling={false} style={styles.carrera}>{alumno?.carrera ?? ""}</Text>
+              <Text allowFontScaling={false} style={styles.aviso}>
+                “SUJETAS A CAMBIO SIN PREVIO AVISO DE LAS AUTORIDADES”
+              </Text>
 
-            <View style={styles.controlesSuperiores}>
-              <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 5, width: "100%" }]}>
-                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                  <Selector
-                    label=""
-                    selectedValue={String(filasPorPagina)}
-                    onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                    items={[
-                      { label: "5", value: "5" },
-                      { label: "10", value: "10" },
-                      { label: "20", value: "20" },
-                    ]}
+              <View style={styles.controlesSuperiores}>
+                <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 5, width: "100%" }]}>
+                  <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                    <Selector
+                      label=""
+                      selectedValue={String(filasPorPagina)}
+                      onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                      items={[
+                        { label: "5", value: "5" },
+                        { label: "10", value: "10" },
+                        { label: "20", value: "20" },
+                      ]}
+                    />
+                  </View>
+
+                  <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>
+                    por página
+                  </Text>
+                </View>
+
+                <View style={{ width: esPantallaPequeña ? "100%" : "40%", marginBottom: 15 }}>
+                  <Entrada
+                    label="Buscar"
+                    value={busqueda}
+                    maxLength={45}
+                    onChangeText={(text) => {
+                      setBusqueda(text);
+                      setPaginaActual(1);
+                    }}
+                  />
+                </View>
+              </View>
+
+              {/* Tabla */}
+              <ScrollView horizontal={esPantallaPequeña}>
+                <Tabla
+                  columnas={[
+                    {
+                      key: "PROGRAMA",
+                      titulo: "Programa",
+                      multilinea: true,
+                      ancho: 240
+                    },
+                    {
+                      key: "sede",
+                      titulo: "Sede",
+                      multilinea: true,
+                      ...(esPantallaPequeña && { ancho: 350 })
+                    },
+                    {
+                      key: "tipoBeca",
+                      titulo: "Beca",
+                      ancho: 100
+                    },
+                    {
+                      key: "tarjetaDisponible",
+                      titulo: "Tarjeta",
+                      ancho: 100
+                    },
+                  ]}
+                  datos={plazasMostradas}
+                />
+              </ScrollView>
+
+              {/* Paginación */}
+              <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                  <Paginacion
+                    paginaActual={paginaActual}
+                    totalPaginas={totalPaginas}
+                    setPaginaActual={setPaginaActual}
                   />
                 </View>
 
-                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>
-                  por página
+                <Text
+                  style={{
+                    color: Colores.textoClaro,
+                    fontSize: Fuentes.caption,
+                    marginTop: 15,
+                  }}
+                  allowFontScaling={false}
+                >
+                  {`Mostrando ${plazasMostradas.length} de ${plazas.length} resultados`}
                 </Text>
               </View>
-
-              <View style={{ width: esPantallaPequeña ? "100%" : "40%", marginBottom: 15 }}>
-                <Entrada
-                  label="Buscar"
-                  value={busqueda}
-                  maxLength={45}
-                  onChangeText={(text) => {
-                    setBusqueda(text);
-                    setPaginaActual(1);
-                  }}
-                />
-              </View>
-            </View>
-
-            {/* Tabla */}
-            <ScrollView horizontal={esPantallaPequeña}>
-              <Tabla
-                columnas={[
-                  {
-                    key: "PROGRAMA",
-                    titulo: "Programa",
-                    multilinea: true,
-                    ancho: 240
-                  },
-                  {
-                    key: "sede",
-                    titulo: "Sede",
-                    multilinea: true,
-                    ...(esPantallaPequeña && { ancho: 350 })
-                  },
-                  {
-                    key: "tipoBeca",
-                    titulo: "Beca",
-                    ancho: 100
-                  },
-                  {
-                    key: "tarjetaDisponible",
-                    titulo: "Tarjeta",
-                    ancho: 100
-                  },
-                ]}
-                datos={plazasMostradas}
-              />
-            </ScrollView>
-
-            {/* Paginación */}
-            <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-              <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                <Paginacion
-                  paginaActual={paginaActual}
-                  totalPaginas={totalPaginas}
-                  setPaginaActual={setPaginaActual}
-                />
-              </View>
-
-              <Text
-                style={{
-                  color: Colores.textoClaro,
-                  fontSize: Fuentes.caption,
-                  marginTop: 15,
-                }}
-                allowFontScaling={false}
-              >
-                {`Mostrando ${plazasMostradas.length} de ${plazas.length} resultados`}
-              </Text>
             </View>
           </View>
-        </View>
-        <ModalAPI ref={modalAPI} />
-        <PiePagina />
-      </ScrollView>
+          <ModalAPI ref={modalAPI} />
+          <PiePagina />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </>
   );
 }

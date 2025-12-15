@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { WebView } from "react-native-webview";
 
 export default function RevisarExpediente() {
@@ -85,10 +85,12 @@ export default function RevisarExpediente() {
         obtenerDocumentos();
         modalAPI.current?.show(true, `El documento ha sido ${estatus?.toLowerCase()} correctamente.`);
       } else {
-        modalAPI.current?.show(false, "Hubo un problema al validar el documento. Inténtalo de nuevo más tarde.");
+        setModalConfirmacionVisible(false);
+        modalAPI.current?.show(false, "Hubo un problema al validar el documento. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalConfirmacionVisible(true); });
       }
     } catch (error) {
-      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+      setModalConfirmacionVisible(false);
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalConfirmacionVisible(true); });
     }
   };
 
@@ -299,87 +301,91 @@ export default function RevisarExpediente() {
           <ActivityIndicator size="large" color="#5a0839" />
         </View>
       )}
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ flex: 1 }}>
-          <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-            <View style={[{ flexDirection: "row", justifyContent: "flex-end" }, esPantallaPequeña && { marginBottom: 5 }]}>
-              {esPantallaPequeña ?
-                <Boton
-                  onPress={() => router.push("/validar-documentos")}
-                  icon={<Ionicons name="arrow-back-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={{ flex: 1 }}>
+            <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+              <View style={[{ flexDirection: "row", justifyContent: "flex-end" }, esPantallaPequeña && { marginBottom: 5 }]}>
+                {esPantallaPequeña ?
+                  <Boton
+                    onPress={() => router.push("/validar-documentos")}
+                    icon={<Ionicons name="arrow-back-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                  />
+                  :
+                  <Boton
+                    title="Regresar"
+                    onPress={() => router.push("/validar-documentos")}
+                  />
+                }
+              </View>
+              <Text allowFontScaling={false} style={styles.titulo}>Expediente digital</Text>
+              <Text allowFontScaling={false} style={styles.alumno}>{boleta}</Text>
+              <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, textAlign: "center" }}>
+                Selecciona un documento del expediente digital del alumno y elige la opción Aprobar o Rechazar según corresponda.
+              </Text>
+              <Text allowFontScaling={false} style={styles.subtitulo}>Registro al servicio social</Text>
+              <ScrollView horizontal={esPantallaPequeña}>
+                <Tabla
+                  columnas={[
+                    { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 300 }) },
+                    {
+                      key: "estatus",
+                      titulo: "Estatus",
+                      render: (valor, fila) => (
+                        <Text allowFontScaling={false} style={[styles.texto, { color: fila.color }]}>
+                          {valor}
+                        </Text>
+                      ),
+                      ...(esPantallaPequeña && { ancho: 190 })
+                    },
+                    { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 300 }) },
+                  ]}
+                  datos={documentos
+                    .filter((d) => d.tipo === 1)
+                    .map((fila) => ({
+                      ...fila,
+                      observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
+                      onPress: () => { setVerDetallesDocumento(true), setDocSeleccionado(fila) },
+                    }))}
                 />
-                :
-                <Boton
-                  title="Regresar"
-                  onPress={() => router.push("/validar-documentos")}
+              </ScrollView>
+
+              <Text allowFontScaling={false} style={styles.subtitulo}>Término del servicio social</Text>
+
+              <ScrollView horizontal={esPantallaPequeña}>
+                <Tabla
+                  columnas={[
+                    { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
+                    {
+                      key: "estatus",
+                      titulo: "Estatus",
+                      render: (valor, fila) => (
+                        <Text allowFontScaling={false} style={[styles.texto, { color: fila.color }]}>
+                          {valor}
+                        </Text>
+                      ),
+                      ...(esPantallaPequeña && { ancho: 150 })
+                    },
+                    { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
+                  ]}
+                  datos={documentos
+                    .filter((d) => d.tipo === 2)
+                    .map((fila) => ({
+                      ...fila,
+                      observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
+                      onPress: () => { setVerDetallesDocumento(true); setDocSeleccionado(fila) },
+                    }))}
                 />
-              }
+              </ScrollView>
             </View>
-            <Text allowFontScaling={false} style={styles.titulo}>Expediente digital</Text>
-            <Text allowFontScaling={false} style={styles.alumno}>{boleta}</Text>
-
-            <Text allowFontScaling={false} style={styles.subtitulo}>Registro al servicio social</Text>
-            <ScrollView horizontal={esPantallaPequeña}>
-              <Tabla
-                columnas={[
-                  { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 300 }) },
-                  {
-                    key: "estatus",
-                    titulo: "Estatus",
-                    render: (valor, fila) => (
-                      <Text allowFontScaling={false} style={[styles.texto, { color: fila.color }]}>
-                        {valor}
-                      </Text>
-                    ),
-                    ...(esPantallaPequeña && { ancho: 190 })
-                  },
-                  { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 300 }) },
-                ]}
-                datos={documentos
-                  .filter((d) => d.tipo === 1)
-                  .map((fila) => ({
-                    ...fila,
-                    observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
-                    onPress: () => { setVerDetallesDocumento(true), setDocSeleccionado(fila) },
-                  }))}
-              />
-            </ScrollView>
-
-            <Text allowFontScaling={false} style={styles.subtitulo}>Término del servicio social</Text>
-
-            <ScrollView horizontal={esPantallaPequeña}>
-              <Tabla
-                columnas={[
-                  { key: "nombreArchivo", titulo: "Documento", ...(esPantallaPequeña && { ancho: 250 }) },
-                  {
-                    key: "estatus",
-                    titulo: "Estatus",
-                    render: (valor, fila) => (
-                      <Text allowFontScaling={false} style={[styles.texto, { color: fila.color }]}>
-                        {valor}
-                      </Text>
-                    ),
-                    ...(esPantallaPequeña && { ancho: 150 })
-                  },
-                  { key: "observacion", titulo: "Observaciones", ...(esPantallaPequeña && { ancho: 250 }) },
-                ]}
-                datos={documentos
-                  .filter((d) => d.tipo === 2)
-                  .map((fila) => ({
-                    ...fila,
-                    observacion: fila.estatus === "Pendiente" ? "En espera de revisión." : fila.observacion,
-                    onPress: () => { setVerDetallesDocumento(true); setDocSeleccionado(fila) },
-                  }))}
-              />
-            </ScrollView>
           </View>
-        </View>
-        {renderModalDetalle()}
-        {renderModalDocumento()}
-        {renderModalDetalleValidar()}
-        <ModalAPI ref={modalAPI} />
-        <PiePagina />
-      </ScrollView>
+          {renderModalDetalle()}
+          {renderModalDocumento()}
+          {renderModalDetalleValidar()}
+          <ModalAPI ref={modalAPI} />
+          <PiePagina />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </>
   );
 }
@@ -421,6 +427,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: Colores.textoClaro,
     textAlign: "center",
+    marginBottom: 20,
   },
   texto: {
     fontSize: Fuentes.cuerpo,

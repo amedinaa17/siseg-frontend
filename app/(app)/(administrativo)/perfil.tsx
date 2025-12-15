@@ -133,7 +133,7 @@ export default function MiPerfil() {
                     <ActivityIndicator size="large" color="#5a0839" />
                 </View>
             )}
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     <View style={{ flex: 1 }}>
                         <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }, vista != 1 && { marginTop: 100 }]}>

@@ -1,27 +1,37 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 
-const esWeb = typeof window !== "undefined" && window.localStorage;
+const esWeb = Platform.OS === "web";
 
-export const storage = {
-  async setItem(key: string, value: string) {
+/**
+ * Para web usa `sessionStorage`
+ * Para móvil usa `AsyncStorage`
+*/
+
+// Guarda un valor asociado a una clave
+export const almacenamiento = {
+  async guardarItem(clave: string, valor: string) {
     if (esWeb) {
-      localStorage.setItem(key, value);
-    } else {
-      await AsyncStorage.setItem(key, value);
+      sessionStorage.setItem(clave, valor);
+      return;
     }
+    await AsyncStorage.setItem(clave, valor);
   },
-  async getItem(key: string) {
+
+  // Obtiene el valor asociado a una clave
+  async obtenerItem(clave: string) {
     if (esWeb) {
-      return localStorage.getItem(key);
-    } else {
-      return await AsyncStorage.getItem(key);
+      return sessionStorage.getItem(clave);
     }
+    return await AsyncStorage.getItem(clave);
   },
-  async removeItem(key: string) {
+
+  // Elimina el valor asociado a una clave
+  async eliminarItem(clave: string) {
     if (esWeb) {
-      localStorage.removeItem(key);
-    } else {
-      await AsyncStorage.removeItem(key);
+      sessionStorage.removeItem(clave);
+      return;
     }
-  }
+    await AsyncStorage.removeItem(clave);
+  },
 };

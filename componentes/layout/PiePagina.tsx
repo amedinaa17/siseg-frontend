@@ -11,7 +11,7 @@ export default function PiePagina() {
   const [visibleTC, setVisibleTC] = useState(false);
   const [visibleAyuda, setVisibleAyuda] = useState(false);
   const { width } = useWindowDimensions();
-  const esPantallaPequeña = Platform.OS === "ios" || Platform.OS === "android" || width < 790;
+  const esPantallaPequeña = Platform.OS === "ios" || Platform.OS === "android" || width < 625;
 
   return (
     <ImageBackground

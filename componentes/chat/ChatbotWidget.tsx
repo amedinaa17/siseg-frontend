@@ -90,7 +90,7 @@ const ChatbotWidget: React.FC<{
       {open && (
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={80}
+          keyboardVerticalOffset={5}
           style={styles.popupWrapper}
         >
           <View style={[styles.popup, { width: esPantallaPequeña ? "100%" : 360 }]}>
@@ -171,8 +171,8 @@ function cryptoRandom() {
 const styles = StyleSheet.create({
   fab: {
     position: Platform.select({ web: "fixed" as any, default: "absolute" }),
-    right: 24,
-    bottom: 24,
+    right: 20,
+    bottom: 20,
     width: 56,
     height: 56,
     borderRadius: 28,

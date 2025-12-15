@@ -13,10 +13,15 @@ import { fetchData, postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Constants from 'expo-constants';
+import * as FileSystemLegacy from "expo-file-system/legacy";
 import { useRouter } from "expo-router";
+import * as Sharing from "expo-sharing";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
+
+const FORMATO_URL = Constants.expoConfig?.extra?.FORMATO_URL;
 
 export default function GestionAlumnos() {
     const { sesion, verificarToken } = useAuth();
@@ -121,13 +126,15 @@ export default function GestionAlumnos() {
                 obtenerAlumnos();
                 modalAPI.current?.show(true, "El alumno se ha registrado correctamente.");
             } else {
+                setModalAgregar(false);
                 if (response.message.includes("La boleta ya está registrada"))
-                    modalAPI.current?.show(false, "El número de boleta o CURP ya está registrado. Verifica los datos e inténtalo de nuevo.");
+                    modalAPI.current?.show(false, "El número de boleta o CURP ya está registrado. Verifica los datos e inténtalo de nuevo.", () => { modalAPI.current?.close(); setModalAgregar(true); });
                 else
-                    modalAPI.current?.show(false, "Hubo un problema al registrar al alumno. Inténtalo de nuevo más tarde.");
+                    modalAPI.current?.show(false, "Hubo un problema al registrar al alumno. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalAgregar(true); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            setModalAgregar(false);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalAgregar(true); });
         }
     };
 
@@ -160,10 +167,12 @@ export default function GestionAlumnos() {
                 obtenerAlumnos();
                 modalAPI.current?.show(true, "Los datos del alumno se han actualizado correctamente.");
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al actualizar los datos del alumno. Inténtalo de nuevo más tarde.");
+                setModalEditar(false);
+                modalAPI.current?.show(false, "Hubo un problema al actualizar los datos del alumno. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalEditar(true); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            setModalEditar(false);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalEditar(true); });
         }
     };
 
@@ -245,10 +254,12 @@ export default function GestionAlumnos() {
                     () => { modalAPI.current?.close(); setDetalleVisible(true) }
                 );
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al subir el archivo. Verifica el formato e inténtalo de nuevo.");
+                setModalCargar(false);
+                modalAPI.current?.show(false, "Hubo un problema al subir el archivo. Verifica el formato e inténtalo de nuevo.", () => { modalAPI.current?.close(); setModalCargar(true); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            setModalCargar(false);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalCargar(true); });
         }
     };
 
@@ -266,13 +277,15 @@ export default function GestionAlumnos() {
 
     useEffect(() => {
         if (Object.keys(errorsAgregar).length > 0) {
-            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+            setModalAgregar(false);
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.", () => { modalAPI.current?.close(); setModalAgregar(true); });
         }
     }, [errorsAgregar]);
 
     useEffect(() => {
         if (Object.keys(errorsEditar).length > 0) {
-            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+            setModalEditar(false);
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.", () => { modalAPI.current?.close(); setModalEditar(true); });
         }
     }, [errorsEditar]);
 
@@ -285,7 +298,6 @@ export default function GestionAlumnos() {
 
         return (
             <Modal visible={modalDetalle} onClose={() => { setAlumnoSeleccionado(null); setModalDetalle(false); }} titulo="Datos del alumno" maxWidth={750}>
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
                     <View style={{ marginTop: 5, marginBottom: 15 }} >
                         <Entrada label="Nombre" value={nombre || ""} editable={false} />
                     </View>
@@ -384,7 +396,6 @@ export default function GestionAlumnos() {
                             <Entrada label="Teléfono local" value={tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                         </View>
                     </View>
-                </KeyboardAvoidingView>
             </Modal>
         );
     };
@@ -395,7 +406,7 @@ export default function GestionAlumnos() {
                 visible={modalAgregar} onClose={() => { setModalAgregar(false); resetAgregar(); }}
                 titulo="Agregar alumno" maxWidth={700} cancelar deshabilitado={isSubmittingAgregar}
                 textoAceptar={isSubmittingAgregar ? "Agregando…" : "Agregar alumno"} onAceptar={handleSubmitAgregar(onSubmitAgregar)}>
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5}>
                     <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlAgregar}
@@ -608,7 +619,7 @@ export default function GestionAlumnos() {
                 cancelar deshabilitado={isSubmittingEditar}
                 textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
             >
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5}>
                     <View style={{ marginTop: 10, marginBottom: 15 }} >
                         <Controller
                             control={controlEditar}
@@ -829,7 +840,7 @@ export default function GestionAlumnos() {
     const renderModalCargarAlumnos = () => {
         return (
             <Modal visible={modalCargar} titulo="Cargar alumnos" maxWidth={600}
-                onClose={() => { setModalCargar(false); setArchivoSeleccionado(null); }}
+                onClose={() => { setModalCargar(false); setArchivoSeleccionado(null); setErrorArchivo(""); }}
                 textoAceptar={isSubmittingCargar ? "Cargando…" : "Cargar archivo"}
                 cancelar onAceptar={handleSubirArchivo} deshabilitado={isSubmittingCargar}>
                 <Text allowFontScaling={false}>
@@ -837,7 +848,7 @@ export default function GestionAlumnos() {
                 </Text>
                 <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption, marginVertical: 10 }}>
                     Descargue el archivo de ejemplo con el formato correcto para la carga de alumnos{" "}
-                    <TouchableOpacity onPress={() => { }}>
+                    <TouchableOpacity onPress={descargarExcel}>
                         <Text allowFontScaling={false} style={{ color: Colores.textoInfo }}>aquí</Text>
                     </TouchableOpacity>.
                 </Text>
@@ -885,6 +896,51 @@ export default function GestionAlumnos() {
         );
     };
 
+    const descargarExcel = async () => {
+        try {
+            // Web
+            if (Platform.OS === "web") {
+                // Descargar como blob
+                const res = await fetch(FORMATO_URL, { method: "GET" });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const blob = await res.blob();
+                // Forzar descarga
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "FORMATO_PARA_CARGAR_ALUMNOS.xlsx";
+                a.style.display = "none";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                return;
+            }
+
+            // Móvil
+            let rutaArchivo = `${FileSystemLegacy.cacheDirectory}FORMATO_PARA_CARGAR_ALUMNOS.xlsx`;
+
+            const downloadResult = await FileSystemLegacy.downloadAsync(FORMATO_URL, rutaArchivo);
+            rutaArchivo = downloadResult.uri;
+
+            // Abre el diálogo del sistema (Guardar/Compartir)
+            if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(rutaArchivo, {
+                    mimeType:
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    dialogTitle: "Guardar archivo",
+                    UTI: "org.openxmlformats.spreadsheetml.sheet",
+                });
+            }
+        } catch (error: any) {
+            console.error(error);
+            modalAPI.current?.show(
+                false,
+                "No se pudo descargar el archivo en este dispositivo."
+            );
+        }
+    };
+
     return (
         <>
             {cargando && (
@@ -892,174 +948,176 @@ export default function GestionAlumnos() {
                     <ActivityIndicator size="large" color="#5a0839" />
                 </View>
             )}
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={{ flex: 1 }}>
-                    <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                        <Text allowFontScaling={false} style={styles.titulo}>Gestionar alumnos</Text>
-                        {sesion?.perfil === 2 && (
-                            <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
-                                <View>
-                                    <Boton title="Agregar alumno" onPress={() => { setModalAgregar(true) }} />
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <View style={{ flex: 1 }}>
+                        <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                            <Text allowFontScaling={false} style={styles.titulo}>Gestionar alumnos</Text>
+                            {sesion?.perfil === 2 && (
+                                <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
+                                    <View>
+                                        <Boton title="Agregar alumno" onPress={() => { setModalAgregar(true) }} />
+                                    </View>
+                                    <View>
+                                        <Boton title="Cargar alumnos" onPress={() => setModalCargar(true)} />
+                                    </View>
                                 </View>
-                                <View>
-                                    <Boton title="Cargar alumnos" onPress={() => setModalCargar(true)} />
-                                </View>
-                            </View>
-                        )}
+                            )}
 
-                        <View style={styles.controlesSuperiores}>
-                            <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                                    <Selector
-                                        label=""
-                                        selectedValue={String(filasPorPagina)}
-                                        onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                        items={[
-                                            { label: "5", value: "5" },
-                                            { label: "10", value: "10" },
-                                            { label: "20", value: "20" },
-                                        ]}
-                                    />
-                                </View>
-                                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
-                            </View>
-
-                            <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
-                                <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
-                                    <Entrada
-                                        label="Buscar"
-                                        value={busqueda}
-                                        maxLength={45}
-                                        onChangeText={setBusqueda}
-                                    />
-                                </View>
-
-                                <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
-                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                            <View style={styles.controlesSuperiores}>
+                                <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+                                    <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
                                         <Selector
-                                            label="Carrera"
-                                            selectedValue={filtroCarrera}
-                                            onValueChange={setFiltroCarrera}
+                                            label=""
+                                            selectedValue={String(filasPorPagina)}
+                                            onValueChange={(valor) => setFilasPorPagina(Number(valor))}
                                             items={[
-                                                { label: "Todos", value: "Todos" },
-                                                { label: "Médico Cirujano y Partero", value: "Partero" },
-                                                { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
+                                                { label: "5", value: "5" },
+                                                { label: "10", value: "10" },
+                                                { label: "20", value: "20" },
                                             ]}
                                         />
                                     </View>
+                                    <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+                                </View>
 
-                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
-                                        <Selector
-                                            label="Estatus"
-                                            selectedValue={filtroEstatus}
-                                            onValueChange={setFiltroEstatus}
-                                            items={[
-                                                { label: "Todos", value: "Todos" },
-                                                { label: "Baja", value: "Baja" },
-                                                { label: "Aspirante", value: "Aspirante" },
-                                                { label: "Candidato", value: "Candidato" },
-                                                { label: "En proceso", value: "En proceso" },
-                                                { label: "Concluido", value: "Concluido" },
-                                            ]}
+                                <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
+                                    <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
+                                        <Entrada
+                                            label="Buscar"
+                                            value={busqueda}
+                                            maxLength={45}
+                                            onChangeText={setBusqueda}
                                         />
                                     </View>
-                                </View>
-                            </View>
-                        </View>
 
-                        <ScrollView horizontal={esPantallaPequeña}>
-                            <Tabla
-                                columnas={[
-                                    { key: "boleta", titulo: "Boleta", ancho: 120 },
-                                    { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: sesion?.perfil === 2 ? 155 : 205 }) },
-                                    { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: sesion?.perfil === 2 ? 155 : 205 }) },
-                                    { key: "generacion", titulo: "Generación", ancho: 150 },
-                                    {
-                                        key: "estatus",
-                                        titulo: "Estatus",
-                                        ancho: 110,
-                                        render: (valor) => (
-                                            <Text
-                                                style={[
-                                                    styles.texto,
-                                                    valor === "Baja" && { color: Colores.textoError },
-                                                    valor === "Candidato" && { color: Colores.textoAdvertencia },
-                                                    valor === "Aspirante" && { color: Colores.textoAdvertencia },
-                                                    valor === "En proceso" && { color: Colores.textoInfo },
-                                                    valor === "Concluido" && { color: Colores.textoExito },
+                                    <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
+                                        <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                                            <Selector
+                                                label="Carrera"
+                                                selectedValue={filtroCarrera}
+                                                onValueChange={setFiltroCarrera}
+                                                items={[
+                                                    { label: "Todos", value: "Todos" },
+                                                    { label: "Médico Cirujano y Partero", value: "Partero" },
+                                                    { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
                                                 ]}
-                                                allowFontScaling={false}
-                                            >
-                                                {valor}
-                                            </Text>
-                                        ),
-                                    },
-                                    ...(sesion?.perfil === 2
-                                        ? [
-                                            {
-                                                key: "acciones",
-                                                titulo: "Acciones",
-                                                ancho: 100,
-                                                render: (_, fila) => (
-                                                    <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
-                                                        <Boton
-                                                            onPress={() => { setAlumnoSeleccionado(fila); setModalEditar(true); }}
-                                                            icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                            color={Colores.textoInfo}
-                                                        />
-                                                        <Boton
-                                                            onPress={() => { setModalDarBaja(fila) }}
-                                                            icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                            color={Colores.textoError}
-                                                            disabled={fila.estatus === "Baja" ? true : false}
-                                                        />
-                                                    </View>
-                                                ),
-                                            },
-                                        ]
-                                        : []),
-                                ]}
-                                datos={alumnosMostrados.map((fila) => ({
-                                    ...fila,
-                                    nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
-                                    carrera: fila.carrera.NOMBRE,
-                                    estatus: fila.estatus.DESCRIPCION,
-                                    onPress: () => { setAlumnoSeleccionado(fila); setModalDetalle(true); },
-                                }))}
-                            />
-                        </ScrollView>
+                                            />
+                                        </View>
 
-                        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                                <Paginacion
-                                    paginaActual={paginaActual}
-                                    totalPaginas={totalPaginas}
-                                    setPaginaActual={setPaginaActual}
-                                />
+                                        <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
+                                            <Selector
+                                                label="Estatus"
+                                                selectedValue={filtroEstatus}
+                                                onValueChange={setFiltroEstatus}
+                                                items={[
+                                                    { label: "Todos", value: "Todos" },
+                                                    { label: "Baja", value: "Baja" },
+                                                    { label: "Aspirante", value: "Aspirante" },
+                                                    { label: "Candidato", value: "Candidato" },
+                                                    { label: "En proceso", value: "En proceso" },
+                                                    { label: "Concluido", value: "Concluido" },
+                                                ]}
+                                            />
+                                        </View>
+                                    </View>
+                                </View>
                             </View>
 
-                            <Text
-                                style={{
-                                    color: Colores.textoClaro,
-                                    fontSize: Fuentes.caption,
-                                    marginTop: 15,
-                                }}
-                                allowFontScaling={false}
-                            >
-                                {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
-                            </Text>
+                            <ScrollView horizontal={esPantallaPequeña}>
+                                <Tabla
+                                    columnas={[
+                                        { key: "boleta", titulo: "Boleta", ancho: 120 },
+                                        { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: sesion?.perfil === 2 ? 155 : 205 }) },
+                                        { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: sesion?.perfil === 2 ? 155 : 205 }) },
+                                        { key: "generacion", titulo: "Generación", ancho: 150 },
+                                        {
+                                            key: "estatus",
+                                            titulo: "Estatus",
+                                            ancho: 110,
+                                            render: (valor) => (
+                                                <Text
+                                                    style={[
+                                                        styles.texto,
+                                                        valor === "Baja" && { color: Colores.textoError },
+                                                        valor === "Candidato" && { color: Colores.textoAdvertencia },
+                                                        valor === "Aspirante" && { color: Colores.textoAdvertencia },
+                                                        valor === "En proceso" && { color: Colores.textoInfo },
+                                                        valor === "Concluido" && { color: Colores.textoExito },
+                                                    ]}
+                                                    allowFontScaling={false}
+                                                >
+                                                    {valor}
+                                                </Text>
+                                            ),
+                                        },
+                                        ...(sesion?.perfil === 2
+                                            ? [
+                                                {
+                                                    key: "acciones",
+                                                    titulo: "Acciones",
+                                                    ancho: 100,
+                                                    render: (_, fila) => (
+                                                        <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                                                            <Boton
+                                                                onPress={() => { setAlumnoSeleccionado(fila); setModalEditar(true); }}
+                                                                icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                                color={Colores.textoInfo}
+                                                            />
+                                                            <Boton
+                                                                onPress={() => { setModalDarBaja(fila) }}
+                                                                icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                                color={Colores.textoError}
+                                                                disabled={fila.estatus === "Baja" ? true : false}
+                                                            />
+                                                        </View>
+                                                    ),
+                                                },
+                                            ]
+                                            : []),
+                                    ]}
+                                    datos={alumnosMostrados.map((fila) => ({
+                                        ...fila,
+                                        nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                                        carrera: fila.carrera.NOMBRE,
+                                        estatus: fila.estatus.DESCRIPCION,
+                                        onPress: () => { setAlumnoSeleccionado(fila); setModalDetalle(true); },
+                                    }))}
+                                />
+                            </ScrollView>
+
+                            <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                                <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                                    <Paginacion
+                                        paginaActual={paginaActual}
+                                        totalPaginas={totalPaginas}
+                                        setPaginaActual={setPaginaActual}
+                                    />
+                                </View>
+
+                                <Text
+                                    style={{
+                                        color: Colores.textoClaro,
+                                        fontSize: Fuentes.caption,
+                                        marginTop: 15,
+                                    }}
+                                    allowFontScaling={false}
+                                >
+                                    {`Mostrando ${alumnosMostrados.length} de ${alumnosFiltrados.length} resultados`}
+                                </Text>
+                            </View>
                         </View>
                     </View>
-                </View>
-                {renderModalDetalle()}
-                {renderModalAgregar()}
-                {renderModalEditar()}
-                {renderModalDarBaja()}
-                {renderModalCargarAlumnos()}
-                {renderModalDetallesCargarAlumnos()}
-                <ModalAPI ref={modalAPI} />
-                <PiePagina />
-            </ScrollView >
+                    {renderModalDetalle()}
+                    {renderModalAgregar()}
+                    {renderModalEditar()}
+                    {renderModalDarBaja()}
+                    {renderModalCargarAlumnos()}
+                    {renderModalDetallesCargarAlumnos()}
+                    <ModalAPI ref={modalAPI} />
+                    <PiePagina />
+                </ScrollView >
+            </KeyboardAvoidingView>
         </>
     );
 }

@@ -74,8 +74,8 @@ function AlumnoDrawerContent(props) {
     <DrawerContentScrollView {...props}>
       <View style={{ alignItems: "center" }}>
         <Image
-          source={require('@/activos/imagenes/favicon.png')}
-          style={{ width: 50, height: 50, marginVertical: 15 }}
+          source={require('@/activos/imagenes/icon.png')}
+          style={{ width: 55, height: 55, marginVertical: 15 }}
           tintColor={Colores.onPrimario}
         />
       </View>

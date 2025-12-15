@@ -77,7 +77,7 @@ export default function NuevaContraseña() {
   }, [errors]);
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         {error ? (
@@ -91,7 +91,7 @@ export default function NuevaContraseña() {
           <>
             <View style={styles.contenedorFormulario}>
               <Text allowFontScaling={false} style={styles.titulo}>Restablecer contraseña</Text>
-              <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 20 }}>
+              <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, textAlign: "center", marginBottom: 20 }}>
                 Ingresa una nueva contraseña de 8 a 12 caracteres, que incluya al menos una letra mayúscula, una letra minúscula y un número.
               </Text>
               <View style={{ marginBottom: 15 }}>

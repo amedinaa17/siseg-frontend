@@ -108,10 +108,12 @@ export default function GestionPlazas() {
                 obtenerPlazas();
                 modalAPI.current?.show(true, "La plaza se ha registrado correctamente.");
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al registrar la plaza. Inténtalo de nuevo más tarde.");
+                setModalAgregar(false);
+                modalAPI.current?.show(false, "Hubo un problema al registrar la plaza. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalAgregar(true); });
             }
         } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            setModalAgregar(false);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalAgregar(true); });
         }
     };
 
@@ -144,10 +146,12 @@ export default function GestionPlazas() {
                 obtenerPlazas();
                 modalAPI.current?.show(true, "Los datos de la plaza se han actualizado correctamente.");
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al actualizar los datos de la plaza. Inténtalo de nuevo más tarde.");
+                setModalEditar(false);
+                modalAPI.current?.show(false, "Hubo un problema al actualizar los datos de la plaza. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalEditar(true); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            setModalEditar(false);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalEditar(true); });
         }
     };
 
@@ -189,46 +193,41 @@ export default function GestionPlazas() {
                 titulo="Datos de la plaza"
                 maxWidth={750}
             >
-                <KeyboardAvoidingView
-                    style={{ flex: 1 }}
-                    behavior={Platform.OS === "web" ? undefined : "padding"}
-                    keyboardVerticalOffset={80}
-                >
-                    <View style={{ marginTop: 5, marginBottom: 15 }}>
-                        <Entrada label="Sede" value={sede || ""} editable={false} />
-                    </View>
+                <View style={{ marginTop: 5, marginBottom: 15 }}>
+                    <Entrada label="Sede" value={sede || ""} editable={false} />
+                </View>
 
-                    <View style={{ marginBottom: 15 }}>
-                        <Entrada label="Ubicación" value={ubicacion || ""} editable={false} />
-                    </View>
+                <View style={{ marginBottom: 15 }}>
+                    <Entrada label="Ubicación" value={ubicacion || ""} editable={false} />
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Programa" value={PROGRAMA || ""} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Tarjeta" value={tarjetaDisponible || ""} editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada label="Programa" value={PROGRAMA || ""} editable={false} />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada label="Tarjeta" value={tarjetaDisponible || ""} editable={false} />
+                    </View>
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Beca" value={tipoBeca || ""} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Estatus" value={estatus === 0 ? "Baja" : "Alta"} editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada label="Beca" value={tipoBeca || ""} editable={false} />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada label="Estatus" value={estatus === 0 ? "Baja" : "Alta"} editable={false} />
+                    </View>
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Carrera" value={carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Partero"} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Promoción" value={promocion || ""} editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada label="Carrera" value={carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Partero"} editable={false} />
                     </View>
-                </KeyboardAvoidingView>
+                    <View style={{ flex: 1, marginBottom: 15 }}>
+                        <Entrada label="Promoción" value={promocion || ""} editable={false} />
+                    </View>
+                </View>
+
             </Modal>
         );
     };
@@ -245,7 +244,7 @@ export default function GestionPlazas() {
                 textoAceptar={isSubmittingAgregar ? "Agregando…" : "Agregar plaza"}
                 onAceptar={handleSubmitAgregar(onSubmitAgregar)}
             >
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80}>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5}>
                     <View style={{ marginBottom: 15 }}>
                         <Controller
                             control={controlAgregar}
@@ -418,7 +417,7 @@ export default function GestionPlazas() {
                 <KeyboardAvoidingView
                     style={{ flex: 1 }}
                     behavior={Platform.OS === "web" ? undefined : "padding"}
-                    keyboardVerticalOffset={80}
+                    keyboardVerticalOffset={5}
                 >
                     <View style={{ marginBottom: 15 }}>
                         <Controller
@@ -583,7 +582,6 @@ export default function GestionPlazas() {
         );
     };
 
-
     const renderModalDarBaja = () => {
         if (!modalDarBaja) return null;
 
@@ -601,9 +599,17 @@ export default function GestionPlazas() {
 
     useEffect(() => {
         if (Object.keys(errorsAgregar).length > 0) {
-            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+            setModalAgregar(false);
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.", () => { modalAPI.current?.close(); setModalAgregar(true); });
         }
     }, [errorsAgregar]);
+
+    useEffect(() => {
+        if (Object.keys(errorsEditar).length > 0) {
+            setModalEditar(false);
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.", () => { modalAPI.current?.close(); setModalEditar(true); });
+        }
+    }, [errorsEditar]);
 
     return (
         <>
@@ -612,154 +618,156 @@ export default function GestionPlazas() {
                     <ActivityIndicator size="large" color="#5a0839" />
                 </View>
             )}
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={{ flex: 1 }}>
-                    <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
-                        <Text allowFontScaling={false} style={styles.titulo}>Gestionar plazas</Text>
-                        <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
-                            <View>
-                                <Boton title="Agregar plaza" onPress={() => { setModalAgregar(true) }} />
-                            </View>
-                        </View>
-
-                        <View style={styles.controlesSuperiores}>
-                            <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
-                                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                                    <Selector
-                                        label=""
-                                        selectedValue={String(filasPorPagina)}
-                                        onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                        items={[
-                                            { label: "5", value: "5" },
-                                            { label: "10", value: "10" },
-                                            { label: "20", value: "20" },
-                                        ]}
-                                    />
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <View style={{ flex: 1 }}>
+                        <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
+                            <Text allowFontScaling={false} style={styles.titulo}>Gestionar plazas</Text>
+                            <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
+                                <View>
+                                    <Boton title="Agregar plaza" onPress={() => { setModalAgregar(true) }} />
                                 </View>
-                                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
                             </View>
 
-                            <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
-                                <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
-                                    <Entrada
-                                        label="Buscar"
-                                        value={busqueda}
-                                        onChangeText={setBusqueda}
-                                    />
-                                </View>
-
-                                <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
-                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                            <View style={styles.controlesSuperiores}>
+                                <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { width: "100%", marginBottom: 15 }]}>
+                                    <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
                                         <Selector
-                                            label="Carrera"
-                                            selectedValue={filtroCarrera}
-                                            onValueChange={setFiltroCarrera}
+                                            label=""
+                                            selectedValue={String(filasPorPagina)}
+                                            onValueChange={(valor) => setFilasPorPagina(Number(valor))}
                                             items={[
-                                                { label: "Todos", value: "Todos" },
-                                                { label: "Médico Cirujano y Partero", value: "Partero" },
-                                                { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
+                                                { label: "5", value: "5" },
+                                                { label: "10", value: "10" },
+                                                { label: "20", value: "20" },
                                             ]}
                                         />
                                     </View>
+                                    <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+                                </View>
 
-                                    <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
-                                        <Selector
-                                            label="Estatus"
-                                            selectedValue={filtroEstatus}
-                                            onValueChange={setFiltroEstatus}
-                                            items={[
-                                                { label: "Todos", value: "Todos" },
-                                                { label: "Baja", value: "Baja" },
-                                                { label: "Alta", value: "Alta" },
-                                            ]}
+                                <View style={[esPantallaPequeña ? { width: "100%" } : { flexDirection: "row", gap: 8, justifyContent: "space-between", width: "70%" }]}>
+                                    <View style={[esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "50%" }]}>
+                                        <Entrada
+                                            label="Buscar"
+                                            value={busqueda}
+                                            onChangeText={setBusqueda}
                                         />
                                     </View>
-                                </View>
-                            </View>
-                        </View>
 
-                        <ScrollView horizontal={esPantallaPequeña}>
-                            <Tabla
-                                columnas={[
-                                    { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 250 }) },
-                                    { key: "carrera", titulo: "Carrera", ancho: 230 },
-                                    { key: "promocion", titulo: "Promoción", ancho: 110 },
-                                    {
-                                        key: "estatus",
-                                        titulo: "Estatus",
-                                        ancho: 100,
-                                        render: (valor) => (
-                                            <Text
-                                                style={[
-                                                    styles.texto,
-                                                    valor === 0 && { color: Colores.textoError },
-                                                    valor === 1 && { color: Colores.textoInfo },
+                                    <View style={{ flexDirection: "row", gap: 8, width: "100%" }}>
+                                        <View style={[esPantallaPequeña ? { width: "50%" } : { width: "30%" }]}>
+                                            <Selector
+                                                label="Carrera"
+                                                selectedValue={filtroCarrera}
+                                                onValueChange={setFiltroCarrera}
+                                                items={[
+                                                    { label: "Todos", value: "Todos" },
+                                                    { label: "Médico Cirujano y Partero", value: "Partero" },
+                                                    { label: "Médico Cirujano y Homeópata", value: "Homeópata" },
                                                 ]}
-                                                allowFontScaling={false}
-                                            >
-                                                {valor === 0 ? "Baja" : "Alta"}
-                                            </Text>
-                                        ),
-                                    },
-                                    {
-                                        key: "acciones",
-                                        titulo: "Acciones",
-                                        ancho: 100,
-                                        render: (_: any, fila: any) => (
-                                            <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
-                                                <Boton
-                                                    onPress={() => { setPlazaSeleccion(fila); setModalEditar(true); }}
-                                                    icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                    color={Colores.textoInfo}
-                                                />
-                                                <Boton
-                                                    onPress={() => { setModalDarBaja(fila) }}
-                                                    icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                                                    color={Colores.textoError}
-                                                    disabled={Number(fila.estatus) === 0}
-                                                />
-                                            </View>
-                                        ),
-                                    },
-                                ]}
-                                datos={plazasMostradas.map((p) => ({
-                                    ...p,
-                                    carrera: p.carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Partero",
-                                    onPress: () => { setPlazaSeleccion(p); setModalDetalle(true); },
-                                }))}
-                            />
-                        </ScrollView>
+                                            />
+                                        </View>
 
-                        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                                <Paginacion
-                                    paginaActual={paginaActual}
-                                    totalPaginas={totalPaginas}
-                                    setPaginaActual={setPaginaActual}
-                                />
+                                        <View style={[esPantallaPequeña ? { width: "50%" } : { width: "20%" }]}>
+                                            <Selector
+                                                label="Estatus"
+                                                selectedValue={filtroEstatus}
+                                                onValueChange={setFiltroEstatus}
+                                                items={[
+                                                    { label: "Todos", value: "Todos" },
+                                                    { label: "Baja", value: "Baja" },
+                                                    { label: "Alta", value: "Alta" },
+                                                ]}
+                                            />
+                                        </View>
+                                    </View>
+                                </View>
                             </View>
 
-                            <Text
-                                style={{
-                                    color: Colores.textoClaro,
-                                    fontSize: Fuentes.caption,
-                                    marginTop: 15,
-                                }}
-                                allowFontScaling={false}
-                            >
-                                {`Mostrando ${plazasMostradas.length} de ${plazasFiltradas.length} resultados`}
-                            </Text>
-                        </View>
+                            <ScrollView horizontal={esPantallaPequeña}>
+                                <Tabla
+                                    columnas={[
+                                        { key: "sede", titulo: "Sede", ...(esPantallaPequeña && { ancho: 250 }) },
+                                        { key: "carrera", titulo: "Carrera", ancho: 230 },
+                                        { key: "promocion", titulo: "Promoción", ancho: 110 },
+                                        {
+                                            key: "estatus",
+                                            titulo: "Estatus",
+                                            ancho: 100,
+                                            render: (valor) => (
+                                                <Text
+                                                    style={[
+                                                        styles.texto,
+                                                        valor === 0 && { color: Colores.textoError },
+                                                        valor === 1 && { color: Colores.textoInfo },
+                                                    ]}
+                                                    allowFontScaling={false}
+                                                >
+                                                    {valor === 0 ? "Baja" : "Alta"}
+                                                </Text>
+                                            ),
+                                        },
+                                        {
+                                            key: "acciones",
+                                            titulo: "Acciones",
+                                            ancho: 100,
+                                            render: (_: any, fila: any) => (
+                                                <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                                                    <Boton
+                                                        onPress={() => { setPlazaSeleccion(fila); setModalEditar(true); }}
+                                                        icon={<Ionicons name="pencil" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                        color={Colores.textoInfo}
+                                                    />
+                                                    <Boton
+                                                        onPress={() => { setModalDarBaja(fila) }}
+                                                        icon={<Ionicons name="trash" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                                                        color={Colores.textoError}
+                                                        disabled={Number(fila.estatus) === 0}
+                                                    />
+                                                </View>
+                                            ),
+                                        },
+                                    ]}
+                                    datos={plazasMostradas.map((p) => ({
+                                        ...p,
+                                        carrera: p.carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Partero",
+                                        onPress: () => { setPlazaSeleccion(p); setModalDetalle(true); },
+                                    }))}
+                                />
+                            </ScrollView>
 
+                            <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                                <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                                    <Paginacion
+                                        paginaActual={paginaActual}
+                                        totalPaginas={totalPaginas}
+                                        setPaginaActual={setPaginaActual}
+                                    />
+                                </View>
+
+                                <Text
+                                    style={{
+                                        color: Colores.textoClaro,
+                                        fontSize: Fuentes.caption,
+                                        marginTop: 15,
+                                    }}
+                                    allowFontScaling={false}
+                                >
+                                    {`Mostrando ${plazasMostradas.length} de ${plazasFiltradas.length} resultados`}
+                                </Text>
+                            </View>
+
+                        </View>
                     </View>
-                </View>
-                {renderModalDetalle()}
-                {renderModalEditar()}
-                {renderModalAgregar()}
-                {renderModalDarBaja()}
-                <ModalAPI ref={modalAPI} />
-                <PiePagina />
-            </ScrollView >
+                    {renderModalDetalle()}
+                    {renderModalEditar()}
+                    {renderModalAgregar()}
+                    {renderModalDarBaja()}
+                    <ModalAPI ref={modalAPI} />
+                    <PiePagina />
+                </ScrollView >
+            </KeyboardAvoidingView>
         </>
     );
 }

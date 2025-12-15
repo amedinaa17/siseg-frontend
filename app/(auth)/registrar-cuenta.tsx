@@ -18,8 +18,6 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, Touchable
 export default function Register() {
   const router = useRouter();
 
-  const [aceptarAviso, setAceptarAviso] = useState(false);
-  const [aceptarTC, setAceptarTC] = useState(false);
   const [visibleAviso, setVisibleAviso] = useState(false);
   const [visibleTC, setVisibleTC] = useState(false);
 
@@ -54,12 +52,11 @@ export default function Register() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Encabezado />
         <View style={styles.contenedorFormulario}>
           <Text allowFontScaling={false} style={styles.titulo}>Registrar cuenta</Text>
-
           <View style={{ marginBottom: error == '' || !error.includes("Error") ? 25 : 10 }}>
             <Controller
               control={control}

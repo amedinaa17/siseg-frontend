@@ -1,6 +1,3 @@
-import lugarFoto from "@/activos/imagenes/LugarFoto.png";
-import cabezaCarta from "@/activos/imagenes/cabezacarta.png";
-import pieCarta from "@/activos/imagenes/piecarta.png";
 import ModalAPI, { ModalAPIRef } from "@/componentes/layout/ModalAPI";
 import PiePagina from "@/componentes/layout/PiePagina";
 import { useAuth } from "@/context/AuthProvider";
@@ -35,6 +32,10 @@ export default function AcuseSolicitud() {
     lugar: string;
   } | null>(null);
 
+  const pieAcuse = require("@/activos/imagenes/pieAcuse.png");
+  const fotoAcuse = require("@/activos/imagenes/fotoAcuse.png");
+  const encabezadoAcuse = require("@/activos/imagenes/encabezadoAcuse.png");
+
   const obtenerDatos = async () => {
     verificarToken();
 
@@ -63,9 +64,9 @@ export default function AcuseSolicitud() {
     const cargarImagenes = async () => {
       try {
         const [cabeza, pie, lugar] = await Asset.loadAsync([
-          cabezaCarta,
-          pieCarta,
-          lugarFoto,
+          encabezadoAcuse,
+          pieAcuse,
+          fotoAcuse,
         ]);
 
         if (Platform.OS === "web") {

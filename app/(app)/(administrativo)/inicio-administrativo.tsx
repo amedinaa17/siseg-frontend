@@ -106,7 +106,7 @@ export default function InicioPersonalAdministrativo() {
                 </Text>
               </View>
               <Text allowFontScaling={false} style={styles.titulo}>Bienvenido</Text>
-              <Text allowFontScaling={false} style={styles.nombreAdmin}>{sesion?.nombre + " " + administrativo?.apellido_paterno + " " + administrativo?.apellido_materno}</Text>
+              <Text allowFontScaling={false} style={styles.nombreAdmin}>{sesion?.nombre + " " + (administrativo?.apellido_paterno || "") + " " + (administrativo?.apellido_materno || "")}</Text>
               <Text allowFontScaling={false} style={styles.boleta}>{sesion?.boleta || ""}</Text>
 
               <View style={[styles.tarjetaContenedor, { flexDirection: esMovil ? "column" : "row" }]}>
@@ -141,12 +141,12 @@ export default function InicioPersonalAdministrativo() {
               </View>
             </View>
           </View>
-            <ModalAPI ref={modalAPI} />
-            <ModalAvisoPrivacidad
-              visible={visibleAviso}
-              onClose={() => setVisibleAviso(false)}
-            />
-            <PiePagina />
+          <ModalAPI ref={modalAPI} />
+          <ModalAvisoPrivacidad
+            visible={visibleAviso}
+            onClose={() => setVisibleAviso(false)}
+          />
+          <PiePagina />
         </ScrollView>
       </View>
     </>

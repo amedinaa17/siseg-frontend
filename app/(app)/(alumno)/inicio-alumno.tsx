@@ -72,7 +72,7 @@ export default function InicioAlumno() {
                 </Text>
               </View>
               <Text allowFontScaling={false} style={styles.titulo}>Bienvenido</Text>
-              <Text allowFontScaling={false} style={styles.nombreAlumno}>{sesion?.nombre + " " + alumno?.apellido_paterno + " " + alumno?.apellido_materno}</Text>
+              <Text allowFontScaling={false} style={styles.nombreAlumno}>{sesion?.nombre + " " + (alumno?.apellido_paterno || "") + " " + (alumno?.apellido_materno || "")}</Text>
               <Text allowFontScaling={false} style={styles.boleta}>{sesion?.boleta || ""}</Text>
               <Text allowFontScaling={false} style={styles.carrera}>{alumno?.carrera || ""}</Text>
 

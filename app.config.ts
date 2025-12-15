@@ -1,14 +1,16 @@
 export default {
   expo: {
     name: "SISEG",
-    slug: "SISEG",
+    slug: "siseg-frontend",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./activos/imagenes/siseg.png",
-    scheme: "SISEG",
+    icon: "./activos/imagenes/favicon.png",
+    scheme: "siseg",
 
     extra: {
       API_URL: process.env.API_URL,
+      MANUAL_URL: process.env.MANUAL_URL,
+      FORMATO_URL: process.env.FORMATO_URL,
       GOOGLE_MAPS_API_KEY:
         process.env.GOOGLE_MAPS_API_KEY || "AIzaSyAN9dlyun_A3YnM9gR3NbMob6y6IPntkNA",
       eas: {
@@ -21,6 +23,9 @@ export default {
 
     ios: {
       supportsTablet: true,
+      adaptiveIcon: {
+        foregroundImage: "./activos/imagenes/favicon.png",
+      },
       bundleIdentifier: "com.tt2025b020.siseg",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false
@@ -28,10 +33,9 @@ export default {
     },
 
     android: {
-      package: "com.tt2025b020.tuapp",
+      package: "com.tt2025b020.siseg",
       adaptiveIcon: {
-        foregroundImage: "./activos/imagenes/siseg.png",
-        backgroundColor: "#ffffff"
+        foregroundImage: "./activos/imagenes/favicon.png",
       },
       edgeToEdgeEnabled: true,
       config: {
@@ -46,7 +50,7 @@ export default {
     web: {
       bundler: "metro",
       output: "static",
-      favicon: "./activos/imagenes/favicon.png",
+      favicon: "./activos/imagenes/icon.png",
       name: "SISEG"
     },
 
@@ -55,7 +59,7 @@ export default {
       [
         "expo-splash-screen",
         {
-          image: "./activos/imagenes/siseg.png",
+          image: "./activos/imagenes/favicon.png",
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#ffffff"

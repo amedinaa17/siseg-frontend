@@ -140,7 +140,7 @@ export default function MiPerfil() {
                     <ActivityIndicator size="large" color="#5a0839" />
                 </View>
             )}
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     <View style={{ flex: 1 }}>
                         <View
@@ -436,7 +436,7 @@ export default function MiPerfil() {
                             {vista === 3 && (
                                 <>
                                     <Text allowFontScaling={false} style={styles.titulo}>Cambiar contraseña</Text>
-                                    <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 20 }}>
+                                    <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, textAlign: "center", marginBottom: 20 }}>
                                         Ingresa una nueva contraseña de 8 a 12 caracteres, que incluya al menos una letra mayúscula, una letra minúscula y un número.
                                     </Text>
                                     <View style={{ marginBottom: 15 }}>

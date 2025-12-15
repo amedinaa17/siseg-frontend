@@ -43,7 +43,7 @@ export default function ReportesRiesgo() {
     const [verEvidencia, setVerEvidencia] = useState<any | null>(null);
 
     const modalAPI = useRef<ModalAPIRef>(null);
-    const [modalAgregar, setModalAgregar] = useState(false);
+    const [verModalAgregar, setVerModalAgregar] = useState(false);
 
     const [busqueda, setBusqueda] = useState("");
     const [filtroEstatus, setFiltroEstatus] = useState("Todos");
@@ -183,22 +183,26 @@ export default function ReportesRiesgo() {
                 formData.append("evidencias", evidencia.file, evidencia.name);
             }
 
-            const response = await postData(`reportes/agregarReporte`, formData,);
+            const response = await postData(`reportes/agregarReporte`, formData);
             if (response.error === 0) {
+                setVerModalAgregar(false);
                 handleCancelar();
                 obtenerReportes();
                 modalAPI.current?.show(true, "El reporte se ha enviado correctamente.");
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al enviar el reporte. Inténtalo de nuevo más tarde.");
+                setVerModalAgregar(false);
+                modalAPI.current?.show(false, "Hubo un problema al enviar el reporte. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setVerModalAgregar(true); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            setVerModalAgregar(false);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setVerModalAgregar(true); });
         }
     };
 
     useEffect(() => {
         if (Object.keys(errors).length > 0) {
-            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.");
+            setVerModalAgregar(false);
+            modalAPI.current?.show(false, "Algunos campos contienen errores. Revísalos y vuelve a intentarlo.", () => { modalAPI.current?.close(); setVerModalAgregar(true); });
         }
     }, [errors]);
 
@@ -206,19 +210,19 @@ export default function ReportesRiesgo() {
         reset();
         setErrorEvidenciaNueva("");
         setEvidenciasNueva([]);
-        setModalAgregar(false);
+        setVerModalAgregar(false);
     };
 
     const renderModalAgregar = () => {
         return (
             <Modal
-                visible={modalAgregar} titulo="Agregar reporte" maxWidth={600}
+                visible={verModalAgregar} titulo="Agregar reporte" maxWidth={600}
                 onClose={handleCancelar}
                 textoAceptar={isSubmitting ? "Enviando…" : "Enviar reporte"} onAceptar={handleSubmit(onSubmit)}
                 cancelar deshabilitado={isSubmitting}
             >
                 <ScrollView>
-                    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={80} >
+                    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
                         <View style={{ marginTop: 5, marginBottom: 20 }}>
                             <Controller
                                 control={control}
@@ -445,129 +449,131 @@ export default function ReportesRiesgo() {
                     <ActivityIndicator size="large" color="#5a0839" />
                 </View>
             )}
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={{ flex: 1 }}>
-                    <View
-                        style={[
-                            styles.contenedorFormulario,
-                            esPantallaPequeña && { maxWidth: "95%" },
-                        ]}
-                    >
-                        <Text allowFontScaling={false} style={styles.titulo}>Reportes de situación de riesgo</Text>
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <View style={{ flex: 1 }}>
+                        <View
+                            style={[
+                                styles.contenedorFormulario,
+                                esPantallaPequeña && { maxWidth: "95%" },
+                            ]}
+                        >
+                            <Text allowFontScaling={false} style={styles.titulo}>Reportes de situación de riesgo</Text>
 
-                        <View style={{ marginBottom: 15, alignItems: "flex-start" }}>
-                            <Boton title="Agregar reporte" onPress={() => setModalAgregar(true)} />
-                        </View>
-                        <View style={styles.controlesSuperiores}>
-                            <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 15, width: "100%" }]}>
-                                <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
-                                    <Selector
-                                        label=""
-                                        selectedValue={String(filasPorPagina)}
-                                        onValueChange={(valor) => setFilasPorPagina(Number(valor))}
-                                        items={[
-                                            { label: "5", value: "5" },
-                                            { label: "10", value: "10" },
-                                            { label: "20", value: "20" },
-                                        ]}
-                                    />
+                            <View style={{ marginBottom: 15, alignItems: "flex-start" }}>
+                                <Boton title="Agregar reporte" onPress={() => setVerModalAgregar(true)} />
+                            </View>
+                            <View style={styles.controlesSuperiores}>
+                                <View style={[{ flexDirection: "row", alignItems: "center", gap: 8 }, esPantallaPequeña && { marginBottom: 15, width: "100%" }]}>
+                                    <View style={[esPantallaPequeña && [filasPorPagina === 5 ? { minWidth: 35.8 } : filasPorPagina === 10 ? { width: 42.8 } : { minWidth: 44.8 }]]}>
+                                        <Selector
+                                            label=""
+                                            selectedValue={String(filasPorPagina)}
+                                            onValueChange={(valor) => setFilasPorPagina(Number(valor))}
+                                            items={[
+                                                { label: "5", value: "5" },
+                                                { label: "10", value: "10" },
+                                                { label: "20", value: "20" },
+                                            ]}
+                                        />
+                                    </View>
+                                    <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
                                 </View>
-                                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, fontSize: Fuentes.caption }}>por página</Text>
+
+                                <View style={[{ flexDirection: "row", gap: 8, justifyContent: "space-between" }, esPantallaPequeña ? { width: "100%" } : { width: "40%" }]}>
+                                    <View style={[esPantallaPequeña ? { width: "60%", marginBottom: 15 } : { width: "60%" }]}>
+                                        <Entrada
+                                            label="Buscar"
+                                            value={busqueda}
+                                            maxLength={45}
+                                            onChangeText={(text) => { setBusqueda(text); setPaginaActual(1); }}
+                                        />
+                                    </View>
+                                    <View style={[esPantallaPequeña ? { width: "40%" } : { width: "40%" }]}>
+                                        <Selector
+                                            label="Estatus"
+                                            selectedValue={filtroEstatus}
+                                            onValueChange={setFiltroEstatus}
+                                            items={[
+                                                { label: "Todos", value: "Todos" },
+                                                { label: "Pendiente", value: "Pendiente" },
+                                                { label: "En revisión", value: "En revisión" },
+                                                { label: "Finalizado", value: "Finalizado" },
+                                            ]}
+                                        />
+                                    </View>
+                                </View>
                             </View>
 
-                            <View style={[{ flexDirection: "row", gap: 8, justifyContent: "space-between" }, esPantallaPequeña ? { width: "100%" } : { width: "40%" }]}>
-                                <View style={[esPantallaPequeña ? { width: "60%", marginBottom: 15 } : { width: "60%" }]}>
-                                    <Entrada
-                                        label="Buscar"
-                                        value={busqueda}
-                                        maxLength={45}
-                                        onChangeText={(text) => { setBusqueda(text); setPaginaActual(1); }}
-                                    />
-                                </View>
-                                <View style={[esPantallaPequeña ? { width: "40%" } : { width: "40%" }]}>
-                                    <Selector
-                                        label="Estatus"
-                                        selectedValue={filtroEstatus}
-                                        onValueChange={setFiltroEstatus}
-                                        items={[
-                                            { label: "Todos", value: "Todos" },
-                                            { label: "Pendiente", value: "Pendiente" },
-                                            { label: "En revisión", value: "En revisión" },
-                                            { label: "Finalizado", value: "Finalizado" },
-                                        ]}
-                                    />
-                                </View>
-                            </View>
-                        </View>
-
-                        <ScrollView horizontal={esPantallaPequeña}>
-                            <Tabla
-                                columnas={[
-                                    { key: "descripcion", titulo: "Descripción", ...(esPantallaPequeña && { ancho: 250 }) },
-                                    { key: "fecha", titulo: "Fecha de envío", ancho: 140 },
-                                    {
-                                        key: "estatus",
-                                        titulo: "Estatus",
-                                        ancho: 150,
-                                        render: (valor) => (
-                                            <Text
-                                                style={[
-                                                    styles.texto,
-                                                    valor === 2 && { color: Colores.textoInfo },
-                                                    valor === 1 && { color: Colores.textoAdvertencia },
-                                                    valor === 3 && { color: Colores.textoExito },
-                                                ]}
-                                                allowFontScaling={false}
-                                            >
-                                                {valor === 1 ? "Pendiente" : valor === 2 ? "En revisión" : "Finalizado"}
-                                            </Text>
-                                        ),
-                                    },
-                                    {
-                                        key: "observacion",
-                                        titulo: "Observaciones",
-                                        ...(esPantallaPequeña && { ancho: 250 }),
-                                    }
-                                ]}
-                                datos={reportesMostrados.map((fila) => {
-                                    const observacion = Array.isArray(fila.observaciones) && fila.observaciones.length > 0 ? fila.observaciones.sort((a: any, b: any) => new Date(b.FECHA_DATETIME).getTime() - new Date(a.FECHA_DATETIME).getTime())[0] : null
-                                    return {
-                                        ...fila,
-                                        fecha: new Date(fila.fechaRegistro).toLocaleDateString(),
-                                        observacion: observacion?.DESCRIPCION ? observacion.DESCRIPCION : "En espera de revisión.",
-                                        onPress: () => { setReporteSeleccionado(fila); setVerDetallesReporte(true) },
-                                    };
-                                })}
-                            />
-                        </ScrollView>
-                        <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
-                            <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
-                                <Paginacion
-                                    paginaActual={paginaActual}
-                                    totalPaginas={totalPaginas}
-                                    setPaginaActual={setPaginaActual}
+                            <ScrollView horizontal={esPantallaPequeña}>
+                                <Tabla
+                                    columnas={[
+                                        { key: "descripcion", titulo: "Descripción", ...(esPantallaPequeña && { ancho: 250 }) },
+                                        { key: "fecha", titulo: "Fecha de envío", ancho: 140 },
+                                        {
+                                            key: "estatus",
+                                            titulo: "Estatus",
+                                            ancho: 150,
+                                            render: (valor) => (
+                                                <Text
+                                                    style={[
+                                                        styles.texto,
+                                                        valor === 2 && { color: Colores.textoInfo },
+                                                        valor === 1 && { color: Colores.textoAdvertencia },
+                                                        valor === 3 && { color: Colores.textoExito },
+                                                    ]}
+                                                    allowFontScaling={false}
+                                                >
+                                                    {valor === 1 ? "Pendiente" : valor === 2 ? "En revisión" : "Finalizado"}
+                                                </Text>
+                                            ),
+                                        },
+                                        {
+                                            key: "observacion",
+                                            titulo: "Observaciones",
+                                            ...(esPantallaPequeña && { ancho: 250 }),
+                                        }
+                                    ]}
+                                    datos={reportesMostrados.map((fila) => {
+                                        const observacion = Array.isArray(fila.observaciones) && fila.observaciones.length > 0 ? fila.observaciones.sort((a: any, b: any) => new Date(b.FECHA_DATETIME).getTime() - new Date(a.FECHA_DATETIME).getTime())[0] : null
+                                        return {
+                                            ...fila,
+                                            fecha: new Date(fila.fechaRegistro).toLocaleDateString(),
+                                            observacion: observacion?.DESCRIPCION ? observacion.DESCRIPCION : "En espera de revisión.",
+                                            onPress: () => { setReporteSeleccionado(fila); setVerDetallesReporte(true) },
+                                        };
+                                    })}
                                 />
-                            </View>
+                            </ScrollView>
+                            <View style={{ flexDirection: esPantallaPequeña ? "column" : "row", justifyContent: "space-between" }}>
+                                <View style={{ flexDirection: "row", marginTop: 15, gap: 6 }}>
+                                    <Paginacion
+                                        paginaActual={paginaActual}
+                                        totalPaginas={totalPaginas}
+                                        setPaginaActual={setPaginaActual}
+                                    />
+                                </View>
 
-                            <Text
-                                style={{
-                                    color: Colores.textoClaro,
-                                    fontSize: Fuentes.caption,
-                                    marginTop: 15,
-                                }}
-                                allowFontScaling={false}
-                            >
-                                {`Mostrando ${reportesMostrados.length} de ${reportesFiltrados.length} resultados`}
-                            </Text>
+                                <Text
+                                    style={{
+                                        color: Colores.textoClaro,
+                                        fontSize: Fuentes.caption,
+                                        marginTop: 15,
+                                    }}
+                                    allowFontScaling={false}
+                                >
+                                    {`Mostrando ${reportesMostrados.length} de ${reportesFiltrados.length} resultados`}
+                                </Text>
+                            </View>
                         </View>
                     </View>
-                </View>
-                {renderModalAgregar()}
-                {renderModalDetalle()}
-                {renderModalEvidencia()}
-                <ModalAPI ref={modalAPI} />
-                <PiePagina />
-            </ScrollView>
+                    {renderModalAgregar()}
+                    {renderModalDetalle()}
+                    {renderModalEvidencia()}
+                    <ModalAPI ref={modalAPI} />
+                    <PiePagina />
+                </ScrollView>
+            </KeyboardAvoidingView>
         </>
     );
 }

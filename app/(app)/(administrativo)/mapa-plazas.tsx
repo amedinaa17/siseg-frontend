@@ -10,8 +10,9 @@ import { useAuth } from "@/context/AuthProvider";
 import { fetchData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, } from "react";
 import {
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -268,232 +269,236 @@ export default function MapaPlazas() {
         setModalVisible(false);
         setModalAlumnoVisible(true);
       } else {
-        modalAPI.current?.show(false, "Hubo un problema al obtener los datos de los alumnos del servidor. Inténtalo de nuevo más tarde.");
+        setModalVisible(false);
+        modalAPI.current?.show(false, "Hubo un problema al obtener los datos de los alumnos del servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalVisible(true); });
       }
     } catch (e) {
-      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+      setModalVisible(false);
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalVisible(true); });
     }
   }
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={{ flex: 1 }}>
-        <View style={[styles.contenedor, esPantallaPequeña && { maxWidth: "95%" }]}>
-          <Text allowFontScaling={false} style={styles.titulo}>Mapa de plazas</Text>
-          <View style={[styles.controlesSuperiores, !esPantallaPequeña && { marginBottom: 15 }]}>
-            <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "34%" }}>
-              <Entrada
-                label="Buscar"
-                value={busquedaTexto}
-                maxLength={45}
-                onChangeText={setBusquedaTexto}
-                editable={!loading}
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5} >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={{ flex: 1 }}>
+          <View style={[styles.contenedor, esPantallaPequeña && { maxWidth: "95%" }]}>
+            <Text allowFontScaling={false} style={styles.titulo}>Mapa de plazas</Text>
+            <View style={[styles.controlesSuperiores, !esPantallaPequeña && { marginBottom: 15 }]}>
+              <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "34%" }}>
+                <Entrada
+                  label="Buscar"
+                  value={busquedaTexto}
+                  maxLength={45}
+                  onChangeText={setBusquedaTexto}
+                  editable={!loading}
+                />
+              </View>
+
+              <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "30%" }}>
+                <Selector
+                  label="Programa"
+                  items={[{ label: "Todos", value: "Todos" }, ...programas.map((p) => ({ label: p, value: p }))]}
+                  selectedValue={filtroPrograma}
+                  onValueChange={(v) => setFiltroPrograma(String(v))}
+                  editable={!loading}
+                />
+              </View>
+
+              <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "30%" }}>
+                <Selector
+                  label="Carrera"
+                  items={[{ label: "Todos", value: "Todos" }, ...carreras.map((c) => ({ label: c, value: c }))]}
+                  selectedValue={filtroCarrera}
+                  onValueChange={(v) => setFiltroCarrera(String(v))}
+                  editable={!loading}
+                />
+              </View>
+            </View>
+            <View style={[styles.controlesSuperiores, { marginBottom: 15 }]}>
+              <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "60%" }}>
+                <Selector
+                  label="Ir a sede"
+                  items={[{ label: "Todos", value: "" }, ...sedesDisponibles.map((s) => ({ label: s, value: s }))]}
+                  selectedValue={sedeJump}
+                  onValueChange={(v) => setSedeJump(String(v))}
+                  editable={!loading}
+                />
+              </View>
+
+              <View style={{ width: esPantallaPequeña ? "100%" : "40%", alignItems: "flex-end", justifyContent: "flex-end" }}>
+                <Boton onPress={recargar} title={loading ? "Cargando..." : "Recargar"} />
+              </View>
+            </View>
+
+            {Platform.OS === "web" ? (
+              <WebMap
+                puntos={puntosFiltrados}
+                puntoSeleccionado={seleccionado}
+                onMarkerPress={handleMarkerPress}
               />
-            </View>
-
-            <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "30%" }}>
-              <Selector
-                label="Programa"
-                items={[{ label: "Todos", value: "Todos" }, ...programas.map((p) => ({ label: p, value: p }))]}
-                selectedValue={filtroPrograma}
-                onValueChange={(v) => setFiltroPrograma(String(v))}
-                editable={!loading}
+            ) : (
+              <NativeMap
+                puntos={puntosFiltrados}
+                puntoSeleccionado={seleccionado}
+                onMarkerPress={handleMarkerPress}
               />
+            )}
+
+            <Text allowFontScaling={false} style={{ marginTop: 15, color: Colores.textoClaro, fontSize: Fuentes.caption }}>
+              Mostrando {puntosFiltrados.length} sede(s) con coordenadas válidas.
+            </Text>
+          </View>
+        </View>
+        <Modal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          titulo={modalSede || "Detalle de sede"}
+          maxWidth={820}
+        >
+          <View style={{ marginTop: 10 }}>
+            {modalAlumnos.length === 0 ? (
+              <View style={{ margin: "auto" }}>
+                <Text allowFontScaling={false} style={{ color: Colores.textoClaro, textAlign: "center" }}>No hay alumnos realizando su servicio social en esta sede.</Text>
+              </View>
+            ) : (
+              <ScrollView horizontal={esPantallaPequeña}>
+                <Tabla
+                  columnas={[
+                    { key: "boleta", titulo: "Boleta", ancho: 130 },
+                    { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 275 }) },
+                    { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 275 }) },
+
+                    {
+                      key: "acciones",
+                      titulo: "Acciones",
+                      ancho: 110,
+                      render: (_, fila) => (
+                        <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
+                          <Boton
+                            onPress={() => { verAlumno(fila.boleta); }}
+                            icon={<Ionicons name="eye" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
+                            color={Colores.textoInfo}
+                          />
+                        </View>
+                      ),
+                    },
+                  ]}
+                  datos={modalAlumnos.map((fila) => ({
+                    ...fila,
+                    nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                    carrera: fila.carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Homeópata"
+                  }))}
+                />
+              </ScrollView>
+            )}
+          </View>
+        </Modal>
+
+        <Modal
+          visible={modalAlumnoVisible}
+          onClose={() => { setModalAlumnoVisible(false); setModalVisible(true) }}
+          titulo="Datos del alumno"
+          maxWidth={750}
+        >
+          <View style={{ marginBottom: 15 }} >
+            <Entrada label="Nombre" value={alumno?.nombre || ""} editable={false} />
+          </View>
+
+          <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Apellido paterno" value={alumno?.apellido_paterno || ""} editable={false} />
             </View>
-
-            <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "30%" }}>
-              <Selector
-                label="Carrera"
-                items={[{ label: "Todos", value: "Todos" }, ...carreras.map((c) => ({ label: c, value: c }))]}
-                selectedValue={filtroCarrera}
-                onValueChange={(v) => setFiltroCarrera(String(v))}
-                editable={!loading}
-              />
-            </View>
-          </View>
-          <View style={[styles.controlesSuperiores, { marginBottom: 15 }]}>
-            <View style={esPantallaPequeña ? { width: "100%", marginBottom: 15 } : { width: "60%" }}>
-              <Selector
-                label="Ir a sede"
-                items={[{ label: "Todos", value: "" }, ...sedesDisponibles.map((s) => ({ label: s, value: s }))]}
-                selectedValue={sedeJump}
-                onValueChange={(v) => setSedeJump(String(v))}
-                editable={!loading}
-              />
-            </View>
-
-            <View style={{ width: esPantallaPequeña ? "100%" : "40%", alignItems: "flex-end", justifyContent: "flex-end" }}>
-              <Boton onPress={recargar} title={loading ? "Cargando..." : "Recargar"} />
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Apellido materno" value={alumno?.apellido_materno || ""} editable={false} />
             </View>
           </View>
 
-          {Platform.OS === "web" ? (
-            <WebMap
-              puntos={puntosFiltrados}
-              puntoSeleccionado={seleccionado}
-              onMarkerPress={handleMarkerPress}
-            />
-          ) : (
-            <NativeMap
-              puntos={puntosFiltrados}
-              puntoSeleccionado={seleccionado}
-              onMarkerPress={handleMarkerPress}
-            />
-          )}
-
-          <Text allowFontScaling={false} style={{ marginTop: 15, color: Colores.textoClaro, fontSize: Fuentes.caption }}>
-            Mostrando {puntosFiltrados.length} sede(s) con coordenadas válidas.
-          </Text>
-        </View>
-      </View>
-      <Modal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        titulo={modalSede || "Detalle de sede"}
-        maxWidth={820}
-      >
-        <View style={{ marginTop: 10 }}>
-          {modalAlumnos.length === 0 ? (
-            <View style={{ margin: "auto" }}>
-              <Text allowFontScaling={false} style={{ color: Colores.textoClaro, textAlign: "center" }}>No hay alumnos realizando su servicio social en esta sede.</Text>
+          <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="CURP" value={alumno?.curp || ""} maxLength={18} editable={false} />
             </View>
-          ) : (
-            <ScrollView horizontal={esPantallaPequeña}>
-              <Tabla
-                columnas={[
-                  { key: "boleta", titulo: "Boleta", ancho: 130 },
-                  { key: "nombre_completo", titulo: "Nombre", ...(esPantallaPequeña && { ancho: 275 }) },
-                  { key: "carrera", titulo: "Carrera", ...(esPantallaPequeña && { ancho: 275 }) },
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="RFC" value={alumno?.rfc || ""} editable={false} />
+            </View>
+          </View>
 
-                  {
-                    key: "acciones",
-                    titulo: "Acciones",
-                    ancho: 110,
-                    render: (_, fila) => (
-                      <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
-                        <Boton
-                          onPress={() => { verAlumno(fila.boleta); }}
-                          icon={<Ionicons name="eye" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
-                          color={Colores.textoInfo}
-                        />
-                      </View>
-                    ),
-                  },
-                ]}
-                datos={modalAlumnos.map((fila) => ({
-                  ...fila,
-                  nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
-                  carrera: fila.carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Homeópata"
-                }))}
-              />
-            </ScrollView>
-          )}
-        </View>
-      </Modal>
+          <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Boleta" value={alumno?.boleta || ""} keyboardType="numeric" maxLength={10} editable={false} />
+            </View>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Carrera" value={alumno?.carrera || ""} editable={false} />
+            </View>
+          </View>
 
-      <Modal
-        visible={modalAlumnoVisible}
-        onClose={() => { setModalAlumnoVisible(false); setModalVisible(true) }}
-        titulo="Datos del alumno"
-        maxWidth={750}
-      >
-        <View style={{ marginBottom: 15 }} >
-          <Entrada label="Nombre" value={alumno?.nombre || ""} editable={false} />
-        </View>
+          <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Generación" value={alumno?.generacion || ""} editable={false} />
+            </View>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Promedio" value={alumno?.promedio || ""} keyboardType="decimal-pad" editable={false} />
+            </View>
+          </View>
 
-        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Apellido paterno" value={alumno?.apellido_paterno || ""} editable={false} />
-          </View>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Apellido materno" value={alumno?.apellido_materno || ""} editable={false} />
-          </View>
-        </View>
-
-        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="CURP" value={alumno?.curp || ""} maxLength={18} editable={false} />
-          </View>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="RFC" value={alumno?.rfc || ""} editable={false} />
-          </View>
-        </View>
-
-        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Boleta" value={alumno?.boleta || ""} keyboardType="numeric" maxLength={10} editable={false} />
-          </View>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Carrera" value={alumno?.carrera || ""} editable={false} />
-          </View>
-        </View>
-
-        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Generación" value={alumno?.generacion || ""} editable={false} />
-          </View>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Promedio" value={alumno?.promedio || ""} keyboardType="decimal-pad" editable={false} />
-          </View>
-        </View>
-
-        <View style={{ marginBottom: 15 }} >
-          <Entrada
-            label="Correo electrónico institucional"
-            value={alumno?.correo || ""}
-            keyboardType="email-address"
-            editable={false}
-          />
-        </View>
-
-        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Calle y número" value={alumno?.calle_y_numero || ""} editable={false} />
-          </View>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Colonia" value={alumno?.colonia || ""} editable={false} />
-          </View>
-        </View>
-
-        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Delegación / municipio" value={alumno?.delegacion || ""} editable={false} />
-          </View>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Estado de procedencia" value={alumno?.estado || ""} editable={false} />
-          </View>
-        </View>
-
-        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Código postal" value={alumno?.cp || ""} keyboardType="numeric" editable={false} />
-          </View>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Selector
-              label="Sexo"
-              selectedValue={alumno?.sexo === "F" ? "Femenino" : alumno?.sexo === "M" ? "Masculino" : ""}
-              items={[
-                { label: "Masculino", value: "M" },
-                { label: "Femenino", value: "F" },
-              ]}
-              onValueChange={() => { }}
+          <View style={{ marginBottom: 15 }} >
+            <Entrada
+              label="Correo electrónico institucional"
+              value={alumno?.correo || ""}
+              keyboardType="email-address"
               editable={false}
             />
           </View>
-        </View>
 
-        <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Celular" value={alumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+          <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Calle y número" value={alumno?.calle_y_numero || ""} editable={false} />
+            </View>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Colonia" value={alumno?.colonia || ""} editable={false} />
+            </View>
           </View>
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            <Entrada label="Teléfono local" value={alumno?.tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+
+          <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Delegación / municipio" value={alumno?.delegacion || ""} editable={false} />
+            </View>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Estado de procedencia" value={alumno?.estado || ""} editable={false} />
+            </View>
           </View>
-        </View>
-      </Modal>
-      <ModalAPI ref={modalAPI} />
-      <PiePagina />
-    </ScrollView >
+
+          <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Código postal" value={alumno?.cp || ""} keyboardType="numeric" editable={false} />
+            </View>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Selector
+                label="Sexo"
+                selectedValue={alumno?.sexo === "F" ? "Femenino" : alumno?.sexo === "M" ? "Masculino" : ""}
+                items={[
+                  { label: "Masculino", value: "M" },
+                  { label: "Femenino", value: "F" },
+                ]}
+                onValueChange={() => { }}
+                editable={false}
+              />
+            </View>
+          </View>
+
+          <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Celular" value={alumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+            </View>
+            <View style={{ flex: 1, marginBottom: 15 }}>
+              <Entrada label="Teléfono local" value={alumno?.tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+            </View>
+          </View>
+        </Modal>
+        <ModalAPI ref={modalAPI} />
+        <PiePagina />
+      </ScrollView >
+    </KeyboardAvoidingView>
   );
 }
 

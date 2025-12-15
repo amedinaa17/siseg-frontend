@@ -72,14 +72,17 @@ export default function ExpedienteDigital() {
             );
 
             if (response?.message) {
+                setVerDetallesDocumento(false);
                 setDocSeleccionado(null);
                 obtenerDocumentos();
                 modalAPI.current?.show(true, "El archivo se ha subido correctamente.");
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al subir el archivo. Inténtalo de nuevo más tarde.");
+                setVerDetallesDocumento(false);
+                modalAPI.current?.show(false, "Hubo un problema al subir el archivo. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setVerDetallesDocumento(true); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            setVerDetallesDocumento(false);
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setVerDetallesDocumento(true); });
         }
     };
 

@@ -1,7 +1,9 @@
-import { storage } from "@/lib/almacenamiento";
+import { almacenamiento } from "@/lib/almacenamiento";
+import { login, logout, verificarJWT } from "@/lib/auth/authServicio";
+import { activarSesionUnica, liberarSesionUnica } from "@/lib/auth/sesionUnica";
 import { useRouter } from "expo-router";
 import React, { createContext, ReactNode, useContext, useState } from "react";
-import { login, logout, verificarJWT } from "../lib/auth/authServicio";
+import { Platform } from "react-native";
 
 interface AuthContextType {
   sesion: any;
@@ -20,13 +22,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const router = useRouter();
 
+  React.useEffect(() => {
+    if (Platform.OS !== "web" || !sesion) return;
+
+    const stop = activarSesionUnica(async () => {
+      await almacenamiento.eliminarItem("token");
+      setSesion(null);
+      setErrorMessage("La sesión ya está activa en otra pestaña.");
+      router.replace("/(auth)/iniciar-sesion");
+    });
+
+    return stop;
+  }, [sesion]);
+
+
   // Verificar token al cargar la página y cada vez que se haga una petición
   const verificarToken = async () => {
-    const token = await storage.getItem("token");
+    const token = await almacenamiento.obtenerItem("token");
 
     try {
       if (sesion && !token) throw new Error("La sesión no es válida. Inicia sesión de nuevo para continuar.");
-      
+
       const usuario = await verificarJWT();
       setSesion(usuario);
     } catch (error) {
@@ -38,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const iniciarSesion = async (boleta: string, contraseña: string) => {
     setErrorMessage("");
-    try { 
+    try {
       const usuario = await login(boleta, contraseña);
       setSesion(usuario);
       if (usuario.rol === "ALUMNO")
@@ -54,6 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await logout();
       setSesion(null);
+      liberarSesionUnica();
       router.replace("/(auth)/iniciar-sesion");
     } catch (error) {
       console.error("Error al cerrar sesión", error);

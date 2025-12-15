@@ -1,4 +1,4 @@
-import { storage } from "@/lib/almacenamiento";
+import { almacenamiento } from "@/lib/almacenamiento";
 import { fetchData, postData } from "@/servicios/api";
 import { jwtDecode } from "jwt-decode";
 
@@ -7,7 +7,7 @@ const REFRESH_MARGIN = 1 * 60;
 
 // Función para verificar el token
 export const verificarJWT = async () => {
-    const token = await storage.getItem("token");
+    const token = await almacenamiento.obtenerItem("token");
 
     if (!token) return null;
 
@@ -31,11 +31,11 @@ export const verificarJWT = async () => {
         }
         else {
             // Si el token ha expirado, lanzamos un error
-            await storage.removeItem("token");
+            await almacenamiento.eliminarItem("token");
             throw new Error("La sesión ha expirado, por favor inicia sesión nuevamente.");
         }
     } catch (error) {
-        await storage.removeItem("token");
+        await almacenamiento.eliminarItem("token");
         throw new Error("La sesión ha expirado. Inicia sesión de nuevo para continuar.");
     }
 };
@@ -45,7 +45,7 @@ export const refreshToken = async (tk: string) => {
     try {
         const response = await fetchData(`users/refreshToken?tk=${tk}`);
         if (response.error === 0 && response.token) {
-            await storage.setItem("token", response.token);
+            await almacenamiento.guardarItem("token", response.token);
             
             const tokenDecodificado: any = jwtDecode(response.token);
             return {
@@ -57,11 +57,11 @@ export const refreshToken = async (tk: string) => {
                 perfil: tokenDecodificado.perfil || 0,
             };
         } else {
-            await storage.removeItem("token");
+            await almacenamiento.eliminarItem("token");
             throw new Error("La sesión ha expirado. Inicia sesión de nuevo para continuar.");
         }
     } catch (error) {
-        await storage.removeItem("token");
+        await almacenamiento.eliminarItem("token");
         throw new Error("La sesión ha expirado. Inicia sesión de nuevo para continuar.");
     }
 };
@@ -72,7 +72,7 @@ export const login = async (boleta: string, password: string) => {
         const data = await postData("users/loginuser", { boleta, password });
         if (data.error === 0) {
             const tokenDecodificado: any = jwtDecode(data.token);
-            await storage.setItem("token", data.token);
+            await almacenamiento.guardarItem("token", data.token);
             return {
                 token: data.token,
                 boleta: tokenDecodificado.id,
@@ -97,7 +97,7 @@ export const login = async (boleta: string, password: string) => {
 // Función para cerrar sesión
 export const logout = async () => {
     try {
-        await storage.removeItem("token");
+        await almacenamiento.eliminarItem("token");
     } catch (error) {
         throw new Error("Error al cerrar sesión");
     }
