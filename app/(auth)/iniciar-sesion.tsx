@@ -17,8 +17,7 @@ export default function IniciarSesion() {
   const esMovil = Platform.OS === "ios" || Platform.OS === "android";
   const { width } = useWindowDimensions();
   const esPantallaPequeña = width < 850;
-  const sesionActiva = localStorage.getItem("sesion_owner") && !errorMessage ? true : false;
-
+  
   const {
     control,
     handleSubmit,
@@ -102,16 +101,14 @@ export default function IniciarSesion() {
 
             {errorMessage ? (
               <Text allowFontScaling={false} style={styles.errorIniciarSesion}>{errorMessage}</Text>
-            ) : !esMovil
-              ? (sesionActiva && <Text allowFontScaling={false} style={styles.errorIniciarSesion}>La sesión ya está activa en otra pestaña.</Text>)
-              : null}
+            ) : null}
 
             <Link allowFontScaling={false} href="/(auth)/restablecer-contrasena" style={styles.olvidarContraseña}>¿Olvidaste tu contraseña?</Link>
 
             <Boton
               title={isSubmitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
               onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting || sesionActiva || errorMessage.includes("activa")}
+              disabled={isSubmitting}
             />
 
             <View style={styles.separador} />

@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   React.useEffect(() => {
-    if (Platform.OS !== "web" || !sesion) return;
+    if (Platform.OS != "web" || !sesion) return;
 
     const stop = activarSesionUnica(async () => {
       await almacenamiento.eliminarItem("token");
@@ -36,10 +36,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [sesion]);
 
   useEffect(() => {
+    if (Platform.OS != "web" || !sesion) return;
+    
     const handleBeforeUnload = () => {
       liberarSesionUnica();
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token");
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {

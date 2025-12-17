@@ -18,6 +18,7 @@ export default function EntradaMultilinea({
   ...props
 }: Propiedades) {
   const [focused, setFocused] = useState(false);
+  const inputRef = React.useRef<TextInput>(null);
   const anim = React.useRef(new Animated.Value(value ? 1 : 0)).current;
 
   React.useEffect(() => {
@@ -31,7 +32,9 @@ export default function EntradaMultilinea({
   const estiloEtiqueta = {
     position: "absolute" as const,
     zIndex: 100,
+    elevation: 2,
     left: 12,
+    paddingRight: editable ? 15 : 20,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
     color: error ? Colores.textoError : focused && editable ? Colores.textoInfo : Colores.textoClaro,
@@ -53,9 +56,22 @@ export default function EntradaMultilinea({
           },
         ]}
       >
-        <Animated.Text style={estiloEtiqueta} allowFontScaling={false}>{label}</Animated.Text>
+        <Animated.Text
+          style={estiloEtiqueta}
+          allowFontScaling={false}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          onPress={() => {
+            if (!editable) return;
+            inputRef.current?.focus();
+          }}
+          suppressHighlighting
+        >
+          {label}
+        </Animated.Text>
         <TextInput
           {...props}
+          ref={inputRef}
           editable={editable}
           value={value}
           allowFontScaling={false}
@@ -79,7 +95,9 @@ export default function EntradaMultilinea({
         />
       </View>
 
-      {error && <Text allowFontScaling={false} style={styles.errorTexto}>{error}</Text>}
+      <Text allowFontScaling={false} style={error && styles.errorTexto}>
+        {error}
+      </Text>
     </View>
   );
 }
@@ -93,6 +111,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   entrada: {
+    flex: 1,
     minHeight: 100,
     fontSize: 15,
     paddingHorizontal: 12,
@@ -102,7 +121,8 @@ const styles = StyleSheet.create({
   },
   errorTexto: {
     color: Colores.textoError,
-    marginTop: 5,
+    marginTop: 10,
+    marginBottom: 10,
     fontSize: Fuentes.caption,
   },
 });

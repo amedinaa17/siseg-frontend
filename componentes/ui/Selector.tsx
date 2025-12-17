@@ -39,10 +39,13 @@ export default function Selector({
 
   const estiloEtiqueta = {
     position: "absolute" as const,
+    zIndex: 100,
+    elevation: 2,
     left: 12,
+    paddingRight: editable ? 15 : 20,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-    color: isError ? Colores.textoError : Colores.textoClaro,
+    color: error ? Colores.textoError : focused && editable ? Colores.textoInfo : Colores.textoClaro,
     backgroundColor: Colores.fondo,
     paddingHorizontal: 4,
   };
@@ -55,13 +58,22 @@ export default function Selector({
         style={[
           styles.contenedor,
           {
-            borderColor: isError
+            borderColor: error
               ? Colores.textoError
-              : Colores.borde,
+              : focused && editable
+                ? Colores.textoInfo
+                : Colores.borde,
           },
         ]}
       >
-        <Animated.Text style={estiloEtiqueta} allowFontScaling={false}>{label}</Animated.Text>
+        <Animated.Text
+          style={estiloEtiqueta}
+          allowFontScaling={false}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {label}
+        </Animated.Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -81,7 +93,9 @@ export default function Selector({
 
       </Pressable>
 
-      {error && <Text allowFontScaling={false} style={styles.errorTexto}>{error}</Text>}
+      <Text allowFontScaling={false} style={error && styles.errorTexto}>
+        {error}
+      </Text>
 
       {editable && (
         <Modal visible={modalVisible} transparent animationType="fade">
@@ -112,7 +126,7 @@ export default function Selector({
                           styles.textoOpcion,
                           seleccionado && styles.textoSeleccionado
                         ]}
-                         allowFontScaling={false}
+                        allowFontScaling={false}
                       >
                         {item.label}
                       </Text>
@@ -154,7 +168,8 @@ const styles = StyleSheet.create({
   },
   errorTexto: {
     color: Colores.textoError,
-    marginTop: 5,
+    marginTop: 10,
+    marginBottom: 10,
     fontSize: Fuentes.caption,
   },
   modalOverlay: {

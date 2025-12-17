@@ -40,7 +40,6 @@ const styles = StyleSheet.create({
     contenedor: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
         paddingEnd: 12,
     },
     label: {
