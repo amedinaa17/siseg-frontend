@@ -42,10 +42,10 @@ export default function MiPerfil() {
                     if (response.error === 0) {
                         setDatosAdministrativo(response.data);
                     } else {
-                        modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
+                        modalAPI.current?.show(false, "Hubo un problema al obtener tus datos del servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-administrativo"); });
                     }
                 } catch (error) {
-                    modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
+                    modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-administrativo"); });
                 } finally {
                     setCargando(false);
                 }

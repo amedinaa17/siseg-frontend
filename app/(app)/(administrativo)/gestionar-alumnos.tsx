@@ -67,10 +67,10 @@ export default function GestionAlumnos() {
             if (response.error === 0) {
                 setAlumnos(response.data);
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close();  router.replace("/inicio-administrativo"); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close();  router.replace("/inicio-administrativo"); });
         } finally {
             setCargando(false);
         }
@@ -198,7 +198,7 @@ export default function GestionAlumnos() {
             }
         } catch (error) {
             setModalDarBaja(false);
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.");
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-administrativo"); });
         }
     };
 

@@ -93,10 +93,10 @@ export default function CompletarRegistro() {
         modalAPI.current?.show(true, "Tu registro se ha completado correctamente. Hemos enviado a tu correo electrónico tu usuario y contraseña para iniciar sesión en el sistema.",
           () => { router.replace("/"); });
       } else {
-        modalAPI.current?.show(false, "Hubo un problema al completar tu registro. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+        modalAPI.current?.show(false, "Hubo un problema al completar tu registro. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/"); });
       }
     } catch (error) {
-      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/"); });
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/"); });
     }
   };
 

@@ -32,16 +32,16 @@ export default function PlazaAsignada() {
                 if (response.plaza.sede) {
                     setDatosAlumno(response.plaza);
                 } else {
-                    modalAPI.current?.show(false, "Aún no tienes una plaza asignada.", () => { router.replace("/inicio-alumno"); });
+                    modalAPI.current?.show(false, "Aún no tienes una plaza asignada.", () => { modalAPI.current?.close(); router.replace("/inicio-alumno"); });
                     setDatosAlumno(null);
                 }
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-alumno"); });
                 setDatosAlumno(null);
             }
         } catch (error) {
             console.error(error);
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-alumno"); });
         } finally {
             setCargando(false);
         }

@@ -21,7 +21,7 @@ export default function CursoInduccion() {
 
   const [codigoQR, setCodigoQR] = useState<string | null>(null);
 
-  const modalRef = useRef<ModalAPIRef>(null);
+  const modalAPI = useRef<ModalAPIRef>(null);
 
   const obtenerDatos = async () => {
     verificarToken();
@@ -34,11 +34,11 @@ export default function CursoInduccion() {
       if (match && match[1]) {
         setCodigoQR(match[1]);
       } else {
-        modalRef.current?.show(false, "Hubo un problema al obtener tu código QR del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
+        modalAPI.current?.show(false, "Hubo un problema al obtener tu código QR del servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-alumno"); });
       }
     } catch (error) {
       console.error("Error en la solicitud:", error);
-      modalRef.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-alumno"); });
     } finally {
       setCargando(false);
     }
@@ -50,7 +50,7 @@ export default function CursoInduccion() {
 
   const descargarQR = async (qr: string) => {
     if (!qr) {
-      modalRef.current?.show(false, "El QR aún no está listo.");
+      modalAPI.current?.show(false, "El QR aún no está listo.");
       return;
     }
 
@@ -74,14 +74,14 @@ export default function CursoInduccion() {
         const downloadResult = await FileSystem.downloadAsync(qr, rutaArchivo);
         rutaArchivo = downloadResult.uri;
       } else {
-        modalRef.current?.show(false, "El QR no tiene un formato válido para descargar.");
+        modalAPI.current?.show(false, "El QR no tiene un formato válido para descargar.");
         return;
       }
 
       await Sharing.shareAsync(rutaArchivo);
     } catch (error) {
       console.error(error);
-      modalRef.current?.show(false, "No se pudo descargar el código QR.");
+      modalAPI.current?.show(false, "No se pudo descargar el código QR.");
     }
   };
 
@@ -123,7 +123,7 @@ export default function CursoInduccion() {
             </View>
           </View>
         </View>
-        <ModalAPI ref={modalRef} />
+        <ModalAPI ref={modalAPI} />
         <PiePagina />
       </ScrollView>
     </>

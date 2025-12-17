@@ -49,10 +49,10 @@ export default function RevisarExpediente() {
         const docsBackend = response.documents;
         setDocumentos(completarDocumentos(docsBackend));
       } else {
-        modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.push("/validar-documentos"); });
+        modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.push("/validar-documentos"); });
       }
     } catch (error) {
-      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.push("/validar-documentos"); });
+      modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.push("/validar-documentos"); });
     } finally {
       setCargando(false);
     }
