@@ -98,7 +98,7 @@ export default function MiPerfil() {
         verificarToken();
 
         try {
-            const response = await postData('users/restablecerPassword', {
+            const response = await postData('users/restablecerPasswordLogin', {
                 password: datos.contraseña,
                 tk: sesion.token,
             });
