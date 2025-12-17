@@ -191,15 +191,15 @@ export default function AsignarPlaza() {
                     behavior={Platform.OS === "web" ? undefined : "padding"}
                     keyboardVerticalOffset={5}
                 >
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: 20 }}>
                         <Entrada label="Nombre" value={`${alumnoSeleccionado?.nombre + " " + alumnoSeleccionado?.apellido_materno + " " + alumnoSeleccionado?.apellido_paterno}` || " "} keyboardType="numeric" maxLength={10} editable={false} />
                     </View>
 
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: 20 }}>
                         <Entrada label="Boleta" value={`${alumnoSeleccionado?.boleta || ""}`} keyboardType="numeric" maxLength={10} editable={false} />
                     </View>
 
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: errors.programa ? 5 : 20 }}>
                         <Controller
                             control={control}
                             name="programa"
@@ -220,7 +220,7 @@ export default function AsignarPlaza() {
                     </View>
                     {
                         !!programaValue && (
-                            <View style={{ marginBottom: 15 }}>
+                            <View style={{ marginBottom: errors.plaza ? 5 : 20 }}>
                                 <Controller
                                     control={control}
                                     name="plaza"
@@ -245,10 +245,10 @@ export default function AsignarPlaza() {
                     {
                         plazaSeleccionada && (
                             <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
+                                <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: plazaSeleccionada.tarjetaDisponible ? 5 : 20 }]}>
                                     <Entrada label="Tarjeta" value={String(plazaSeleccionada?.tarjetaDisponible) || ""} editable={false} />
                                 </View>
-                                <View style={{ flex: 1, marginBottom: 15 }}>
+                                <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: plazaSeleccionada.tipoBeca ? 5 : 20 }]}>
                                     <Entrada label="Beca" value={plazaSeleccionada?.tipoBeca || ""} editable={false} />
                                 </View>
                             </View>
@@ -374,7 +374,7 @@ export default function AsignarPlaza() {
                                     ]}
                                     datos={alumnosMostrados.map(fila => ({
                                         ...fila,
-                                        nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                                        nombre_completo: `${fila.nombre || ""} ${fila.apellido_paterno || ""} ${fila.apellido_materno || ""}`,
                                         carrera: fila.carrera?.NOMBRE ?? "",
                                         sede: plazas?.find((p) => p.ID === fila.sede)?.sede || "-",
                                         estatusAsignacion: fila.sede ? "Asignado" : "Sin asignar"

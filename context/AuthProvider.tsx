@@ -2,7 +2,7 @@ import { almacenamiento } from "@/lib/almacenamiento";
 import { login, logout, verificarJWT } from "@/lib/auth/authServicio";
 import { activarSesionUnica, liberarSesionUnica } from "@/lib/auth/sesionUnica";
 import { useRouter } from "expo-router";
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 
 interface AuthContextType {
@@ -35,20 +35,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return stop;
   }, [sesion]);
 
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      liberarSesionUnica();
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   // Verificar token al cargar la página y cada vez que se haga una petición
   const verificarToken = async () => {
     const token = await almacenamiento.obtenerItem("token");
 
     try {
-      if (sesion && !token) throw new Error("La sesión no es válida. Inicia sesión de nuevo para continuar.");
+      if (sesion && !token) {
+        cerrarSesion();
+        throw new Error("La sesión no es válida. Inicia sesión de nuevo para continuar.");
+      }
 
       const usuario = await verificarJWT();
       setSesion(usuario);
     } catch (error) {
       router.replace("/(auth)/iniciar-sesion");
+      cerrarSesion();
       setErrorMessage(error instanceof Error ? error.message : "Error al verificar el token.");
-      setSesion(null);
     }
   };
 

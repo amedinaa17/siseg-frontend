@@ -205,24 +205,24 @@ export default function GestionPersonalAdministrativo() {
         return (
             <Modal visible={modalDetalle} onClose={() => { setPersonalSeleccionado(null); setModalDetalle(false); }} titulo="Datos del personal administrativo" maxWidth={750}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    <View style={{ marginTop: 5, marginBottom: 15 }} >
+                    <View style={{ marginTop: 5, marginBottom: 20 }} >
                         <Entrada label="Nombre" value={persona.nombre || ""} editable={false} />
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                             <Entrada label="Apellido paterno" value={persona.APELLIDO_PATERNO || ""} editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                             <Entrada label="Apellido materno" value={persona.APELLIDO_MATERNO || ""} editable={false} />
                         </View>
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                             <Entrada label="CURP" value={persona.curp || ""} maxLength={18} editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                             <Selector
                                 label="Sexo"
                                 selectedValue={persona.sexo === "F" ? "Femenino" : persona.sexo === "M" ? "Masculino" : ""}
@@ -236,25 +236,25 @@ export default function GestionPersonalAdministrativo() {
                         </View>
                     </View>
 
-                    <View style={{ marginBottom: 15 }} >
+                    <View style={{ marginBottom: 20 }} >
                         <Entrada label="No. empleado" value={persona.boleta || ""} keyboardType="numeric" editable={false} />
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                             <Entrada label="Estatus" value={estatus.DESCRIPCION || ""} editable={false} />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                             <Entrada label="Perfil" value={perfil || ""} editable={false} />
                         </View>
                     </View>
 
-                    <View style={{ marginBottom: 15 }} >
+                    <View style={{ marginBottom: 20 }} >
                         <Entrada label="Correo electrónico institucional" value={persona.correo || ""} editable={false} />
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                             <Entrada label="Celular" value={persona.telefonoMovil || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                         </View>
                         <View style={{ flex: 1, marginBottom: 25 }}>
@@ -271,7 +271,7 @@ export default function GestionPersonalAdministrativo() {
             <Modal visible={modalAgregar} onClose={() => { setModalAgregar(false); resetAgregar(); }} titulo="Agregar personal administrativo" maxWidth={700}
                 cancelar deshabilitado={isSubmittingAgregar} textoAceptar={isSubmittingAgregar ? "Agregando…" : "Agregar personal"} onAceptar={handleSubmitAgregar(onSubmitAgregar)}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5}>
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: errorsAgregar.nombre ? 5 : 20 }}>
                         <Controller
                             control={controlAgregar}
                             name="nombre"
@@ -291,7 +291,7 @@ export default function GestionPersonalAdministrativo() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.apellido_paterno && !errorsEditar.apellido_materno ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.apellido_paterno ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="apellido_paterno"
@@ -309,7 +309,7 @@ export default function GestionPersonalAdministrativo() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.apellido_materno && !errorsAgregar.apellido_paterno ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.apellido_materno ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="apellido_materno"
@@ -329,7 +329,7 @@ export default function GestionPersonalAdministrativo() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.curp && !errorsAgregar.sexo ? 25 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.curp ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="curp"
@@ -350,7 +350,7 @@ export default function GestionPersonalAdministrativo() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.sexo ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="sexo"
@@ -371,7 +371,7 @@ export default function GestionPersonalAdministrativo() {
                         </View>
                     </View>
 
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.numempleado && errorsAgregar.estatus ? 20 : 15 }}>
+                    <View style={{ marginBottom: errorsAgregar.numempleado ? 5 : 20 }}>
                         <Controller
                             control={controlAgregar}
                             name="numempleado"
@@ -391,7 +391,7 @@ export default function GestionPersonalAdministrativo() {
                         />
                     </View>
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.estatus && !errorsAgregar.perfil ? 25 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.estatus ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="estatus"
@@ -410,7 +410,7 @@ export default function GestionPersonalAdministrativo() {
                             />
                         </View>
 
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.perfil ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="perfil"
@@ -431,7 +431,7 @@ export default function GestionPersonalAdministrativo() {
                         </View>
                     </View>
 
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.correo && !errorsAgregar.telcelular ? 20 : 15 }}>
+                    <View style={{ marginBottom: errorsAgregar.correo ? 5 : 20 }}>
                         <Controller
                             control={controlAgregar}
                             name="correo"
@@ -448,7 +448,7 @@ export default function GestionPersonalAdministrativo() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.telcelular && !errorsAgregar.tellocal ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.telcelular ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="telcelular"
@@ -467,7 +467,7 @@ export default function GestionPersonalAdministrativo() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.tellocal ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.tellocal ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="tellocal"
@@ -503,7 +503,7 @@ export default function GestionPersonalAdministrativo() {
                 textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
             >
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5}>
-                    <View style={{ marginTop: 10, marginBottom: 15 }} >
+                    <View style={{ marginBottom: errorsEditar.nombre ? 5 : 20 }}>
                         <Controller
                             control={controlEditar}
                             name="nombre"
@@ -523,7 +523,7 @@ export default function GestionPersonalAdministrativo() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.apellido_paterno && !errorsEditar.apellido_materno ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.apellido_paterno ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="apellido_paterno"
@@ -542,7 +542,7 @@ export default function GestionPersonalAdministrativo() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.apellido_materno && !errorsEditar.apellido_paterno ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.apellido_materno ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="apellido_materno"
@@ -563,7 +563,7 @@ export default function GestionPersonalAdministrativo() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.sexo ? 5 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.curp ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="curp"
@@ -579,7 +579,7 @@ export default function GestionPersonalAdministrativo() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.sexo ? 25 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.sexo ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="sexo"
@@ -600,7 +600,7 @@ export default function GestionPersonalAdministrativo() {
                         </View>
                     </View>
 
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.sexo ? 5 : 15 }}>
+                    <View style={{ marginBottom: errorsEditar.numempleado ? 5 : 20 }}>
                         <Controller
                             control={controlEditar}
                             name="numempleado"
@@ -618,7 +618,7 @@ export default function GestionPersonalAdministrativo() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.numempleado && !errorsEditar.perfil ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.estatus ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="estatus"
@@ -636,7 +636,7 @@ export default function GestionPersonalAdministrativo() {
                                     />)}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.perfil ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.perfil ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="perfil"
@@ -656,8 +656,7 @@ export default function GestionPersonalAdministrativo() {
                             />
                         </View>
                     </View>
-
-                    <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.correo && !errorsEditar.telcelular ? 25 : 15 }}>
+                    <View style={{ marginBottom: errorsEditar.correo ? 5 : 20 }}>
                         <Controller
                             control={controlEditar}
                             name="correo"
@@ -676,7 +675,7 @@ export default function GestionPersonalAdministrativo() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.telcelular && !errorsEditar.tellocal ? 15 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.telcelular ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="telcelular"
@@ -697,7 +696,7 @@ export default function GestionPersonalAdministrativo() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.tellocal ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.tellocal ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="tellocal"
@@ -865,7 +864,7 @@ export default function GestionPersonalAdministrativo() {
                                     datos={personalMostrados.map((fila) => ({
                                         ...fila,
                                         boleta: fila.persona.boleta,
-                                        nombre_completo: `${fila.persona.nombre} ${fila.persona.APELLIDO_PATERNO} ${fila.persona.APELLIDO_MATERNO}`,
+                                        nombre_completo: `${fila.persona.nombre || ""} ${fila.persona.APELLIDO_PATERNO || ""} ${fila.persona.APELLIDO_MATERNO || ""}`,
                                         estatus: fila.estatus.DESCRIPCION,
                                         onPress: () => { setPersonalSeleccionado(fila); setModalDetalle(true); },
                                     }))}

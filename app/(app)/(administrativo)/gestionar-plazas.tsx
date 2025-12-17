@@ -193,37 +193,37 @@ export default function GestionPlazas() {
                 titulo="Datos de la plaza"
                 maxWidth={750}
             >
-                <View style={{ marginTop: 5, marginBottom: 15 }}>
+                <View style={{ marginTop: 5, marginBottom: 20 }}>
                     <Entrada label="Sede" value={sede || ""} editable={false} />
                 </View>
 
-                <View style={{ marginBottom: 15 }}>
+                <View style={{ marginBottom: 20 }}>
                     <Entrada label="Ubicación" value={ubicacion || ""} editable={false} />
                 </View>
 
                 <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
                         <Entrada label="Programa" value={PROGRAMA || ""} editable={false} />
                     </View>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
                         <Entrada label="Tarjeta" value={tarjetaDisponible || ""} editable={false} />
                     </View>
                 </View>
 
                 <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
                         <Entrada label="Beca" value={tipoBeca || ""} editable={false} />
                     </View>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
                         <Entrada label="Estatus" value={estatus === 0 ? "Baja" : "Alta"} editable={false} />
                     </View>
                 </View>
 
                 <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
                         <Entrada label="Carrera" value={carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Partero"} editable={false} />
                     </View>
-                    <View style={{ flex: 1, marginBottom: 15 }}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
                         <Entrada label="Promoción" value={promocion || ""} editable={false} />
                     </View>
                 </View>
@@ -245,7 +245,7 @@ export default function GestionPlazas() {
                 onAceptar={handleSubmitAgregar(onSubmitAgregar)}
             >
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5}>
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: errorsAgregar.sede ? 5 : 20 }}>
                         <Controller
                             control={controlAgregar}
                             name="sede"
@@ -261,7 +261,7 @@ export default function GestionPlazas() {
                         />
                     </View>
 
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: errorsAgregar.ubicacion ? 5 : 20 }}>
                         <Controller
                             control={controlAgregar}
                             name="ubicacion"
@@ -278,7 +278,7 @@ export default function GestionPlazas() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.programa && !errorsAgregar.tarjeta ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.programa ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="programa"
@@ -293,7 +293,7 @@ export default function GestionPlazas() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.tarjeta && !errorsAgregar.beca ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.tarjeta ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="tarjeta"
@@ -316,7 +316,7 @@ export default function GestionPlazas() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.beca && !errorsAgregar.estatus ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.beca ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="beca"
@@ -334,7 +334,7 @@ export default function GestionPlazas() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.estatus && !errorsAgregar.carrera ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.estatus ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="estatus"
@@ -356,7 +356,7 @@ export default function GestionPlazas() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.carrera && !errorsAgregar.promocion ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.carrera ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="carrera"
@@ -376,7 +376,7 @@ export default function GestionPlazas() {
                             />
                         </View>
 
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.promocion ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="promocion"
@@ -419,7 +419,7 @@ export default function GestionPlazas() {
                     behavior={Platform.OS === "web" ? undefined : "padding"}
                     keyboardVerticalOffset={5}
                 >
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: errorsEditar.sede ? 5 : 20 }}>
                         <Controller
                             control={controlEditar}
                             name="sede"
@@ -436,7 +436,7 @@ export default function GestionPlazas() {
                         />
                     </View>
 
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: errorsEditar.ubicacion ? 5 : 20 }}>
                         <Controller
                             control={controlEditar}
                             name="ubicacion"
@@ -460,7 +460,7 @@ export default function GestionPlazas() {
                                 : { flexDirection: "row", gap: 12 }
                         }
                     >
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.programa ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="programa"
@@ -477,7 +477,7 @@ export default function GestionPlazas() {
                             />
                         </View>
 
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.tarjeta ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="tarjeta"
@@ -503,7 +503,7 @@ export default function GestionPlazas() {
                         </View>
                     </View>
 
-                    <View style={{ marginBottom: 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.beca ? 5 : 20 }]}>
                         <Controller
                             control={controlEditar}
                             name="beca"
@@ -530,7 +530,7 @@ export default function GestionPlazas() {
                                 : { flexDirection: "row", gap: 12 }
                         }
                     >
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.carrera ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="carrera"
@@ -560,7 +560,7 @@ export default function GestionPlazas() {
                             />
                         </View>
 
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.programa ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="promocion"

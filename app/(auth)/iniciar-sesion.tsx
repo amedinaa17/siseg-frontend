@@ -17,6 +17,7 @@ export default function IniciarSesion() {
   const esMovil = Platform.OS === "ios" || Platform.OS === "android";
   const { width } = useWindowDimensions();
   const esPantallaPequeña = width < 850;
+  const sesionActiva = localStorage.getItem("sesion_owner") && !errorMessage ? true : false;
 
   const {
     control,
@@ -59,7 +60,7 @@ export default function IniciarSesion() {
 
           <View style={[styles.contenedorFormulario, { width: esPantallaPequeña ? '90%' : '70%' }]}>
             <Text allowFontScaling={false} style={styles.titulo}>Iniciar sesión</Text>
-            <View style={{ marginBottom: 15 }}>
+            <View style={{ marginBottom: errors.boleta ? 5 : 20 }}>
               <Controller
                 control={control}
                 name="boleta"
@@ -81,7 +82,7 @@ export default function IniciarSesion() {
               />
             </View>
 
-            <View style={{ marginBottom: 15 }}>
+            <View style={{ marginBottom: errors.contraseña ? 0 : 15 }}>
               <Controller
                 control={control}
                 name="contraseña"
@@ -102,7 +103,7 @@ export default function IniciarSesion() {
             {errorMessage ? (
               <Text allowFontScaling={false} style={styles.errorIniciarSesion}>{errorMessage}</Text>
             ) : !esMovil
-              ? (localStorage.getItem("sesion_owner") && <Text allowFontScaling={false} style={styles.errorIniciarSesion}>La sesión ya está activa en otra pestaña.</Text>)
+              ? (sesionActiva && <Text allowFontScaling={false} style={styles.errorIniciarSesion}>La sesión ya está activa en otra pestaña.</Text>)
               : null}
 
             <Link allowFontScaling={false} href="/(auth)/restablecer-contrasena" style={styles.olvidarContraseña}>¿Olvidaste tu contraseña?</Link>
@@ -110,7 +111,7 @@ export default function IniciarSesion() {
             <Boton
               title={isSubmitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
               onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
+              disabled={isSubmitting || sesionActiva || errorMessage.includes("activa")}
             />
 
             <View style={styles.separador} />

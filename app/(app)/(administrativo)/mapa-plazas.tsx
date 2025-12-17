@@ -386,7 +386,7 @@ export default function MapaPlazas() {
                   ]}
                   datos={modalAlumnos.map((fila) => ({
                     ...fila,
-                    nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                    nombre_completo: `${fila.nombre || ""} ${fila.apellido_paterno || ""} ${fila.apellido_materno || ""}`,
                     carrera: fila.carrera === 1 ? "Médico Cirujano y Homeópata" : "Médico Cirujano y Homeópata"
                   }))}
                 />
@@ -401,47 +401,47 @@ export default function MapaPlazas() {
           titulo="Datos del alumno"
           maxWidth={750}
         >
-          <View style={{ marginBottom: 15 }} >
+          <View style={{ marginBottom: 20 }} >
             <Entrada label="Nombre" value={alumno?.nombre || ""} editable={false} />
           </View>
 
           <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Apellido paterno" value={alumno?.apellido_paterno || ""} editable={false} />
             </View>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Apellido materno" value={alumno?.apellido_materno || ""} editable={false} />
             </View>
           </View>
 
           <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="CURP" value={alumno?.curp || ""} maxLength={18} editable={false} />
             </View>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="RFC" value={alumno?.rfc || ""} editable={false} />
             </View>
           </View>
 
           <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Boleta" value={alumno?.boleta || ""} keyboardType="numeric" maxLength={10} editable={false} />
             </View>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Carrera" value={alumno?.carrera || ""} editable={false} />
             </View>
           </View>
 
           <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Generación" value={alumno?.generacion || ""} editable={false} />
             </View>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Promedio" value={alumno?.promedio || ""} keyboardType="decimal-pad" editable={false} />
             </View>
           </View>
 
-          <View style={{ marginBottom: 15 }} >
+          <View style={{ marginBottom: 20 }} >
             <Entrada
               label="Correo electrónico institucional"
               value={alumno?.correo || ""}
@@ -451,28 +451,28 @@ export default function MapaPlazas() {
           </View>
 
           <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Calle y número" value={alumno?.calle_y_numero || ""} editable={false} />
             </View>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Colonia" value={alumno?.colonia || ""} editable={false} />
             </View>
           </View>
 
           <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Delegación / municipio" value={alumno?.delegacion || ""} editable={false} />
             </View>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Estado de procedencia" value={alumno?.estado || ""} editable={false} />
             </View>
           </View>
 
           <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Código postal" value={alumno?.cp || ""} keyboardType="numeric" editable={false} />
             </View>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Selector
                 label="Sexo"
                 selectedValue={alumno?.sexo === "F" ? "Femenino" : alumno?.sexo === "M" ? "Masculino" : ""}
@@ -487,10 +487,10 @@ export default function MapaPlazas() {
           </View>
 
           <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Celular" value={alumno?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
             </View>
-            <View style={{ flex: 1, marginBottom: 15 }}>
+            <View style={{ flex: 1, marginBottom: 20 }}>
               <Entrada label="Teléfono local" value={alumno?.tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
             </View>
           </View>

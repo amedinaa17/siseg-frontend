@@ -94,7 +94,7 @@ export default function NuevaContraseña() {
               <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, textAlign: "center", marginBottom: 20 }}>
                 Ingresa una nueva contraseña de 8 a 12 caracteres, que incluya al menos una letra mayúscula, una letra minúscula y un número.
               </Text>
-              <View style={{ marginBottom: 15 }}>
+              <View style={{ marginBottom: errors.contraseña ? 5 : 20 }}>
                 <Controller
                   control={control}
                   name="contraseña"
@@ -111,7 +111,7 @@ export default function NuevaContraseña() {
                 />
               </View>
 
-              <View style={{ marginBottom: 25 }}>
+              <View style={{ marginBottom: errors.confirmarContraseña ? 15 : 25 }}>
                 <Controller
                   control={control}
                   name="confirmarContraseña"

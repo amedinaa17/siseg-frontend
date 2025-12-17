@@ -136,19 +136,19 @@ export default function CompletarRegistro() {
                       <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 20 }}>
                         Verifica que tus datos sean correctos. Si hay un error, acude al Departamento de Extensión y Apoyos Educativos.
                       </Text>
-                      <View style={{ marginBottom: 15 }} >
+                      <View style={{ marginBottom: 20 }} >
                         <Entrada label="Nombre" value={alumno?.nombre || ""} editable={false} />
                       </View>
 
                       <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                           <Entrada
                             label="Apellido paterno"
                             value={alumno?.apellido_paterno || ""}
                             editable={false}
                           />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                           <Entrada
                             label="Apellido materno"
                             value={alumno?.apellido_materno || ""}
@@ -157,7 +157,7 @@ export default function CompletarRegistro() {
                         </View>
                       </View>
 
-                      <View style={{ marginBottom: 15 }} >
+                      <View style={{ marginBottom: 20 }} >
                         <Entrada
                           label="CURP"
                           maxLength={18}
@@ -167,7 +167,7 @@ export default function CompletarRegistro() {
                       </View>
 
                       <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                           <Entrada
                             label="Boleta"
                             keyboardType="numeric"
@@ -176,7 +176,7 @@ export default function CompletarRegistro() {
                             editable={false}
                           />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                           <Entrada
                             label="Carrera"
                             value={alumno?.carrera || ""}
@@ -186,14 +186,14 @@ export default function CompletarRegistro() {
                       </View>
 
                       <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                           <Entrada
                             label="Generación"
                             value={alumno?.generacion || ""}
                             editable={false}
                           />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={{ flex: 1, marginBottom: 20 }}>
                           <Entrada
                             label="Promedio"
                             value={alumno?.promedio || ""}
@@ -224,7 +224,7 @@ export default function CompletarRegistro() {
                       <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 20 }}>
                         Para completar tu registro, ingresa los siguientes datos:
                       </Text>
-                      <View style={{ marginBottom: 15 }}>
+                      <View style={{ marginBottom: errors.rfc ? 5 : 20 }}>
                         <Controller
                           control={control}
                           name="rfc"
@@ -245,7 +245,7 @@ export default function CompletarRegistro() {
                       </View>
 
                       <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.calle && !errors.colonia ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errors.calle ? 5 : 20 }]}>
                           <Controller
                             control={control}
                             name="calle"
@@ -260,7 +260,7 @@ export default function CompletarRegistro() {
                             )}
                           />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.colonia && !errors.delegacion ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errors.colonia ? 5 : 20 }]}>
                           <Controller
                             control={control}
                             name="colonia"
@@ -277,7 +277,7 @@ export default function CompletarRegistro() {
                         </View>
                       </View>
                       <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]} >
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.delegacion && !errors.estado ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errors.delegacion ? 5 : 20 }]}>
                           <Controller
                             control={control}
                             name="delegacion"
@@ -292,7 +292,7 @@ export default function CompletarRegistro() {
                             )}
                           />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.estado && !errors.cp ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errors.estado ? 5 : 20 }]}>
                           <Controller
                             control={control}
                             name="estado"
@@ -310,7 +310,7 @@ export default function CompletarRegistro() {
                       </View>
 
                       <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]} >
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.cp ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errors.cp ? 5 : 20 }]}>
                           <Controller
                             control={control}
                             name="cp"
@@ -330,7 +330,7 @@ export default function CompletarRegistro() {
                             )}
                           />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && !errors.telcelular ? 15 : 20 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errors.sexo ? 5 : 20 }]}>
                           <Controller
                             control={control}
                             name="sexo"
@@ -352,7 +352,7 @@ export default function CompletarRegistro() {
                       </View>
 
                       <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errors.telcelular && !errors.tellocal ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errors.telcelular ? 5 : 20 }]}>
                           <Controller
                             control={control}
                             name="telcelular"
@@ -372,7 +372,7 @@ export default function CompletarRegistro() {
                             )}
                           />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 30 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errors.tellocal ? 5 : 30 }]}>
                           <Controller
                             control={control}
                             name="tellocal"

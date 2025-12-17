@@ -196,7 +196,7 @@ export default function ValidarDocumentos() {
                                     ]}
                                     datos={alumnosMostrados.map((fila) => ({
                                         ...fila,
-                                        nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                                        nombre_completo: `${fila.nombre || ""} ${fila.apellido_paterno || ""} ${fila.apellido_materno || ""}`,
                                         carrera: fila.carrera.NOMBRE,
                                         estatus: fila.estatus.DESCRIPCION,
                                         // onPress: () => { setAlumnoSeleccionado(fila); },

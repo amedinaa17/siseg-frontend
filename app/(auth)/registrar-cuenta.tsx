@@ -58,25 +58,27 @@ export default function Register() {
         <View style={styles.contenedorFormulario}>
           <Text allowFontScaling={false} style={styles.titulo}>Registrar cuenta</Text>
           <View style={{ marginBottom: error == '' || !error.includes("Error") ? 25 : 10 }}>
-            <Controller
-              control={control}
-              name="correo"
-              render={({ field: { onChange, value } }) => (
-                <Entrada
-                  label="Correo electrónico institucional"
-                  value={value}
-                  maxLength={100}
-                  onChangeText={(text) => {
-                    setError("");
-                    onChange(text);
-                  }}
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                  error={errors.correo?.message}
-                />
-              )}
-            />
-            <View style={{ flexDirection: "row", marginTop: 20 }}>
+            <View style={{ marginBottom: errors.correo ? 5 : 15 }}>
+              <Controller
+                control={control}
+                name="correo"
+                render={({ field: { onChange, value } }) => (
+                  <Entrada
+                    label="Correo electrónico institucional"
+                    value={value}
+                    maxLength={100}
+                    onChangeText={(text) => {
+                      setError("");
+                      onChange(text);
+                    }}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                    error={errors.correo?.message}
+                  />
+                )}
+              />
+            </View>
+            <View style={{ flexDirection: "row" }}>
               <Controller
                 control={control}
                 name="avisoPrivacidad"

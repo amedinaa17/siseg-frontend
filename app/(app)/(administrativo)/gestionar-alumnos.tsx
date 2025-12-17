@@ -228,18 +228,13 @@ export default function GestionAlumnos() {
 
                 // Construir filas
                 const filas = erroresArr.map((e: any) => {
-                    const match = typeof e.error === "string" ? e.error.match(/(\d+)$/) : null;
-                    const boleta = match ? match[1] : (e.boleta || "Desconocido");
+                    const error = typeof e.error === "string"
+                        ? e.error.includes("La boleta ya está registrada") ? "Boleta duplicada"
+                            : e.error.includes("Matrícula inválida") ? "Boleta inválida"
+                                : e.error.split(":")[0]
+                        : "Error desconocido";
 
-                    const error =
-                        typeof e.error === "string"
-                            ? e.error.includes("ya está registrada")
-                                ? "Boleta duplicada"
-                                : e.error.includes("inválida")
-                                    ? "Boleta inválida"
-                                    : e.error
-                            : "Error desconocido";
-
+                    const boleta = e.alumno ? e.alumno["10o"] : "Desconocido";
                     return { boleta, error };
                 });
 
@@ -298,104 +293,104 @@ export default function GestionAlumnos() {
 
         return (
             <Modal visible={modalDetalle} onClose={() => { setAlumnoSeleccionado(null); setModalDetalle(false); }} titulo="Datos del alumno" maxWidth={750}>
-                    <View style={{ marginTop: 5, marginBottom: 15 }} >
-                        <Entrada label="Nombre" value={nombre || ""} editable={false} />
-                    </View>
+                <View style={{ marginTop: 5, marginBottom: 20 }} >
+                    <Entrada label="Nombre" value={nombre || ""} editable={false} />
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Apellido paterno" value={apellido_paterno || ""} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Apellido materno" value={apellido_materno || ""} editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Apellido paterno" value={apellido_paterno || ""} editable={false} />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Apellido materno" value={apellido_materno || ""} editable={false} />
+                    </View>
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="CURP" value={curp || ""} maxLength={18} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="RFC" value={rfc || ""} editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="CURP" value={curp || ""} maxLength={18} editable={false} />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="RFC" value={rfc || ""} editable={false} />
+                    </View>
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Boleta" value={boleta || ""} keyboardType="numeric" maxLength={10} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Carrera" value={carrera.NOMBRE || ""} editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Boleta" value={boleta || ""} keyboardType="numeric" maxLength={10} editable={false} />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Carrera" value={carrera.NOMBRE || ""} editable={false} />
+                    </View>
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Generación" value={generacion || ""} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Promedio" value={promedio || ""} keyboardType="decimal-pad" editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Generación" value={generacion || ""} editable={false} />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Promedio" value={promedio || ""} keyboardType="decimal-pad" editable={false} />
+                    </View>
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada
-                                label="Correo electrónico institucional"
-                                value={correo || ""}
-                                keyboardType="email-address"
-                                editable={false}
-                            />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Estatus" value={estatus.DESCRIPCION || ""} editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada
+                            label="Correo electrónico institucional"
+                            value={correo || ""}
+                            keyboardType="email-address"
+                            editable={false}
+                        />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Estatus" value={estatus.DESCRIPCION || ""} editable={false} />
+                    </View>
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Calle y número" value={calle_y_numero || ""} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Colonia" value={colonia || ""} editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Calle y número" value={calle_y_numero || ""} editable={false} />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Colonia" value={colonia || ""} editable={false} />
+                    </View>
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Delegación / municipio" value={delegacion || ""} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Estado de procedencia" value={estado || ""} editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Delegación / municipio" value={delegacion || ""} editable={false} />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Estado de procedencia" value={estado || ""} editable={false} />
+                    </View>
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Código postal" value={cp || ""} keyboardType="numeric" editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Selector
-                                label="Sexo"
-                                selectedValue={sexo === "F" ? "Femenino" : sexo === "M" ? "Masculino" : ""}
-                                items={[
-                                    { label: "Masculino", value: "M" },
-                                    { label: "Femenino", value: "F" },
-                                ]}
-                                onValueChange={() => { }}
-                                editable={false}
-                            />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Código postal" value={cp || ""} keyboardType="numeric" editable={false} />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Selector
+                            label="Sexo"
+                            selectedValue={sexo === "F" ? "Femenino" : sexo === "M" ? "Masculino" : ""}
+                            items={[
+                                { label: "Masculino", value: "M" },
+                                { label: "Femenino", value: "F" },
+                            ]}
+                            onValueChange={() => { }}
+                            editable={false}
+                        />
+                    </View>
+                </View>
 
-                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Celular" value={telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
-                        </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
-                            <Entrada label="Teléfono local" value={tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
-                        </View>
+                <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Celular" value={telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                     </View>
+                    <View style={{ flex: 1, marginBottom: 20 }}>
+                        <Entrada label="Teléfono local" value={tellocal || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
+                    </View>
+                </View>
             </Modal>
         );
     };
@@ -407,7 +402,7 @@ export default function GestionAlumnos() {
                 titulo="Agregar alumno" maxWidth={700} cancelar deshabilitado={isSubmittingAgregar}
                 textoAceptar={isSubmittingAgregar ? "Agregando…" : "Agregar alumno"} onAceptar={handleSubmitAgregar(onSubmitAgregar)}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5}>
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: errorsAgregar.nombre ? 5 : 20 }}>
                         <Controller
                             control={controlAgregar}
                             name="nombre"
@@ -427,7 +422,7 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.apellido_paterno && !errorsEditar.apellido_materno ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.apellido_paterno ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="apellido_paterno"
@@ -445,7 +440,7 @@ export default function GestionAlumnos() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.apellido_materno && !errorsAgregar.apellido_paterno ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.apellido_materno ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="apellido_materno"
@@ -463,7 +458,7 @@ export default function GestionAlumnos() {
                             />
                         </View>
                     </View>
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: errorsAgregar.curp ? 5 : 20 }}>
                         <Controller
                             control={controlAgregar}
                             name="curp"
@@ -486,7 +481,7 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.boleta && errorsAgregar.estatus ? 20 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.boleta ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="boleta"
@@ -505,7 +500,7 @@ export default function GestionAlumnos() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.carrera && !errorsAgregar.generacion ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.carrera ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="carrera"
@@ -527,7 +522,7 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.generacion && !errorsAgregar.promedio ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.generacion ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="generacion"
@@ -542,7 +537,7 @@ export default function GestionAlumnos() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.promedio && !errorsAgregar.estatus ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.promedio ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="promedio"
@@ -564,7 +559,7 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.estatus && !errorsAgregar.correo ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.estatus ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="estatus"
@@ -586,7 +581,7 @@ export default function GestionAlumnos() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsAgregar.correo ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsAgregar.correo ? 5 : 20 }]}>
                             <Controller
                                 control={controlAgregar}
                                 name="correo"
@@ -620,7 +615,7 @@ export default function GestionAlumnos() {
                 textoAceptar={isSubmittingEditar ? "Guardando…" : "Guardar cambios"} onAceptar={handleSubmitEditar(onSubmitEditar)}
             >
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "web" ? undefined : "padding"} keyboardVerticalOffset={5}>
-                    <View style={{ marginTop: 10, marginBottom: 15 }} >
+                    <View style={{ marginBottom: errorsEditar.nombre ? 5 : 20 }}>
                         <Controller
                             control={controlEditar}
                             name="nombre"
@@ -640,7 +635,7 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.apellido_paterno && !errorsEditar.apellido_materno ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.apellido_paterno ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="apellido_paterno"
@@ -659,7 +654,7 @@ export default function GestionAlumnos() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.apellido_materno && !errorsEditar.apellido_paterno ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.apellido_materno ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="apellido_materno"
@@ -679,7 +674,7 @@ export default function GestionAlumnos() {
                         </View>
                     </View>
 
-                    <View style={{ flex: 1, marginBottom: 15 }}>
+                    <View style={{ marginBottom: errorsEditar.curp ? 5 : 20 }}>
                         <Controller
                             control={controlEditar}
                             name="curp"
@@ -697,7 +692,7 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.carrera ? 5 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.boleta ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="boleta"
@@ -714,7 +709,7 @@ export default function GestionAlumnos() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.carrera ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.carrera ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="carrera"
@@ -736,7 +731,7 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.generacion && !errorsEditar.promedio ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.generacion ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="generacion"
@@ -753,7 +748,7 @@ export default function GestionAlumnos() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.promedio && !errorsEditar.correo ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.promedio ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="promedio"
@@ -777,7 +772,7 @@ export default function GestionAlumnos() {
                     </View>
 
                     <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
-                        <View style={{ flex: 1, marginBottom: esPantallaPequeña && errorsEditar.correo && !errorsEditar.estatus ? 30 : 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.correo ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="correo"
@@ -794,7 +789,7 @@ export default function GestionAlumnos() {
                                 )}
                             />
                         </View>
-                        <View style={{ flex: 1, marginBottom: 15 }}>
+                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsEditar.estatus ? 5 : 20 }]}>
                             <Controller
                                 control={controlEditar}
                                 name="estatus"
@@ -877,7 +872,7 @@ export default function GestionAlumnos() {
             >
                 <View style={{ marginBottom: 12 }}>
                     <View style={{ marginBottom: 6, flexDirection: "row", justifyContent: "space-between" }}>
-                        <Text allowFontScaling={false}>Alumnos procesados: <Text style={{ fontWeight: "700" }}>{detalleTotales.total}</Text></Text>
+                        <Text allowFontScaling={false}>Alumnos procesados: <Text style={{ fontWeight: "700", color: Colores.textoInfo }}>{detalleTotales.total}</Text></Text>
                         <Text allowFontScaling={false}>Alumnos registrados: <Text style={{ fontWeight: "700", color: Colores.textoExito }}>{detalleTotales.exitos}</Text></Text>
                         <Text allowFontScaling={false}>Errores: <Text style={{ fontWeight: "700", color: Colores.textoError }}>{detalleTotales.errores}</Text></Text>
                     </View>
@@ -886,7 +881,20 @@ export default function GestionAlumnos() {
                 <Tabla
                     columnas={[
                         { key: "boleta", titulo: "Boleta", ancho: 150 },
-                        { key: "error", titulo: "Error" },
+                        {
+                            key: "error", titulo: "Error",
+                            render: (valor) => (
+                                <Text
+                                    style={[
+                                        styles.texto,
+                                        { color: Colores.textoError, fontWeight: "400" },
+                                    ]}
+                                    allowFontScaling={false}
+                                >
+                                    {valor}
+                                </Text>
+                            ),
+                        },
                     ]}
                     datos={detalleFilas.map((f) => ({
                         ...f,
@@ -1078,7 +1086,7 @@ export default function GestionAlumnos() {
                                     ]}
                                     datos={alumnosMostrados.map((fila) => ({
                                         ...fila,
-                                        nombre_completo: `${fila.nombre} ${fila.apellido_paterno} ${fila.apellido_materno}`,
+                                        nombre_completo: `${fila.nombre || ""} ${fila.apellido_paterno || ""} ${fila.apellido_materno || ""}`,
                                         carrera: fila.carrera.NOMBRE,
                                         estatus: fila.estatus.DESCRIPCION,
                                         onPress: () => { setAlumnoSeleccionado(fila); setModalDetalle(true); },

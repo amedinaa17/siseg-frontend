@@ -74,7 +74,7 @@ export default function PlazaAsignada() {
                             </View>
                         </View>
 
-                        <View style={{ marginBottom: 15 }}>
+                        <View style={{ marginBottom: 20 }}>
                             <Entrada label="Sede" value={datosAlumno?.sede ?? ""} editable={false} />
                         </View>
 
@@ -87,7 +87,7 @@ export default function PlazaAsignada() {
                             </View>
                         </View>
 
-                        <View style={{ marginBottom: 15 }}>
+                        <View style={{ marginBottom: 20 }}>
                             <Entrada label="Ubicación" value={datosAlumno?.ubicacion ?? ""} editable={false} />
                         </View>
                     </View>
@@ -133,6 +133,6 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: "row",
         gap: 12,
-        marginBottom: 15,
+        marginBottom: 20,
     },
 });

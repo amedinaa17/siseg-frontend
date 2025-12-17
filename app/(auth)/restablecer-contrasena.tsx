@@ -53,7 +53,7 @@ export default function ResetPassword() {
         <View style={styles.contenedorFormulario}>
           <Text allowFontScaling={false} style={styles.titulo}>Restablecer contraseña</Text>
           <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 20 }}>Ingrese su correo electrónico institucional para recuperar su contraseña.</Text>
-          <View style={{ marginBottom: error.includes("@") || error === "" ? 25 : 10 }}>
+          <View style={{ marginBottom: (error.includes("@") || error === "") && !errors.correo ? 30 : 10 }}>
             <Controller
               control={control}
               name="correo"

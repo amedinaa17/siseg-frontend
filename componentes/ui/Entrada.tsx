@@ -21,6 +21,7 @@ export default function Entrada({
 }: Propiedades) {
   const [focused, setFocused] = React.useState(false);
   const [mostrarContraseña, setMostrarContraseña] = React.useState(false);
+  const inputRef = React.useRef<TextInput>(null);
   const anim = React.useRef(new Animated.Value(value ? 1 : 0)).current;
 
   React.useEffect(() => {
@@ -34,6 +35,7 @@ export default function Entrada({
   const estiloEtiqueta = {
     position: "absolute" as const,
     zIndex: 100,
+    elevation: 2,
     left: 12,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
@@ -56,7 +58,20 @@ export default function Entrada({
           },
         ]}
       >
-        <Animated.Text style={estiloEtiqueta} allowFontScaling={false}>{label}</Animated.Text>
+        <Animated.Text
+          style={estiloEtiqueta}
+          allowFontScaling={false}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          onPress={() => {
+            if (!editable) return;
+            inputRef.current?.focus();
+          }}
+          suppressHighlighting
+        >
+          {label}
+        </Animated.Text>
+
         <ScrollView
           horizontal
           showsVerticalScrollIndicator={false}
@@ -65,6 +80,7 @@ export default function Entrada({
           contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
         >
           <TextInput
+            ref={inputRef}
             {...props}
             editable={editable}
             value={value}
@@ -85,7 +101,8 @@ export default function Entrada({
                 ? ({ outlineStyle: "none" } as any)
                 : null,
             ]}
-          /></ScrollView>
+          />
+        </ScrollView>
 
         {secureTextEntry && (
           <Pressable
@@ -101,9 +118,9 @@ export default function Entrada({
         )}
       </View>
 
-      {error && (
-        <Text allowFontScaling={false} style={styles.errorTexto}>{error}</Text>
-      )}
+      <Text allowFontScaling={false} style={error && styles.errorTexto}>
+        {error}
+      </Text>
     </View>
   );
 }
@@ -134,7 +151,8 @@ const styles = StyleSheet.create({
   },
   errorTexto: {
     color: Colores.textoError,
-    marginTop: 5,
+    marginTop: 10,
+    marginBottom: 10,
     fontSize: Fuentes.caption,
   },
 });

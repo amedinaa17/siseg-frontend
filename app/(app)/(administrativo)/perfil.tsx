@@ -141,24 +141,24 @@ export default function MiPerfil() {
                                 <>
                                     <Text allowFontScaling={false} style={styles.titulo}>Mi perfil</Text>
 
-                                    <View style={{ marginBottom: 15 }}>
+                                    <View style={{ marginBottom: 20 }}>
                                         <Entrada label="Nombre" value={datosAdministrativo?.nombre || ""} editable={false} />
                                     </View>
 
-                                    <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                        <View style={{ flex: 1, marginBottom: 0 }}>
+                                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                        <View style={{ flex: 1, marginBottom: 20 }}>
                                             <Entrada label="Apellido paterno" value={datosAdministrativo?.apellido_paterno || ""} editable={false} />
                                         </View>
-                                        <View style={{ flex: 1, marginBottom: 0 }}>
+                                        <View style={{ flex: 1, marginBottom: 20 }}>
                                             <Entrada label="Apellido materno" value={datosAdministrativo?.apellido_materno || ""} editable={false} />
                                         </View>
                                     </View>
 
-                                    <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                        <View style={{ flex: 1, marginBottom: 0 }}>
+                                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                        <View style={{ flex: 1, marginBottom: 20 }}>
                                             <Entrada label="CURP" value={datosAdministrativo?.curp || ""} maxLength={18} editable={false} />
                                         </View>
-                                        <View style={{ flex: 1, marginBottom: 0 }}>
+                                        <View style={{ flex: 1, marginBottom: 20 }}>
                                             <Selector
                                                 label="Sexo"
                                                 selectedValue={datosAdministrativo ? (datosAdministrativo.sexo === "F" ? "Femenino" : "Masculino") : ""}
@@ -172,16 +172,16 @@ export default function MiPerfil() {
                                         </View>
                                     </View>
 
-                                    <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                        <View style={{ flex: 1, marginBottom: 0 }}>
+                                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                        <View style={{ flex: 1, marginBottom: 20 }}>
                                             <Entrada label="Número de empleado" value={datosAdministrativo?.numempleado || ""} keyboardType="numeric" editable={false} />
                                         </View>
-                                        <View style={{ flex: 1, marginBottom: 0 }}>
+                                        <View style={{ flex: 1, marginBottom: 20 }}>
                                             <Entrada label="Perfil" value={datosAdministrativo ? (datosAdministrativo.perfil === "1" ? "Administrador de seguimiento" : "Administrador general") : ""} editable={false} />
                                         </View>
                                     </View>
 
-                                    <View style={{ marginBottom: 15 }}>
+                                    <View style={{ marginBottom: 20 }}>
                                         <Entrada
                                             label="Correo electrónico institucional"
                                             value={datosAdministrativo?.correo || ""}
@@ -190,8 +190,8 @@ export default function MiPerfil() {
                                         />
                                     </View>
 
-                                    <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                        <View style={{ flex: 1, marginBottom: 0 }}>
+                                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                        <View style={{ flex: 1, marginBottom: 20 }}>
                                             <Entrada label="Celular" value={datosAdministrativo?.telcelular || ""} keyboardType="phone-pad" maxLength={10} editable={false} />
                                         </View>
                                         <View style={{ flex: 1, marginBottom: 25 }}>
@@ -214,7 +214,7 @@ export default function MiPerfil() {
                             {vista === 2 && (
                                 <>
                                     <Text allowFontScaling={false} style={styles.titulo}>Modificar datos</Text>
-                                    <View style={{ marginBottom: 15 }}>
+                                    <View style={{ marginBottom: errorsPerfil.sexo ? 5 : 20 }}>
                                         <Controller
                                             control={controlPerfil}
                                             name="sexo"
@@ -233,8 +233,8 @@ export default function MiPerfil() {
                                             )}
                                         />
                                     </View>
-                                    <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
-                                        <View style={{ flex: 1, marginBottom: errorsPerfil.telcelular && !errorsPerfil.tellocal ? 15 : 5 }}>
+                                    <View style={[esPantallaPequeña ? { flexDirection: "column" } : { flexDirection: "row", gap: 12 }]}>
+                                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsPerfil.telcelular ? 5 : 20 }]}>
                                             <Controller
                                                 control={controlPerfil}
                                                 name="telcelular"
@@ -254,7 +254,7 @@ export default function MiPerfil() {
                                                 )}
                                             />
                                         </View>
-                                        <View style={{ flex: 1, marginBottom: 25 }}>
+                                        <View style={[!esPantallaPequeña && { flex: 1 }, { marginBottom: errorsPerfil.tellocal ? 5 : 25 }]}>
                                             <Controller
                                                 control={controlPerfil}
                                                 name="tellocal"
@@ -296,7 +296,7 @@ export default function MiPerfil() {
                                     <Text allowFontScaling={false} style={{ fontSize: Fuentes.cuerpo, color: Colores.textoPrincipal, marginBottom: 20 }}>
                                         Ingresa una nueva contraseña de 8 a 12 caracteres, que incluya al menos una letra mayúscula, una letra minúscula y un número.
                                     </Text>
-                                    <View style={{ marginBottom: 15 }}>
+                                    <View style={{ marginBottom: errorsContraseña.contraseña ? 5 : 20 }}>
                                         <Controller
                                             control={controlContraseña}
                                             name="contraseña"
@@ -314,7 +314,7 @@ export default function MiPerfil() {
                                         />
                                     </View>
 
-                                    <View style={{ marginBottom: 25 }}>
+                                    <View style={{ marginBottom: errorsContraseña.confirmarContraseña ? 10 : 25 }}>
                                         <Controller
                                             control={controlContraseña}
                                             name="confirmarContraseña"
@@ -379,10 +379,5 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginBottom: 24,
         color: Colores.textoPrincipal,
-    },
-    row: {
-        flexDirection: "row",
-        gap: 12,
-        marginBottom: 15,
     },
 });
