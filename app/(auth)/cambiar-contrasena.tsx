@@ -36,7 +36,7 @@ export default function CambiarContraseña() {
         password: contraseña.contraseña,
         tk: sesion.token
       };
-      const response = await postData("users/restablecerPassword", datos);
+      const response = await postData("users/restablecerPasswordLogin", datos);
 
       if (response.error === 0) {
         await login(sesion.boleta, contraseña.contraseña);
