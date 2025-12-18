@@ -50,7 +50,7 @@ export default function NuevaContraseña() {
         password: contraseña.contraseña,
         tk: token
       };
-      const response = await postData("users/restablecerPasswordLogin", datos);
+      const response = await postData("users/restablecerPassword", datos);
 
       if (response.error === 0) {
         modalAPI.current?.show(true, "Tu contraseña se ha actualizado correctamente.",
