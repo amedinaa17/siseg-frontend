@@ -80,7 +80,7 @@ export default function PlazaAsignada() {
 
                         <View style={[styles.row, esPantallaPequeña && { flexDirection: "column" }]}>
                             <View style={{ flex: 1, marginBottom: 0 }}>
-                                <Entrada label="Tarjeta" value={String(datosAlumno?.tarjetaDisponible) ?? ""} editable={false} />
+                                <Entrada label="Tarjeta" value={datosAlumno?.tarjetaDisponible ?? ""} editable={false} />
                             </View>
                             <View style={{ flex: 1, marginBottom: 0 }}>
                                 <Entrada label="Beca" value={datosAlumno?.tipoBeca ?? ""} editable={false} />

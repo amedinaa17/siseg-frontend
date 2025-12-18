@@ -34,11 +34,11 @@ export default function EntradaMultilinea({
     zIndex: 100,
     elevation: 2,
     left: 12,
-    paddingRight: editable ? 15 : 20,
+    paddingRight: focused || value ? 12 : 20,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
     color: error ? Colores.textoError : focused && editable ? Colores.textoInfo : Colores.textoClaro,
-    backgroundColor: Colores.fondo,
+    backgroundColor: focused || value ? Colores.fondo : "transparent",
     paddingHorizontal: 4,
   };
 
@@ -54,6 +54,7 @@ export default function EntradaMultilinea({
                 ? Colores.textoInfo
                 : Colores.borde,
           },
+          !editable && styles.deshabilitado,
         ]}
       >
         <Animated.Text
@@ -124,5 +125,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     fontSize: Fuentes.caption,
+  },
+  deshabilitado: {
+    backgroundColor: Colores.textoDeshabilitado,
   },
 });

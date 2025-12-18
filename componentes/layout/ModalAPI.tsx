@@ -34,7 +34,23 @@ const ModalAPI = forwardRef<ModalAPIRef>((_, ref) => {
     }));
 
     const correoRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/;
-    const mensajePartes = mensaje.split(correoRegex);
+    const curpRegex = /^[A-ZÑ]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
+    const boletaRegex = /^\d{10}$/;
+
+    const highlightText = (text: string) => {
+        return text.split(" ").map((word, index) => {
+            if (correoRegex.test(word)) {
+                return <Text key={`correo-${index}`} style={{ color: estatus ? Colores.textoInfo : Colores.textoError }}>{word} </Text>;
+            }
+            if (curpRegex.test(word)) {
+                return <Text key={`curp-${index}`} style={{ color: estatus ? Colores.textoSecundario : Colores.textoError }}>{word} </Text>;
+            }
+            if (boletaRegex.test(word)) {
+                return <Text key={`boleta-${index}`} style={{ color: estatus ? Colores.textoPrimario : Colores.textoError }}>{word} </Text>;
+            }
+            return <Text key={`text-${index}`}>{word} </Text>;
+        });
+    };
 
     return (
         <Modal key={modalKey} visible={visible} titulo=""
@@ -51,16 +67,7 @@ const ModalAPI = forwardRef<ModalAPIRef>((_, ref) => {
                     {estatus ? "¡Todo listo!" : "¡Algo salió mal!"}
                 </Text>
                 <Text allowFontScaling={false} style={styles.mensaje}>
-                    {mensajePartes.map((parte, index) => {
-                        if (correoRegex.test(parte)) {
-                            return (
-                                <Text allowFontScaling={false} key={`p-${index}`} style={{ color: estatus ? Colores.textoInfo : Colores.textoError }}>
-                                    {parte}
-                                </Text>
-                            );
-                        }
-                        return <Text key={`t-${index}`}>{parte}</Text>;
-                    })}
+                    {highlightText(mensaje)}
                 </Text>
 
                 {onDetalles && (

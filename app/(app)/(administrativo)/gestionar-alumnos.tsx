@@ -67,10 +67,10 @@ export default function GestionAlumnos() {
             if (response.error === 0) {
                 setAlumnos(response.data);
             } else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close();  router.replace("/inicio-administrativo"); });
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-administrativo"); });
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close();  router.replace("/inicio-administrativo"); });
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-administrativo"); });
         } finally {
             setCargando(false);
         }
@@ -127,10 +127,19 @@ export default function GestionAlumnos() {
                 modalAPI.current?.show(true, "El alumno se ha registrado correctamente.");
             } else {
                 setModalAgregar(false);
-                if (response.message.includes("La boleta ya está registrada"))
-                    modalAPI.current?.show(false, "El número de boleta o CURP ya está registrado. Verifica los datos e inténtalo de nuevo.", () => { modalAPI.current?.close(); setModalAgregar(true); });
+                let mensaje = "";
+                const error = response.message.split(":")[1]?.trim() || "";
+
+                if (response.message.includes("Boleta duplicada"))
+                    mensaje = "La boleta " + error + " ya está registrada. Verifica los datos e inténtalo de nuevo.";
+                else if (response.message.includes("Correo duplicado"))
+                    mensaje = "El correo " + error + " ya está registrado. Verifica los datos e inténtalo de nuevo.";
+                else if (response.message.includes("CURP duplicado"))
+                    mensaje = "El CURP " + response.message.split(":")[1]?.trim() + " ya está registrado. Verifica los datos e inténtalo de nuevo.";
                 else
-                    modalAPI.current?.show(false, "Hubo un problema al registrar al alumno. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); setModalAgregar(true); });
+                    mensaje = "Hubo un problema al registrar al alumno. Inténtalo de nuevo más tarde.";
+
+                modalAPI.current?.show(false, mensaje, () => { modalAPI.current?.close(); setModalAgregar(true); });
             }
         } catch (error) {
             setModalAgregar(false);
@@ -964,7 +973,7 @@ export default function GestionAlumnos() {
                             {sesion?.perfil === 2 && (
                                 <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
                                     <View>
-                                        <Boton title="Agregar alumno" onPress={() => { setModalAgregar(true) }} />
+                                        <Boton title="Agregar alumno" onPress={() => { setModalAgregar(true); resetAgregar(); }} />
                                     </View>
                                     <View>
                                         <Boton title="Cargar alumnos" onPress={() => setModalCargar(true)} />

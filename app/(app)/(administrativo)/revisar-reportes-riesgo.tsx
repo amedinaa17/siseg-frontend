@@ -165,18 +165,21 @@ export default function ReportesRiesgo() {
                                 value={estatus === 1}
                                 onValueChange={() => setEstatus(1)}
                                 labelColor="textoAdvertencia"
+                                disabled={reporteSeleccionado.estatus === 3 ? true : false}
                             />
                             <Checkbox
                                 label="En revisión"
                                 value={estatus === 2}
                                 onValueChange={() => setEstatus(2)}
                                 labelColor="textoInfo"
+                                disabled={reporteSeleccionado.estatus === 3 ? true : false}
                             />
                             <Checkbox
                                 label="Finalizado"
                                 value={estatus === 3}
                                 onValueChange={() => setEstatus(3)}
                                 labelColor="textoExito"
+                                disabled={reporteSeleccionado.estatus === 3 ? true : false}
                             />
                         </View>
                     </View>

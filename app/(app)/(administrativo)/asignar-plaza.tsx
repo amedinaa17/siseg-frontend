@@ -356,7 +356,6 @@ export default function AsignarPlaza() {
                                             titulo: "Acciones",
                                             ancho: 100,
                                             render: (_valor, fila) => {
-                                                const asignado = !!Number(fila.sede);
                                                 return (
                                                     <View style={{ flexDirection: "row", gap: 10, justifyContent: "center", marginVertical: "auto" }}>
                                                         <Boton
@@ -365,7 +364,7 @@ export default function AsignarPlaza() {
                                                             }}
                                                             icon={<Ionicons name="add-outline" size={18} color={Colores.onPrimario} style={{ padding: 5 }} />}
                                                             color={Colores.textoInfo}
-                                                            disabled={asignado}
+                                                            disabled={fila.sede === "-" ? false : true}
                                                         />
                                                     </View>
                                                 );

@@ -54,9 +54,9 @@ export const registroEsquema = z.object({
   rfc: z
     .string()
     .nonempty("El RFC es obligatorio")
-    .min(12, "El RFC debe tener al menos 12 caracteres")
+    .min(13, "El RFC debe tener 13 caracteres")
     .max(13, "El RFC no puede tener más de 13 caracteres")
-    .regex(/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/, "Formato de RFC inválido"),
+    .regex(/^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/, "Formato de RFC inválido"),
 
   calle: z
     .string()

@@ -42,11 +42,11 @@ export default function Selector({
     zIndex: 100,
     elevation: 2,
     left: 12,
-    paddingRight: editable ? 15 : 20,
+    paddingRight: focused || selectedValue ? 12 : 20,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
     color: isError ? Colores.textoError : Colores.textoClaro,
-    backgroundColor: Colores.fondo,
+    backgroundColor: focused || selectedValue ? Colores.fondo : "transparent",
     paddingHorizontal: 4,
   };
 
@@ -62,6 +62,7 @@ export default function Selector({
               ? Colores.textoError
               : Colores.borde,
           },
+          !editable && styles.deshabilitado,
         ]}
       >
         <Animated.Text
@@ -70,7 +71,7 @@ export default function Selector({
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {label}
+          {/*!selectedValue && <Ionicons name="chevron-down-outline" size={15} color={Colores.textoClaro} style={{ marginRight: 5 }} />*/}{label}
         </Animated.Text>
         <ScrollView
           horizontal
@@ -210,5 +211,7 @@ const styles = StyleSheet.create({
     color: Colores.primario,
     fontWeight: "600",
   },
-
+  deshabilitado: {
+    backgroundColor: Colores.textoDeshabilitado,
+  },
 });

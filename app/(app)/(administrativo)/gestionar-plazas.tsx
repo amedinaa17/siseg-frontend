@@ -625,7 +625,7 @@ export default function GestionPlazas() {
                             <Text allowFontScaling={false} style={styles.titulo}>Gestionar plazas</Text>
                             <View style={{ marginBottom: 15, flexDirection: "row", gap: 10 }}>
                                 <View>
-                                    <Boton title="Agregar plaza" onPress={() => { setModalAgregar(true) }} />
+                                    <Boton title="Agregar plaza" onPress={() => { setModalAgregar(true); resetAgregar(); }} />
                                 </View>
                             </View>
 

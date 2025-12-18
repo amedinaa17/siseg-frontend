@@ -53,6 +53,7 @@ export default function MiPerfil() {
         };
 
         obtenerDatos();
+        resetContraseña();
     }, [vista]);
 
     const {
@@ -105,6 +106,7 @@ export default function MiPerfil() {
 
             if (response.error === 0) {
                 setVista(1);
+                resetContraseña();
                 modalAPI.current?.show(true, "Tu contraseña se ha cambiado correctamente.");
             } else {
                 modalAPI.current?.show(false, "Hubo un problema al actualizar tu contraseña. Inténtalo de nuevo más tarde.");

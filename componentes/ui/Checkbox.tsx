@@ -9,20 +9,27 @@ type Propiedades = {
     value: boolean
     onValueChange: (val: boolean) => void
     error?: string
+    disabled?: boolean
 }
 
-export default function Checkbox({ label, labelColor, value, onValueChange, error }: Propiedades) {
+export default function Checkbox({ label, labelColor, value, onValueChange, error, disabled }: Propiedades) {
     return (
         <View style={{ marginBottom: 10 }}>
             <Pressable
                 style={styles.contenedor}
-                onPress={() => onValueChange(!value)}
+                onPress={() => {
+                    if (!disabled) {
+                        onValueChange(!value);
+                    }
+                }}
+                disabled={disabled}
             >
                 <View
                     style={[
                         styles.checkbox,
                         { borderColor: error ? Colores.textoError : Colores.borde },
-                        value && { backgroundColor: Colores.textoSecundario, borderColor: Colores.textoSecundario }
+                        value && { backgroundColor: Colores.textoSecundario, borderColor: Colores.textoSecundario },
+                        disabled && styles.deshabilitado
                     ]}
                 >
                     {value && <Ionicons name="checkmark" size={16} color={Colores.onPrimario} />}
@@ -54,6 +61,9 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         justifyContent: "center",
         alignItems: "center",
+    },
+    deshabilitado: {
+        opacity: 0.6,
     },
     errorTexto: {
         color: Colores.textoError,
