@@ -51,10 +51,10 @@ export default function AsignarPlaza() {
                 setAlumnos(response.data);
             }
             else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
+                modalAPI.current?.show(false, "Hubo un problema al obtener los datos del servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-administrativo"); });
             }
         } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-administrativo"); });
         } finally {
             setCargando(false);
         }
@@ -73,10 +73,10 @@ export default function AsignarPlaza() {
                 setPlazas(response.plazas.filter((plaza) => plaza.estatus == 1 && plaza.tarjetaDisponible > 0));
             }
             else {
-                modalAPI.current?.show(false, "Hubo un problema al obtener las plazas del servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
+                modalAPI.current?.show(false, "Hubo un problema al obtener las plazas del servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-administrativo"); });
             }
         } catch {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-administrativo"); });
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-administrativo"); });
         }
     };
 

@@ -97,7 +97,7 @@ export default function EncuestaSatisfaccion() {
                 }
             }
         } catch (error) {
-            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { router.replace("/inicio-alumno"); });
+            modalAPI.current?.show(false, "Error al conectar con el servidor. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-alumno"); });
         } finally {
             setCargando(false);
         }
@@ -137,7 +137,7 @@ export default function EncuestaSatisfaccion() {
             });
 
             if (resp?.error === 0) {
-                modalAPI.current?.show(true, "La encuesta se ha enviado correctamente.", () => { router.replace("/inicio-alumno"); });
+                modalAPI.current?.show(true, "La encuesta se ha enviado correctamente.", () => { modalAPI.current?.close(); router.replace("/inicio-alumno"); });
                 setAnswers({});
             } else {
                 modalAPI.current?.show(false, "Hubo un problema al enviar tu encuesta. Inténtalo de nuevo más tarde.");
