@@ -1,10 +1,29 @@
 import { postData } from "@/servicios/api";
 import { Colores, Fuentes } from "@/temas/colores";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState, } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 type Msg = { id: string; role: "user" | "bot"; text: string };
+
+const NO_ANSWER_TEXT = "No tengo respuesta para la pregunta.";
+
+const GREETING: Msg = {
+  id: "greet",
+  role: "bot",
+  text: "¡Hola! Soy tu asistente virtual. Selecciona un tema o escribe tu pregunta.",
+};
+
+const FAQ_OPTIONS: { label: string; emoji: string }[] = [
+  { label: "Requisitos de Inscripción", emoji: "📋" },
+  { label: "Registro SIASS y Web", emoji: "💻" },
+  { label: "Entrega de Calificaciones (Internado)", emoji: "📄" },
+  { label: "Datos para el Donativo", emoji: "💰" },
+  { label: "Curso de Inducción (Obligatorio)", emoji: "🎓" },
+  { label: "Selección de Plaza (Acto Público)", emoji: "🏥" },
+  { label: "Grupos de WhatsApp", emoji: "📱" },
+  { label: "Problemas con vigencia IMSS", emoji: "🚑" },
+];
 
 const ChatbotWidget: React.FC<{
   endpoint?: string;
@@ -12,28 +31,103 @@ const ChatbotWidget: React.FC<{
 }> = ({ endpoint = "chatbot/chatbotQuery", title = "Asistente SISEG" }) => {
   const { width } = useWindowDimensions();
   const esPantallaPequeña = width < 790;
-
   const [open, setOpen] = useState(false);
+  const [blocked, setBlocked] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [msgs, setMsgs] = useState<Msg[]>([
-    {
-      id: "greet",
-      role: "bot",
-      text:
-        "¡Hola! Soy tu asistente virtual. ¿Cómo puedo ayudarte hoy?",
-    },
-  ]);
-
+  const [msgs, setMsgs] = useState<Msg[]>([GREETING]);
+  const [showMenu, setShowMenu] = useState(true);
+  const [awaitingAnotherQuery, setAwaitingAnotherQuery] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+  const noAnswerStreakRef = useRef(0);
 
-  const send = async () => {
-    const q = input.trim();
-    if (!q || loading) return;
-
-    const userMsg: Msg = { id: cryptoRandom(), role: "user", text: q };
-    setMsgs((m) => [...m, userMsg]);
+  const resetChat = () => {
+    noAnswerStreakRef.current = 0;
+    setBlocked(false);
     setInput("");
+    setLoading(false);
+    setMsgs([GREETING]);
+    setShowMenu(true);
+    setAwaitingAnotherQuery(false);
+  };
+
+  const handleCloseChat = () => {
+    setOpen(false);
+    resetChat();
+  };
+
+  const appendMsg = (role: "user" | "bot", text: string) => {
+    const m: Msg = { id: cryptoRandom(), role, text };
+    setMsgs((prev) => [...prev, m]);
+  };
+
+  const scrollToEndSoon = () => {
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 40);
+  };
+
+  const normalize = (s: string) =>
+    s
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  const showMenuMessage = () => {
+    appendMsg("bot", "Selecciona una opción del menú.");
+    setShowMenu(true);
+    setAwaitingAnotherQuery(false);
+  };
+
+  const askAnotherQueryPrompt = () => {
+    appendMsg("bot", "¿Deseas realizar otra consulta?");
+    setAwaitingAnotherQuery(true);
+  };
+
+  const handleNoAnswerRules = (answer: string) => {
+    if (answer === NO_ANSWER_TEXT) {
+      noAnswerStreakRef.current += 1;
+    } else {
+      noAnswerStreakRef.current = 0;
+    }
+
+    if (noAnswerStreakRef.current >= 3) {
+      appendMsg(
+        "bot",
+        "Por el momento no ha sido posible brindar una respuesta adecuada a tus consultas. Para continuar con una atención adecuada, te solicitamos cerrar el chat y volver a abrirlo para reiniciar la conversación."
+      );
+      setBlocked(true);
+      setShowMenu(false);
+      setAwaitingAnotherQuery(false);
+    }
+  };
+
+  const handleAnotherQueryAnswer = (val: "si" | "no") => {
+    if (!awaitingAnotherQuery) return;
+
+    if (val === "si") {
+      appendMsg("user", "Sí");
+      showMenuMessage();
+    } else {
+      appendMsg("user", "No");
+      appendMsg(
+        "bot",
+        "De acuerdo. Si deseas realizar otra consulta, escribe “menú” para ver las opciones disponibles."
+      );
+      setShowMenu(false);
+      setAwaitingAnotherQuery(false);
+    }
+
+    scrollToEndSoon();
+  };
+
+  const askBackend = async (question: string) => {
+    const q = question.trim();
+    if (!q || loading || blocked) return;
+
+    setShowMenu(false);
+    setAwaitingAnotherQuery(false);
+
+    appendMsg("user", q);
     setLoading(true);
 
     try {
@@ -44,29 +138,60 @@ const ChatbotWidget: React.FC<{
       if (resp && resp.error === 0 && typeof resp.answer === "string") {
         answer = resp.answer.trim();
       } else if (resp?.message) {
-        answer = resp.message;
+        answer = String(resp.message).trim();
       }
 
-      const botMsg: Msg = { id: cryptoRandom(), role: "bot", text: answer };
-      setMsgs((m) => [...m, botMsg]);
+      appendMsg("bot", answer);
+
+      if (answer === NO_ANSWER_TEXT) {
+        appendMsg("bot", "Selecciona una opción del menú.");
+        setShowMenu(true);
+        setAwaitingAnotherQuery(false);
+      } else {
+        askAnotherQueryPrompt();
+      }
+
+      handleNoAnswerRules(answer);
     } catch (e) {
-      const botMsg: Msg = {
-        id: cryptoRandom(),
-        role: "bot",
-        text:
-          "Ocurrió un error al conectar con el asistente. Intenta nuevamente en un momento.",
-      };
-      setMsgs((m) => [...m, botMsg]);
+      appendMsg(
+        "bot",
+        "Ocurrió un error al conectar con el asistente. Intenta nuevamente en un momento."
+      );
+      noAnswerStreakRef.current = 0;
     } finally {
       setLoading(false);
-      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 20);
+      scrollToEndSoon();
     }
   };
 
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
+  const send = async () => {
+    const q = input.trim();
+    if (!q || blocked || loading) return;
+
+    const qn = normalize(q);
+    setInput("");
+
+    if (awaitingAnotherQuery && (qn === "si" || qn === "sí" || qn === "no")) {
+      handleAnotherQueryAnswer(qn === "no" ? "no" : "si");
+      return;
     }
+
+    if (qn === "menu" || qn === "menú") {
+      appendMsg("user", q);
+      showMenuMessage();
+      scrollToEndSoon();
+      return;
+    }
+
+    await askBackend(q);
+  };
+
+  const onPickOption = async (label: string) => {
+    await askBackend(label);
+  };
+
+  useEffect(() => {
+    if (open) scrollToEndSoon();
   }, [open, msgs.length]);
 
   const onKeyPress = (e: any) => {
@@ -76,17 +201,72 @@ const ChatbotWidget: React.FC<{
     }
   };
 
+  const optionsGrid = useMemo(() => {
+    if (!showMenu || loading) return null;
+
+    return (
+      <View style={styles.optionsWrap}>
+        {FAQ_OPTIONS.map((o) => (
+          <TouchableOpacity
+            key={o.label}
+            onPress={() => onPickOption(o.label)}
+            disabled={blocked || loading}
+            activeOpacity={0.85}
+            style={[styles.optionChip, (blocked || loading) && { opacity: 0.5 }]}
+          >
+            <Text allowFontScaling={false} style={styles.optionChipText}>
+              {o.label} {o.emoji}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  }, [blocked, loading, showMenu]);
+
+  const yesNoRow = useMemo(() => {
+    if (!awaitingAnotherQuery || loading || blocked) return null;
+
+    return (
+      <View style={styles.yesNoWrap}>
+        <TouchableOpacity
+          style={styles.yesBtn}
+          activeOpacity={0.85}
+          onPress={() => handleAnotherQueryAnswer("si")}
+        >
+          <Text allowFontScaling={false} style={[styles.yesNoText, styles.yesText]}>
+            Sí
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.noBtn}
+          activeOpacity={0.85}
+          onPress={() => handleAnotherQueryAnswer("no")}
+        >
+          <Text allowFontScaling={false} style={[styles.yesNoText, styles.noText]}>
+            No
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }, [awaitingAnotherQuery, loading, blocked]);
+
+  const inputEditable = !blocked && !showMenu && !awaitingAnotherQuery && !loading;
+  const sendDisabled =
+    loading || blocked || showMenu || awaitingAnotherQuery || !input.trim();
+
   return (
     <>
       {!open && (
         <TouchableOpacity
-          onPress={() => setOpen((v) => !v)}
+          onPress={() => setOpen(true)}
           activeOpacity={0.9}
           style={styles.fab}
         >
-          <Ionicons name={open ? "close" : "chatbubble-ellipses"} size={26} color={Colores.onPrimario} />
+          <Ionicons name="chatbubble-ellipses" size={26} color={Colores.onPrimario} />
         </TouchableOpacity>
       )}
+
       {open && (
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -95,8 +275,11 @@ const ChatbotWidget: React.FC<{
         >
           <View style={[styles.popup, { width: esPantallaPequeña ? "100%" : 360 }]}>
             <View style={styles.header}>
-              <Text allowFontScaling={false} style={styles.headerTitle}>{title}</Text>
-              <TouchableOpacity onPress={() => setOpen(false)}>
+              <Text allowFontScaling={false} style={styles.headerTitle}>
+                {title}
+              </Text>
+
+              <TouchableOpacity onPress={handleCloseChat}>
                 <Ionicons name="close" size={20} color={Colores.textoPrincipal} />
               </TouchableOpacity>
             </View>
@@ -104,7 +287,7 @@ const ChatbotWidget: React.FC<{
             <ScrollView
               ref={scrollRef}
               style={styles.body}
-              contentContainerStyle={{ paddingBottom: 8 }}
+              contentContainerStyle={{ paddingBottom: 10 }}
             >
               {msgs.map((m) => (
                 <View
@@ -126,9 +309,15 @@ const ChatbotWidget: React.FC<{
                   </Text>
                 </View>
               ))}
+
+              {yesNoRow}
+              {optionsGrid}
+
               {loading && (
                 <View style={[styles.bubble, styles.botBubble]}>
-                  <Text allowFontScaling={false} style={[styles.bubbleText, styles.botBubbleText]}>Pensando…</Text>
+                  <Text allowFontScaling={false} style={[styles.bubbleText, styles.botBubbleText]}>
+                    Pensando…
+                  </Text>
                 </View>
               )}
             </ScrollView>
@@ -137,17 +326,33 @@ const ChatbotWidget: React.FC<{
               <TextInput
                 value={input}
                 onChangeText={setInput}
-                placeholder="Escribe tu pregunta…"
+                placeholder={
+                  blocked
+                    ? "Cierra el chat para iniciar una nueva conversación"
+                    : awaitingAnotherQuery
+                      ? "Selecciona Sí o No…"
+                      : showMenu
+                        ? "Selecciona una opción del menú…"
+                        : "Escribe tu pregunta…"
+                }
+                editable={inputEditable}
                 multiline
                 onKeyPress={onKeyPress}
-                style={styles.textInput}
+                style={[
+                  styles.textInput,
+                  !inputEditable && { backgroundColor: "#F3F4F6" },
+                ]}
                 allowFontScaling={false}
                 placeholderTextColor={Colores.textoClaro}
               />
+
               <TouchableOpacity
                 onPress={send}
-                disabled={loading || !input.trim()}
-                style={[styles.sendBtn, (loading || !input.trim()) && { opacity: 0.5 }]}
+                disabled={sendDisabled}
+                style={[
+                  styles.sendBtn,
+                  sendDisabled && { opacity: 0.5 },
+                ]}
               >
                 <Ionicons name="send" size={18} color={Colores.onPrimario} />
               </TouchableOpacity>
@@ -191,7 +396,7 @@ const styles = StyleSheet.create({
     ...Platform.select({ web: { zIndex: 9999 }, default: { zIndex: 999 } }),
   },
   popup: {
-    maxHeight: 500,
+    maxHeight: 520,
     backgroundColor: Colores.fondo,
     borderWidth: 1,
     borderColor: Colores.borde,
@@ -217,9 +422,57 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: Colores.textoPrincipal,
   },
-  body: {
-    padding: 12,
+  body: { padding: 12 },
+
+  optionsWrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 6,
+    marginBottom: 10,
   },
+  optionChip: {
+    borderWidth: 1,
+    borderColor: Colores.borde,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  optionChipText: {
+    fontSize: 12,
+    color: Colores.textoPrincipal ?? "#111827",
+    fontWeight: "600",
+  },
+
+  yesNoWrap: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 2,
+    marginBottom: 10,
+  },
+  yesBtn: {
+    flex: 1,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: Colores.primario,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noBtn: {
+    flex: 1,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colores.borde,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  yesNoText: { fontSize: 13, fontWeight: "700" },
+  yesText: { color: Colores.onPrimario ?? "#FFFFFF" },
+  noText: { color: Colores.textoPrincipal ?? "#111827" },
+
   bubble: {
     maxWidth: "85%",
     paddingHorizontal: 12,
@@ -237,15 +490,10 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     borderTopLeftRadius: 4,
   },
-  bubbleText: {
-    fontSize: (Fuentes?.cuerpoPrincipal as number) ?? 14,
-  },
-  userBubbleText: {
-    color: Colores.textoPrincipal ?? "#111827",
-  },
-  botBubbleText: {
-    color: Colores.textoPrincipal ?? "#111827",
-  },
+  bubbleText: { fontSize: (Fuentes?.cuerpoPrincipal as number) ?? 14 },
+  userBubbleText: { color: Colores.textoPrincipal ?? "#111827" },
+  botBubbleText: { color: Colores.textoPrincipal ?? "#111827" },
+
   inputRow: {
     flexDirection: "row",
     gap: 8,
