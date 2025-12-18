@@ -45,7 +45,7 @@ export default function Selector({
     paddingRight: editable ? 15 : 20,
     top: anim.interpolate({ inputRange: [0, 1], outputRange: [14, -8] }),
     fontSize: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-    color: error ? Colores.textoError : focused && editable ? Colores.textoInfo : Colores.textoClaro,
+    color: isError ? Colores.textoError : Colores.textoClaro,
     backgroundColor: Colores.fondo,
     paddingHorizontal: 4,
   };
@@ -58,11 +58,9 @@ export default function Selector({
         style={[
           styles.contenedor,
           {
-            borderColor: error
+            borderColor: isError
               ? Colores.textoError
-              : focused && editable
-                ? Colores.textoInfo
-                : Colores.borde,
+              : Colores.borde,
           },
         ]}
       >
