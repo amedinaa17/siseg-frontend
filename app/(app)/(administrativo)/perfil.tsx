@@ -73,7 +73,7 @@ export default function MiPerfil() {
                 data,
                 tk: sesion.token
             };
-            const response = await postData('users/modificarDatos', payload);
+            const response = await postData('users/modificarDatosAdmin', payload);
 
             if (response.error === 0) {
                 modalAPI.current?.show(true, "Tus datos se han actualizado correctamente.");
