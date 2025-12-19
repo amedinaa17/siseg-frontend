@@ -65,15 +65,18 @@ export default function MiPerfil() {
         resolver: zodResolver(modificarPerfilAdminEsquema),
     });
 
-    const onSubmitPerfil = async (data: ModificarPerfilAdminFormulario) => {
+    const onSubmitPerfil = async (datos: ModificarPerfilAdminFormulario) => {
         verificarToken();
 
         try {
-            const payload = {
-                data,
-                tk: sesion.token
+            const datosActualizar = {
+                sexo: datos.sexo,
+                telcelular: datos.telcelular,
+                tellocal: datos.tellocal,
+                tk: sesion?.token
             };
-            const response = await postData('users/modificarDatosAdmin', payload);
+
+            const response = await postData('users/modificarDatosAdmin', datosActualizar);
 
             if (response.error === 0) {
                 modalAPI.current?.show(true, "Tus datos se han actualizado correctamente.");
