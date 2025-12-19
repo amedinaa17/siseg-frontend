@@ -32,16 +32,16 @@ export default function AcuseSolicitud() {
     lugar: string;
   } | null>(null);
 
+  const [configPDF, setConfigPDF] = useState<{ header: string; footer: string } | null>(null);
+
   const pieAcuse = require("@/activos/imagenes/pieAcuse.png");
   const fotoAcuse = require("@/activos/imagenes/fotoAcuse.png");
   const encabezadoAcuse = require("@/activos/imagenes/encabezadoAcuse.png");
 
   const obtenerDatos = async () => {
     verificarToken();
-
     try {
       setCargando(true);
-
       const response = await fetchData(`users/obtenerTodosDatosAlumno?tk=${sesion.token}`);
 
       if (response.error === 0) {
@@ -56,18 +56,28 @@ export default function AcuseSolicitud() {
     }
   };
 
+  const obtenerConfigPDF = async () => {
+    try {
+      const r = await fetchData(`users/actualizarConfiguracion?tk=${sesion.token}`);
+      console.log("CONFIG PDF:", r);
+
+      if (r?.error === 0 && r?.config) {
+        setConfigPDF(r.config);
+      }
+    } catch (e) {
+      console.log("Error obteniendo config PDF:", e);
+    }
+  };
+
   useEffect(() => {
     obtenerDatos();
+    obtenerConfigPDF();
   }, []);
 
   useEffect(() => {
     const cargarImagenes = async () => {
       try {
-        const [cabeza, pie, lugar] = await Asset.loadAsync([
-          encabezadoAcuse,
-          pieAcuse,
-          fotoAcuse,
-        ]);
+        const [cabeza, pie, lugar] = await Asset.loadAsync([encabezadoAcuse, pieAcuse, fotoAcuse]);
 
         if (Platform.OS === "web") {
           setImagenes({
@@ -105,9 +115,9 @@ export default function AcuseSolicitud() {
 
   const generarHTML = useCallback(
     (includePrintButton: boolean) => {
-      const cabezaSrc = imagenes?.cabeza ?? "";
-      const pieSrc = imagenes?.pie ?? "";
       const lugarSrc = imagenes?.lugar ?? "";
+      const cabezaSrc = configPDF?.header ?? "";
+      const pieSrc = configPDF?.footer ?? "";
 
       return `
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -222,7 +232,7 @@ export default function AcuseSolicitud() {
     </body>
     </html>`;
     },
-    [datosAlumno, imagenes]
+    [datosAlumno, imagenes, configPDF]
   );
 
   const onDescargarPDF = useCallback(async () => {
@@ -240,9 +250,7 @@ export default function AcuseSolicitud() {
       const html = generarHTML(false);
       const { uri } = await Print.printToFileAsync({ html });
 
-      const base = datosAlumno?.boleta
-        ? `solicitudRegistro_${datosAlumno.boleta}.pdf`
-        : "solicitudRegistro.pdf";
+      const base = datosAlumno?.boleta ? `solicitudRegistro_${datosAlumno.boleta}.pdf` : "solicitudRegistro.pdf";
       const nuevoNombre = `${FS.documentDirectory}${base}`;
 
       const existe = await FS.getInfoAsync(nuevoNombre);
@@ -258,34 +266,50 @@ export default function AcuseSolicitud() {
       }
     } catch (e: any) {
       console.error(e);
-      modalAPI.current?.show(false, "Hubo un problema al generar el acuse. Inténtalo de nuevo más tarde.", () => { modalAPI.current?.close(); router.replace("/inicio-alumno"); });
+      modalAPI.current?.show(false, "Hubo un problema al generar el acuse. Inténtalo de nuevo más tarde.", () => {
+        modalAPI.current?.close();
+        router.replace("/inicio-alumno");
+      });
     }
-  }, [datosAlumno, imagenes, generarHTML]);
+  }, [datosAlumno, imagenes, generarHTML, router]);
 
   return (
     <>
       {cargando && (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white", position: "absolute", top: 60, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "white",
+            position: "absolute",
+            top: 60,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 100,
+          }}
+        >
           <ActivityIndicator size="large" color="#5a0839" />
         </View>
       )}
+
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={{ flex: 1 }}>
-          <View
-            style={[
-              styles.contenedorFormulario,
-              esPantallaPequeña && { maxWidth: "95%" },
-            ]}
-          >
+          <View style={[styles.contenedorFormulario, esPantallaPequeña && { maxWidth: "95%" }]}>
             <Text allowFontScaling={false} style={styles.titulo}>
               Acuse de solicitud de registro al servicio social
             </Text>
 
             <Text allowFontScaling={false} style={styles.subtitulo}>
-              Descarga e imprime tu Acuse de Solicitud de Registro al Servicio Social. Deberás pegar en el lado superior izquierdo una fotografía tamaño infantil actual a color y firmarlo antes de cargarlo en tu expediente digital.
+              Descarga e imprime tu Acuse de Solicitud de Registro al Servicio Social. Deberás pegar en el lado superior
+              izquierdo una fotografía tamaño infantil actual a color y firmarlo antes de cargarlo en tu expediente digital.
             </Text>
 
-            <Text allowFontScaling={false} style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}>
+            <Text
+              allowFontScaling={false}
+              style={{ fontSize: Fuentes.caption, color: Colores.textoError, marginBottom: 20, textAlign: "center" }}
+            >
               Importante: Verifica que tu información sea correcta antes de imprimir o descargar el acuse.
             </Text>
 
@@ -311,18 +335,19 @@ export default function AcuseSolicitud() {
                 />
               )}
             </View>
+
             {Platform.OS !== "web" && (
               <View style={{ alignItems: "center", marginTop: 12 }}>
-                <TouchableOpacity
-                  onPress={onDescargarPDF}
-                  style={styles.botonPrimario}
-                >
-                  <Text allowFontScaling={false} style={styles.botonPrimarioTexto}>Descargar</Text>
+                <TouchableOpacity onPress={onDescargarPDF} style={styles.botonPrimario}>
+                  <Text allowFontScaling={false} style={styles.botonPrimarioTexto}>
+                    Descargar
+                  </Text>
                 </TouchableOpacity>
               </View>
             )}
           </View>
         </View>
+
         <ModalAPI ref={modalAPI} />
         <PiePagina />
       </ScrollView>
