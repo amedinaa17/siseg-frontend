@@ -1,7 +1,7 @@
 export default {
   expo: {
     name: "SISEG",
-    slug: "siseg-frontend",
+    slug: "SISEG",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./activos/imagenes/favicon.png",
@@ -14,7 +14,7 @@ export default {
       GOOGLE_MAPS_API_KEY:
         process.env.GOOGLE_MAPS_API_KEY || "AIzaSyAN9dlyun_A3YnM9gR3NbMob6y6IPntkNA",
       eas: {
-        projectId: process.env.PROJECT_ID
+        projectId: '733f616e-e525-4a99-921e-38393a115507'
       }
     },
 

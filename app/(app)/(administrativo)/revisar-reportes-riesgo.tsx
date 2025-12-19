@@ -117,6 +117,10 @@ export default function ReportesRiesgo() {
     const agregarObservacionReporte = async () => {
         verificarToken();
 
+        if (reporteSeleccionado.estatus === 1) {
+            const datosEstatus = { idReporte: reporteSeleccionado.id, nuevoEstatus: 2, tk: sesion.token }
+            await postData("reportes/cambiarEstatusReporte", datosEstatus);
+        }
         const datos = { idReporte: reporteSeleccionado.id, descripcion: observacionNueva, tk: sesion.token };
         try {
             const response = await postData("reportes/agregarObservacionReporte", datos);
@@ -165,7 +169,7 @@ export default function ReportesRiesgo() {
                                 value={estatus === 1}
                                 onValueChange={() => setEstatus(1)}
                                 labelColor="textoAdvertencia"
-                                disabled={reporteSeleccionado.estatus === 3 ? true : false}
+                                disabled={reporteSeleccionado.estatus === 3 || reporteSeleccionado.estatus === 2 ? true : false}
                             />
                             <Checkbox
                                 label="En revisión"
@@ -366,7 +370,7 @@ export default function ReportesRiesgo() {
                 )}
                 {reporteSeleccionado.estatus != 3 && (
                     <View style={{ alignItems: "flex-start", marginTop: 20 }}>
-                        <Boton title="Agregar observación" onPress={() => { setModalObservaciones(false); setModalAgregarObservacion(true); }} />
+                        <Boton title="Agregar observación" onPress={() => { setModalObservaciones(false); reset(); setModalAgregarObservacion(true); }} />
                     </View>
                 )}
 

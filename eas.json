@@ -14,6 +14,11 @@
     "production": {
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "API_URL": "https://sisegplataform.online/api",
+        "MANUAL_URL": "https://sisegstorage.blob.core.windows.net/manual-de-usuario-siseg/MANUAL_DE_USUARIO_SISEG.pdf",
+        "FORMATO_URL": "https://sisegstorage.blob.core.windows.net/formato-para-cargar-alumnos/FORMATO_PARA_CARGAR_ALUMNOS.xlsx"
       }
     }
   },
