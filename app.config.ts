@@ -5,7 +5,7 @@ export default {
     version: "1.0.0",
     orientation: "portrait",
     icon: "./activos/imagenes/favicon.png",
-    scheme: "siseg",
+    scheme: "SISEG",
 
     extra: {
       API_URL: process.env.API_URL,

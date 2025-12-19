@@ -5,6 +5,7 @@ import Entrada from '@/componentes/ui/Entrada';
 import { useAuth } from '@/context/AuthProvider';
 import { iniciarSesionEsquema, type IniciarSesionFormulario } from '@/lib/validacion';
 import { Colores, Fuentes } from '@/temas/colores';
+import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'expo-router';
 import React from 'react';
@@ -17,7 +18,7 @@ export default function IniciarSesion() {
   const esMovil = Platform.OS === "ios" || Platform.OS === "android";
   const { width } = useWindowDimensions();
   const esPantallaPequeña = width < 850;
-  
+
   const {
     control,
     handleSubmit,
@@ -119,6 +120,16 @@ export default function IniciarSesion() {
                 Regístrate aquí
               </Link>
             </View>
+            {!esMovil && (
+              <>
+                <View style={{ flexDirection: 'row', justifyContent: "center", marginTop: 10, gap: 10 }}>
+                  <Text allowFontScaling={false} style={{ fontSize: 13, color: Colores.textoClaro }}>Disponible en Android</Text>
+                  <Link allowFontScaling={false} href="https://expo.dev/artifacts/eas/83pCjUZFRmCofwgpmDLzox.apk" style={{ fontSize: 13, color: Colores.textoClaro }}>
+                    <Ionicons name="logo-android"></Ionicons>
+                  </Link>
+                </View>
+              </>
+            )}
           </View>
         </View>
         <PiePagina />
